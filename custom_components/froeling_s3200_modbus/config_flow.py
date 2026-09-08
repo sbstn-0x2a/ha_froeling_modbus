@@ -24,21 +24,31 @@ _LOGGER = logging.getLogger(__name__)
 PROBE_REGISTER = INPUT_REGISTERS[0]
 
 
-def _probelesen(host: str, port: int, unit_id: int) -> bool:
-    """Liest ein einzelnes Register. Blockierend, gehört in den Executor."""
+def _probelesen(host: str, port: int, unit_id: int) -> str | None:
+    """Liest ein einzelnes Register zur Probe.
+
+    Rueckgabe ist der Uebersetzungsschluessel des Fehlers, oder None bei
+    Erfolg. Die Unterscheidung ist fuer den Nutzer wesentlich: Kommt gar keine
+    Verbindung zustande, stimmen Host oder Port nicht. Antwortet das Geraet
+    und weist die Anfrage ab, ist meist die Unit-ID falsch -- und danach
+    wuerde man an der falschen Stelle suchen.
+    """
     client = ModbusTcpClient(host, port=port, timeout=3, retries=1)
     try:
         res, err = read_input_sync(client, unit_id, PROBE_REGISTER - INPUT_BASE, 1)
-        if err or res is None or not hasattr(res, "registers"):
-            _LOGGER.debug(
-                "Probelesen an %s:%s (unit_id %s) fehlgeschlagen: %s",
-                host, port, unit_id, err,
-            )
-            return False
-        return True
+        if res is not None and hasattr(res, "registers") and not err:
+            return None
+        _LOGGER.debug(
+            "Probelesen an %s:%s (unit_id %s) fehlgeschlagen: %s",
+            host, port, unit_id, err,
+        )
+        if err and str(err).startswith("error("):
+            # TCP stand, der Kessel hat die Anfrage abgelehnt.
+            return "invalid_unit_id"
+        return "cannot_connect"
     except Exception:  # noqa: BLE001 - jeder Fehler bedeutet: nicht erreichbar
         _LOGGER.debug("Probelesen an %s:%s warf eine Ausnahme", host, port, exc_info=True)
-        return False
+        return "cannot_connect"
     finally:
         try:
             client.close()
@@ -46,8 +56,8 @@ def _probelesen(host: str, port: int, unit_id: int) -> bool:
             pass
 
 
-async def erreichbar(hass: HomeAssistant, eingabe: dict) -> bool:
-    """Prüft, ob die Anlage unter den angegebenen Daten antwortet."""
+async def pruefe_verbindung(hass: HomeAssistant, eingabe: dict) -> str | None:
+    """Fehlerschluessel, oder None wenn die Anlage antwortet."""
     return await hass.async_add_executor_job(
         _probelesen,
         eingabe["host"],
@@ -73,9 +83,10 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            if await erreichbar(self.hass, user_input):
+            fehler = await pruefe_verbindung(self.hass, user_input)
+            if fehler is None:
                 return self.async_create_entry(title=user_input["name"], data=user_input)
-            errors["base"] = "cannot_connect"
+            errors["base"] = fehler
 
         # Bei einem Fehler die Eingaben erhalten, statt sie zu verwerfen.
         vorher = user_input or {}
@@ -103,9 +114,10 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            if await erreichbar(self.hass, {**cfg, **user_input}):
+            fehler = await pruefe_verbindung(self.hass, {**cfg, **user_input})
+            if fehler is None:
                 return self.async_create_entry(title="", data=user_input)
-            errors["base"] = "cannot_connect"
+            errors["base"] = fehler
             cfg = {**cfg, **user_input}
 
         schema = vol.Schema({
