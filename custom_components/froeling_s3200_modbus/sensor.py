@@ -5,106 +5,22 @@ from datetime import timedelta
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.translation import async_get_translations
 from homeassistant.helpers import entity_registry as er
-from .const import DOMAIN, VERSION
+from .const import DOMAIN
+from .device import tr_key as _tr_key, device_info_for
+from .modbus import read_holding_sync as _read_holding_sync, read_input_sync as _read_input_sync
 
 _LOGGER = logging.getLogger(__name__)
 
 # ------------------- Geräte-Gruppierung -------------------
-DEVICE_NAME = {
-    "controller": "SP Dual Compact",
-    "kessel": "Kessel",
-    "boiler01": "Boiler 01",
-    "hk01": "Heizkreis 01",
-    "hk02": "Heizkreis 02",
-    "puffer01": "Puffer 01",
-    "austragung": "Austragung",
-    "zirkulationspumpe": "Zirkulationspumpe",
-}
 
-def device_info_for(device_key: str, device_name_from_config: str, domain: str):
-    dev_name = DEVICE_NAME.get(device_key, device_key)
-    if device_key == "controller":
-        return {
-            "identifiers": {(domain, f"{device_name_from_config}:controller")},
-            "name": "SP Dual Compact",
-            "manufacturer": "Fröling",
-            "model": "SP Dual Compact",
-            "sw_version": VERSION,
-        }
-    return {
-        "identifiers": {(domain, f"{device_name_from_config}:{device_key}")},
-        "name": dev_name,
-        "manufacturer": "Fröling",
-        "model": dev_name,
-        "via_device": (domain, f"{device_name_from_config}:controller"),
-        "sw_version": VERSION,
-    }
 # ----------------------------------------------------------
 
-# ---------- Verbindungs-Helfer ----------
-def _ensure_connected(client: ModbusTcpClient):
-    try:
-        if not getattr(client, "connected", False):
-            client.connect()
-    except Exception:
-        pass
 # ---------------------------------------
 
 # --- HELPER: Modbus Calls ---
-def _read_input_sync(client, unit_id: int, addr: int, count: int):
-    if not client.connect():
-        return None, "connect"
-    # 1) Bevorzugt: device_id
-    try:
-        res = client.read_input_registers(addr, count=count, device_id=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(device_id)"
-        return res, None
-    except TypeError:
-        pass
-    except (BrokenPipeError, ConnectionResetError):
-        try:
-            client.close()
-        except Exception:
-            pass
-        return None, "broken_pipe"
-    # 2) Fallback: unit
-    try:
-        res = client.read_input_registers(addr, count=count, unit=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(unit)"
-        return res, None
-    except Exception as e:
-        return None, f"exc:{e}"
 
-def _read_holding_sync(client, unit_id: int, addr: int, count: int):
-    if not client.connect():
-        return None, "connect"
-    try:
-        res = client.read_holding_registers(addr, count=count, device_id=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(device_id)"
-        return res, None
-    except TypeError:
-        pass
-    except (BrokenPipeError, ConnectionResetError):
-        try:
-            client.close()
-        except Exception:
-            pass
-        return None, "broken_pipe"
-    try:
-        res = client.read_holding_registers(addr, count=count, unit=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(unit)"
-        return res, None
-    except Exception as e:
-        return None, f"exc:{e}"
 # ---------------------------------------
 
-# ---------- Helper: Friendly Name-Key (defensiv) ----------
-def _tr_key(s: str) -> str:
-    return "".join(ch.lower() if ch.isalnum() else "_" for ch in s)
 # -------------------------------------------------------------------
 
 async def async_setup_entry(hass, config_entry, async_add_entities):

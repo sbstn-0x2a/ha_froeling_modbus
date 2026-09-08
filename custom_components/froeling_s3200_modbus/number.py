@@ -4,136 +4,23 @@ import logging
 from datetime import datetime, timezone, timedelta
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.translation import async_get_translations
-from .const import DOMAIN, VERSION
+from .const import DOMAIN
+from .device import tr_key as _tr_key, device_info_for
+from .modbus import read_holding_sync as _read_holding_sync, read_input_sync as _read_input_sync, write_register_sync as _write_register_sync
 
 _LOGGER = logging.getLogger(__name__)
 
 # ------------------- Geräte-Gruppierung -------------------
-DEVICE_NAME = {
-    "controller": "SP Dual Compact",
-    "kessel": "Kessel",
-    "boiler01": "Boiler 01",
-    "hk01": "Heizkreis 01",
-    "hk02": "Heizkreis 02",
-    "puffer01": "Puffer 01",
-    "austragung": "Austragung",
-}
 
-def device_info_for(device_key: str, device_name_from_config: str, domain: str):
-    dev_name = DEVICE_NAME.get(device_key, device_key)
-
-    if device_key == "controller":
-        return {
-            "identifiers": {(domain, f"{device_name_from_config}:controller")},
-            "name": "SP Dual Compact",
-            "manufacturer": "Fröling",
-            "model": "SP Dual Compact",
-            "sw_version": VERSION,
-        }
-
-    return {
-        "identifiers": {(domain, f"{device_name_from_config}:{device_key}")},
-        "name": dev_name,
-        "manufacturer": "Fröling",
-        "model": dev_name,
-        "via_device": (domain, f"{device_name_from_config}:controller"),
-        "sw_version": VERSION,
-    }
 # ----------------------------------------------------------
 
-# ---------- Verbindungs-Helfer ----------
-def _ensure_connected(client: ModbusTcpClient):
-    try:
-        if not getattr(client, "connected", False):
-            client.connect()
-    except Exception:
-        pass
 # ---------------------------------------
 
 # --- HELPER: Modbus Calls (Input/Holding + Write) ---
-def _read_input_sync(client, unit_id: int, addr: int, count: int):
-    if not client.connect():
-        return None, "connect"
-    try:
-        res = client.read_input_registers(addr, count=count, device_id=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(device_id)"
-        return res, None
-    except TypeError:
-        pass
-    except (BrokenPipeError, ConnectionResetError):
-        try:
-            client.close()
-        except Exception:
-            pass
-        return None, "broken_pipe"
-    try:
-        res = client.read_input_registers(addr, count=count, unit=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(unit)"
-        return res, None
-    except Exception as e:
-        return None, f"exc:{e}"
 
-def _read_holding_sync(client, unit_id: int, addr: int, count: int):
-    if not client.connect():
-        return None, "connect"
-    try:
-        res = client.read_holding_registers(addr, count=count, device_id=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(device_id)"
-        return res, None
-    except TypeError:
-        pass
-    except (BrokenPipeError, ConnectionResetError):
-        try:
-            client.close()
-        except Exception:
-            pass
-        return None, "broken_pipe"
-    try:
-        res = client.read_holding_registers(addr, count=count, unit=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(unit)"
-        return res, None
-    except Exception as e:
-        return None, f"exc:{e}"
 
-def _write_register_sync(client, unit_id: int, addr: int, value: int):
-    if not client.connect():
-        return None, "connect"
-    try:
-        res = client.write_register(addr, value, device_id=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(device_id)"
-        return res, None
-    except TypeError:
-        pass
-    except (BrokenPipeError, ConnectionResetError):
-        try:
-            client.close()
-        except Exception:
-            pass
-        return None, "broken_pipe"
-    try:
-        res = client.write_register(addr, value, unit=unit_id)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(unit)"
-        return res, None
-    except TypeError:
-        pass
-    try:
-        client.unit_id = unit_id
-        res = client.write_register(addr, value)
-        if hasattr(res, "isError") and res.isError():
-            return None, "error(client.unit_id)"
-        return res, None
-    except Exception as e:
-        return None, f"exc:{e}"
 # --- ENDE HELPER ---
 
-def _tr_key(s: str) -> str:
-    return "".join(ch.lower() if ch.isalnum() else "_" for ch in s)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     data = hass.data[DOMAIN][config_entry.entry_id]
