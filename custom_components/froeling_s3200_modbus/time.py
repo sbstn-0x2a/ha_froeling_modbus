@@ -2,11 +2,11 @@ from __future__ import annotations
 from datetime import time, timedelta
 import logging
 from pymodbus.client import ModbusTcpClient
-from homeassistant.util import dt as dt_util
 from homeassistant.components.time import TimeEntity
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.translation import async_get_translations
 from .const import DOMAIN, VERSION
+from .timeconv import register_to_time, time_to_register
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -100,39 +100,9 @@ def _write_register_sync(client: ModbusTcpClient, unit_id: int, addr: int, value
 
 # --------------------------------
 
-# ---- Zeitzonen/DST nur für echte Tageszeiten (40062/40095) ----
-ASSUME_DEVICE_USES_UTC = True  # typischerweise lokale Uhrzeit im Gerät
-
-def _now_offset_minutes(hass) -> int:
-    tz = dt_util.get_time_zone(hass.config.time_zone) if hass.config.time_zone else dt_util.DEFAULT_TIME_ZONE
-    return int(dt_util.now(tz).utcoffset().total_seconds() // 60)
-
-def _hhmm_to_minutes(raw: int) -> int:
-    if raw == 2400:
-        return 0
-    h = max(0, min(23, raw // 100))
-    m = max(0, min(59, raw % 100))
-    return h * 60 + m
-
-def _minutes_to_hhmm(mins: int) -> int:
-    mins %= 1440
-    h = mins // 60
-    m = mins % 60
-    return h * 100 + m
-
-def _device_to_local_minutes(hass, device_mins: int) -> int:
-    if not ASSUME_DEVICE_USES_UTC:
-        return device_mins
-    return (device_mins + _now_offset_minutes(hass)) % 1440
-
-def _local_to_device_minutes(hass, local_mins: int) -> int:
-    if not ASSUME_DEVICE_USES_UTC:
-        return local_mins
-    return (local_mins - _now_offset_minutes(hass)) % 1440
-
 # ---- Register ----
-REGISTER_START_PELLETSBEFUELLUNG_1 = 40062  # R/W Uhrzeit (HHMM 0..2400)
-REGISTER_START_PELLETSBEFUELLUNG_2 = 40095  # R   Uhrzeit (HHMM 0..2400)
+REGISTER_START_PELLETSBEFUELLUNG_1 = 40062  # R/W Tageszeit, Minuten seit Mitternacht (0..1439)
+REGISTER_START_PELLETSBEFUELLUNG_2 = 40095  # R   Tageszeit, Minuten seit Mitternacht (0..1439)
 REGISTER_VERZOEGERUNG_NACH_SCHEITHOLZ = 40252  # R/W Dauer in 0,1 h (0..24, skaliert)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
@@ -146,13 +116,13 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     entities = [
         # 40062 – Start 1. Pelletsbefüllung (R/W, echte Tageszeit)
-        FroelingAustragungTimeHHMM(
+        FroelingAustragungTimeOfDay(
             hass=hass, client=client, lock=lock, translations=translations, data=data,
             entity_id="pelletsbefuellung_1_startzeit", register=REGISTER_START_PELLETSBEFUELLUNG_1,
             device_key="austragung",
         ),
         # 40095 – Start 2. Pelletsbefüllung (R, echte Tageszeit)
-        FroelingAustragungTimeHHMMReadOnly(
+        FroelingAustragungTimeOfDayReadOnly(
             hass=hass, client=client, lock=lock, translations=translations, data=data,
             entity_id="pelletsbefuellung_2_startzeit", register=REGISTER_START_PELLETSBEFUELLUNG_2,
             device_key="austragung",
@@ -171,8 +141,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     for e in entities:
         async_track_time_interval(hass, e.async_update, interval)
 
-# ---------------- Basisklasse: echte HHMM-Tageszeit ----------------
-class _BaseTimeHHMM(TimeEntity):
+# ---------------- Basisklasse: Tageszeit ----------------
+class _BaseTimeOfDay(TimeEntity):
     _attr_should_poll = False
 
     def __init__(self, hass, client, lock, translations, data, entity_id: str, register: int, device_key="controller"):
@@ -219,27 +189,22 @@ class _BaseTimeHHMM(TimeEntity):
                 return await self._hass.async_add_executor_job(_read_holding_sync, self._client, self._unit_id, addr, 1)
         return await self._hass.async_add_executor_job(_read_holding_sync, self._client, self._unit_id, addr, 1)
 
-# --- Konkrete HHMM-Entities (Tageszeit mit optionaler UTC-Umrechnung) ---
-class FroelingAustragungTimeHHMM(_BaseTimeHHMM):
-    """R/W HHMM-Zeit (40062)."""
+# --- Konkrete Tageszeit-Entities (40062/40095) ---
+class FroelingAustragungTimeOfDay(_BaseTimeOfDay):
+    """R/W Tageszeit (40062)."""
     async def async_update(self, *_):
         res, err = await self._read_holding_1()
         if err or not res or not hasattr(res, "registers"):
             _LOGGER.debug("read_holding err @%s: %s", self._register, err)
             return
         try:
-            raw = int(res.registers[0])
-            dev_mins = _hhmm_to_minutes(raw)
-            loc_mins = _device_to_local_minutes(self._hass, dev_mins)
-            self._value = time(hour=(loc_mins // 60) % 24, minute=loc_mins % 60)
+            self._value = register_to_time(int(res.registers[0]))
             self._push_state()
         except Exception as e:
-            _LOGGER.debug("parse HHMM failed (%s): %s", self._entity_id, e)
+            _LOGGER.debug("Tageszeit-Register %s nicht lesbar (%s): %s", self._register, self._entity_id, e)
 
     async def async_set_value(self, value: time) -> None:
-        loc_mins = value.hour * 60 + value.minute
-        dev_mins = _local_to_device_minutes(self._hass, loc_mins)
-        write_val = _minutes_to_hhmm(dev_mins)
+        write_val = time_to_register(value)
         addr = self._register - 40001
         if self._lock is not None:
             async with self._lock:
@@ -252,21 +217,18 @@ class FroelingAustragungTimeHHMM(_BaseTimeHHMM):
         self._value = value
         self._push_state()
 
-class FroelingAustragungTimeHHMMReadOnly(_BaseTimeHHMM):
-    """R/O HHMM-Zeit (40095)."""
+class FroelingAustragungTimeOfDayReadOnly(_BaseTimeOfDay):
+    """R/O Tageszeit (40095)."""
     async def async_update(self, *_):
         res, err = await self._read_holding_1()
         if err or not res or not hasattr(res, "registers"):
             _LOGGER.debug("read_holding err @%s: %s", self._register, err)
             return
         try:
-            raw = int(res.registers[0])
-            dev_mins = _hhmm_to_minutes(raw)
-            loc_mins = _device_to_local_minutes(self._hass, dev_mins)
-            self._value = time(hour=(loc_mins // 60) % 24, minute=loc_mins % 60)
+            self._value = register_to_time(int(res.registers[0]))
             self._push_state()
         except Exception as e:
-            _LOGGER.debug("parse HHMM failed (%s): %s", self._entity_id, e)
+            _LOGGER.debug("Tageszeit-Register %s nicht lesbar (%s): %s", self._register, self._entity_id, e)
 
 # --- Speziell: 40252 als „Zeit-Feld“, intern 0,1 h (Dauer) ---
 class FroelingAustragungDelayAsTime(TimeEntity):
