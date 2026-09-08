@@ -1,4 +1,4 @@
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from pymodbus.client import ModbusTcpClient
 import logging
 from datetime import timedelta
@@ -358,6 +358,11 @@ class FroelingSensor(SensorEntity):
     def device_class(self): return self._device_class
 
     @property
+    @property
+    def state_class(self):
+        # Der Recorder legt nur Statistik an, wenn eine Einheit vorhanden ist.
+        # Ohne Einheit daher None statt MEASUREMENT - sonst nur Log-Warnungen.
+        return SensorStateClass.MEASUREMENT if self._unit else None
     def device_info(self):
         return device_info_for(self._device_key, self._device_name, DOMAIN)
 
@@ -414,6 +419,11 @@ class FroelingHoldingSensor(SensorEntity):
     def device_class(self): return self._device_class
 
     @property
+    @property
+    def state_class(self):
+        # Der Recorder legt nur Statistik an, wenn eine Einheit vorhanden ist.
+        # Ohne Einheit daher None statt MEASUREMENT - sonst nur Log-Warnungen.
+        return SensorStateClass.MEASUREMENT if self._unit else None
     def device_info(self):
         return device_info_for(self._device_key, self._device_name, DOMAIN)
 
