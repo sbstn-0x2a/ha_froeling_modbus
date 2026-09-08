@@ -12,6 +12,8 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 
+from .coordinator import FroelingCoordinator
+
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
     logging.getLogger(name).setLevel(logging.WARNING)
 
@@ -81,13 +83,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN][f"{entry.entry_id}_client"] = client
     hass.data[DOMAIN][f"{entry.entry_id}_lock"] = lock
 
-    _LOGGER.warning(
+    _LOGGER.debug(
         "Froeling Modbus initialisiert (pymodbus=%s, host=%s, port=%s, unit_id=%s)",
         pymodbus.__version__,
         data["host"],
         data.get("port", 502),
         data["unit_id"],
     )
+
+    # Ein Coordinator fuer alle Entitaeten. Bewusst async_refresh statt
+    # async_config_entry_first_refresh: Letzteres wuerde das Setup abbrechen,
+    # wenn die Anlage beim Start nicht erreichbar ist, und die Entitaeten
+    # gaebe es dann gar nicht -- Automationen wuerden ins Leere greifen. So
+    # entstehen sie immer und melden sich bei Lesefehlern als unavailable.
+    coordinator = FroelingCoordinator(
+        hass, entry, client, data["unit_id"], data.get("update_interval", 60)
+    )
+    await coordinator.async_refresh()
+    hass.data[DOMAIN][f"{entry.entry_id}_coordinator"] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -151,6 +164,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
             pass
 
     hass.data[DOMAIN].pop(f"{entry.entry_id}_lock", None)
+    hass.data[DOMAIN].pop(f"{entry.entry_id}_coordinator", None)
     hass.data[DOMAIN].pop(entry.entry_id, None)
 
     return unload_ok
