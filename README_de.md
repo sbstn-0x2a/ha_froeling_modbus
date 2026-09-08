@@ -83,6 +83,21 @@ Diese Optionen befinden sich ebenfalls im Menü:
 
 ---
 
+## 📚 Herstellerdokumentation
+
+Die Fröling-Handbücher und die Modbus-Registerliste liegen im Ordner
+[`documentation/`](documentation/) dieses Repositorys.
+
+Sie liegen bewusst **außerhalb** von `custom_components/`, damit HACS nicht rund
+33 MB PDFs in jedes Home-Assistant-Konfigurationsverzeichnis kopiert. Die
+Integration liest diese Dateien zur Laufzeit nicht — sie sind reines
+Nachschlagematerial.
+
+`documentation/Modbus_Register.txt` listet die von dieser Integration genutzten
+Register samt Entitätstyp auf.
+
+---
+
 ## 🖼️ Screenshots
 <img width="2010" height="1344" alt="2025-10-03_14-57-08" src="https://github.com/user-attachments/assets/ebbb796a-b0e1-4b06-b8c6-bd18caea4a31" />
 
