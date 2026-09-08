@@ -91,6 +91,8 @@
       "kessel_mind_dauer_geblaesenachlauf2": { "name": "Minimum Fan Overrun II" },
       "kessel_sicherheitszeit": { "name": "Safety Time" },
       "kessel_wos_laufzeit": { "name": "WOS Runtime" },
+      "kessel_mindesttemperatur_ruecklauf": { "name": "Minimum Return Temperature" },
+      "kessel_laufzeit_mischer": { "name": "Mixer Running Time" },
       "kessel_abgastemperatur_feuer_aus": { "name": "Flue Gas Temperature Fire OFF" },
       "kessel_nach_wie_viel_mal_abstellen_abreinigen": { "name": "Clean after How Many Shutdowns" },
       "hk01_vorlauf_isttemperatur": { "name": "HK01 – Flow Actual Temperature" },

@@ -91,6 +91,8 @@
       "kessel_mind_dauer_geblaesenachlauf2": { "name": "Mindestdauer Gebläsenachlauf II" },
       "kessel_sicherheitszeit": { "name": "Sicherheitszeit" },
       "kessel_wos_laufzeit": { "name": "WOS Laufzeit" },
+      "kessel_mindesttemperatur_ruecklauf": { "name": "Mindesttemperatur Rücklauf" },
+      "kessel_laufzeit_mischer": { "name": "Laufzeit Mischer" },
       "kessel_abgastemperatur_feuer_aus": { "name": "Abgastemperatur Feuer AUS" },
       "kessel_nach_wie_viel_mal_abstellen_abreinigen": { "name": "Nach wie viel Mal Abstellen Abreinigen" },
       "hk01_vorlauf_isttemperatur": { "name": "HK01 – Vorlauf-Isttemperatur" },

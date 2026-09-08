@@ -231,6 +231,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 FroelingHoldingSensor(hass, config_entry, client, lock, translations, data, "kessel_mind_dauer_geblaesenachlauf2", 40050, "min", 60, 0, device_key="kessel"),
                 FroelingHoldingSensor(hass, config_entry, client, lock, translations, data, "kessel_sicherheitszeit", 40051, "min", 60, 0, device_key="kessel"),
                 FroelingHoldingSensor(hass, config_entry, client, lock, translations, data, "kessel_wos_laufzeit", 40061, "s", 1, 0, device_key="kessel"),
+                FroelingHoldingSensor(hass, config_entry, client, lock, translations, data, "kessel_mindesttemperatur_ruecklauf", 40067, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingHoldingSensor(hass, config_entry, client, lock, translations, data, "kessel_laufzeit_mischer", 40070, "s", 1, 0, device_key="kessel"),
                 FroelingHoldingSensor(hass, config_entry, client, lock, translations, data, "kessel_abgastemperatur_feuer_aus", 40073, "°C", 1, 0, device_class="temperature", device_key="kessel"),
                 FroelingHoldingSensor(hass, config_entry, client, lock, translations, data, "kessel_nach_wie_viel_mal_abstellen_abreinigen", 40085, "", 1, 0, device_key="kessel"),
             ])
@@ -356,13 +358,13 @@ class FroelingSensor(SensorEntity):
     def unit_of_measurement(self): return self._unit
     @property
     def device_class(self): return self._device_class
-
-    @property
     @property
     def state_class(self):
         # Der Recorder legt nur Statistik an, wenn eine Einheit vorhanden ist.
         # Ohne Einheit daher None statt MEASUREMENT - sonst nur Log-Warnungen.
         return SensorStateClass.MEASUREMENT if self._unit else None
+
+    @property
     def device_info(self):
         return device_info_for(self._device_key, self._device_name, DOMAIN)
 
@@ -417,13 +419,13 @@ class FroelingHoldingSensor(SensorEntity):
     def unit_of_measurement(self): return self._unit
     @property
     def device_class(self): return self._device_class
-
-    @property
     @property
     def state_class(self):
         # Der Recorder legt nur Statistik an, wenn eine Einheit vorhanden ist.
         # Ohne Einheit daher None statt MEASUREMENT - sonst nur Log-Warnungen.
         return SensorStateClass.MEASUREMENT if self._unit else None
+
+    @property
     def device_info(self):
         return device_info_for(self._device_key, self._device_name, DOMAIN)
 
