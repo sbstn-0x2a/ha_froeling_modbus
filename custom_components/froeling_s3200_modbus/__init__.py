@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 import pymodbus
 from pymodbus.client import ModbusTcpClient
@@ -8,11 +7,9 @@ from pymodbus.client import ModbusTcpClient
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
-import voluptuous as vol
-import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 
-from .coordinator import FroelingCoordinator
+from .coordinator import FroelingCoordinator, FroelingRuntimeData
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
     logging.getLogger(name).setLevel(logging.WARNING)
@@ -20,28 +17,6 @@ for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.fr
 DOMAIN = "froeling_s3200_modbus"
 _LOGGER = logging.getLogger(__name__)
 
-# Optional: YAML-Schema
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required("name", default="Froeling"): cv.string,
-                vol.Required("host"): cv.string,
-                vol.Required("port", default=502): cv.port,
-                vol.Optional("unit_id", default=2): cv.positive_int,
-                vol.Required("update_interval", default=60): cv.positive_int,
-                vol.Optional("kessel", default=True): cv.boolean,
-                vol.Optional("boiler01", default=True): cv.boolean,
-                vol.Optional("hk01", default=True): cv.boolean,
-                vol.Optional("hk02", default=True): cv.boolean,
-                vol.Optional("austragung", default=True): cv.boolean,
-                vol.Optional("puffer01", default=True): cv.boolean,
-                vol.Optional("zirkulationspumpe", default=True): cv.boolean,
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
-)
 
 PLATFORMS = [
     Platform.SENSOR,
@@ -64,9 +39,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         data.update(entry.options)
     data.setdefault("unit_id", 2)
 
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = data
-
     # Gemeinsamer Modbus-Client + Lock für diese Entry-ID (einmalig verbinden)
     client = ModbusTcpClient(
         data["host"],
@@ -78,10 +50,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         client.connect()
     except Exception:
         pass
-
-    lock = asyncio.Lock()
-    hass.data[DOMAIN][f"{entry.entry_id}_client"] = client
-    hass.data[DOMAIN][f"{entry.entry_id}_lock"] = lock
 
     _LOGGER.debug(
         "Froeling Modbus initialisiert (pymodbus=%s, host=%s, port=%s, unit_id=%s)",
@@ -100,7 +68,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass, entry, client, data["unit_id"], data.get("update_interval", 60)
     )
     await coordinator.async_refresh()
-    hass.data[DOMAIN][f"{entry.entry_id}_coordinator"] = coordinator
+    entry.runtime_data = FroelingRuntimeData(coordinator, data)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -108,7 +76,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     async def _cleanup_disabled_groups_and_reload(
         hass: HomeAssistant, updated_entry: ConfigEntry
     ):
-        old_cfg = hass.data[DOMAIN].get(updated_entry.entry_id, {})
+        laufzeit = getattr(updated_entry, "runtime_data", None)
+        old_cfg = laufzeit.konfiguration if laufzeit else {}
         new_cfg = {**updated_entry.data, **updated_entry.options}
 
         name = new_cfg.get("name", old_cfg.get("name", "Froeling"))
@@ -153,18 +122,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload the config entry and close the client."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if not unload_ok:
+        return False
 
-    client: ModbusTcpClient | None = hass.data[DOMAIN].pop(
-        f"{entry.entry_id}_client", None
-    )
-    if client:
+    laufzeit: FroelingRuntimeData | None = getattr(entry, "runtime_data", None)
+    if laufzeit is not None:
         try:
-            client.close()
-        except Exception:
-            pass
+            laufzeit.coordinator.client_schliessen()
+        except Exception:  # noqa: BLE001 - beim Entladen nie hart scheitern
+            _LOGGER.debug("Modbus-Verbindung liess sich nicht schliessen", exc_info=True)
 
-    hass.data[DOMAIN].pop(f"{entry.entry_id}_lock", None)
-    hass.data[DOMAIN].pop(f"{entry.entry_id}_coordinator", None)
-    hass.data[DOMAIN].pop(entry.entry_id, None)
-
-    return unload_ok
+    hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
+    return True

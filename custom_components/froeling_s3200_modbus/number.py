@@ -18,11 +18,10 @@ PARALLEL_UPDATES = 1
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    data = hass.data[DOMAIN][config_entry.entry_id]
+    laufzeit = config_entry.runtime_data
+    coordinator = laufzeit.coordinator
+    data = laufzeit.konfiguration
     translations = await async_get_translations(hass, hass.config.language, "entity")
-    coordinator: FroelingCoordinator = hass.data[DOMAIN][
-        f"{config_entry.entry_id}_coordinator"
-    ]
 
     def create_numbers():
         nums: list[NumberEntity] = []

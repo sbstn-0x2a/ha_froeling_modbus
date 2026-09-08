@@ -21,14 +21,13 @@ REGISTER_START_PELLETSBEFUELLUNG_2 = 40095  # R   Tageszeit, Minuten seit Mitter
 REGISTER_VERZOEGERUNG_NACH_SCHEITHOLZ = 40252  # R/W Dauer in 0,1 h (0..24, skaliert)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    data = hass.data[DOMAIN][config_entry.entry_id]
+    laufzeit = config_entry.runtime_data
+    coordinator = laufzeit.coordinator
+    data = laufzeit.konfiguration
     if not data.get("austragung", False):
         return
 
     translations = await async_get_translations(hass, hass.config.language, "entity")
-    coordinator: FroelingCoordinator = hass.data[DOMAIN][
-        f"{config_entry.entry_id}_coordinator"
-    ]
 
     entities = [
         # 40062 – Start 1. Pelletsbefüllung (R/W, echte Tageszeit)

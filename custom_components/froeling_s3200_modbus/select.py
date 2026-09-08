@@ -54,14 +54,13 @@ REG_HK2_BETRIEBSART = 48048     # Select HK2 - Betriebsart
 REG_BRENNSTOFFAUSWAHL = 40441   # Select Brennstoffauswahl
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    data = hass.data[DOMAIN][config_entry.entry_id]
+    laufzeit = config_entry.runtime_data
+    coordinator = laufzeit.coordinator
+    data = laufzeit.konfiguration
 
     # Übersetzungen: nur der erlaubte "entity"-Namespace
     translations = await async_get_translations(hass, hass.config.language, "entity")
 
-    coordinator: FroelingCoordinator = hass.data[DOMAIN][
-        f"{config_entry.entry_id}_coordinator"
-    ]
 
     def create_selects():
         entities: list[SelectEntity] = []

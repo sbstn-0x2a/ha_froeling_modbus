@@ -14,7 +14,9 @@ Assistant den nächsten, statt ihn aufzustauen.
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from datetime import timedelta
+from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -40,6 +42,19 @@ from .registers import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+@dataclass(slots=True)
+class FroelingRuntimeData:
+    """Was die Plattformen zur Laufzeit brauchen.
+
+    Haengt am Config-Entry (``entry.runtime_data``) statt an Stringschluesseln
+    in ``hass.data`` -- die waren fehleranfaellig und beim Entladen leicht zu
+    uebersehen.
+    """
+
+    coordinator: "FroelingCoordinator"
+    konfiguration: dict[str, Any]
 
 
 class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
@@ -116,6 +131,10 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         if self.data is None:
             return None
         return self.data.get(register)
+
+    def client_schliessen(self) -> None:
+        """Schliesst die Modbus-Verbindung. Wird beim Entladen aufgerufen."""
+        self._client.close()
 
     async def schreibe(self, register: int, rohwert: int) -> str | None:
         """Schreibt ein Holding-Register (FC=06).
