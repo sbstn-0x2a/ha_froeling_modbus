@@ -13,15 +13,6 @@ _LOGGER = logging.getLogger(__name__)
 # Der Coordinator buendelt die Abfragen; die Plattform ist rein lesend.
 PARALLEL_UPDATES = 0
 
-# ------------------- Geräte-Gruppierung -------------------
-
-# ----------------------------------------------------------
-
-# ---------------------------------------
-
-# --- HELPER: Modbus Calls ---
-
-# ---------------------------------------
 
 # -------------------------------------------------------------------
 

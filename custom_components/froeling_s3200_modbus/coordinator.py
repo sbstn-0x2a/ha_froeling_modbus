@@ -22,8 +22,17 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from pymodbus.client import ModbusTcpClient
 
 from .const import DOMAIN
-from .modbus import read_holding_sync, read_input_sync
+from .modbus import (
+    read_coils_sync,
+    read_discrete_sync,
+    read_holding_sync,
+    read_input_sync,
+    write_register_sync,
+)
 from .registers import (
+    COIL_BLOCKS,
+    DISCRETE_BASE,
+    DISCRETE_BLOCKS,
     HOLDING_BASE,
     HOLDING_BLOCKS,
     INPUT_BASE,
@@ -76,10 +85,29 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
                 for versatz, rohwert in enumerate(res.registers):
                     werte[start + versatz] = rohwert
 
+        # Coils (FC=01) werden direkt adressiert, Discrete Inputs (FC=02)
+        # ueber ihre 1xxxx-Nummer. Beide liefern Bits statt Register.
+        for basis, bloecke, lese in (
+            (0, COIL_BLOCKS, read_coils_sync),
+            (DISCRETE_BASE, DISCRETE_BLOCKS, read_discrete_sync),
+        ):
+            for start, anzahl in bloecke:
+                res, err = await self.hass.async_add_executor_job(
+                    lese, self._client, self._unit_id, start - basis, anzahl
+                )
+                if err or res is None or not hasattr(res, "bits"):
+                    raise UpdateFailed(
+                        f"Bitblock ab {start} ({anzahl} Bits) nicht lesbar: {err}"
+                    )
+                # bits ist auf ganze Bytes aufgefuellt, deshalb abschneiden.
+                for versatz, bit in enumerate(res.bits[:anzahl]):
+                    werte[start + versatz] = int(bit)
+
         _LOGGER.debug(
-            "%d Register in %d Bloecken gelesen",
+            "%d Werte in %d Anfragen gelesen",
             len(werte),
-            len(INPUT_BLOCKS) + len(HOLDING_BLOCKS),
+            len(INPUT_BLOCKS) + len(HOLDING_BLOCKS)
+            + len(COIL_BLOCKS) + len(DISCRETE_BLOCKS),
         )
         return werte
 
@@ -88,3 +116,23 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         if self.data is None:
             return None
         return self.data.get(register)
+
+    async def schreibe(self, register: int, rohwert: int) -> str | None:
+        """Schreibt ein Holding-Register (FC=06).
+
+        Bei Erfolg wird eine Aktualisierung angestossen, damit der neue Wert
+        nicht bis zum naechsten regulaeren Durchlauf alt aussieht. Rueckgabe
+        ist die Fehlermeldung oder None.
+        """
+        _, err = await self.hass.async_add_executor_job(
+            write_register_sync,
+            self._client,
+            self._unit_id,
+            register - HOLDING_BASE,
+            rohwert,
+        )
+        if err:
+            _LOGGER.error("Register %s nicht beschreibbar: %s", register, err)
+            return err
+        await self.async_request_refresh()
+        return None

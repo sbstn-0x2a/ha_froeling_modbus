@@ -1,27 +1,19 @@
 from __future__ import annotations
-from datetime import time, timedelta
+from datetime import time
 import logging
-from pymodbus.client import ModbusTcpClient
 from homeassistant.components.time import TimeEntity
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.translation import async_get_translations
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import DOMAIN
+from .coordinator import FroelingCoordinator
 from .device import tr_key as _tr_key, device_info_for
-from .modbus import read_holding_sync as _read_holding_sync, write_register_sync as _write_register_sync
 from .timeconv import register_to_time, time_to_register
 
 _LOGGER = logging.getLogger(__name__)
 
-# ------------------- Geräte-Gruppierung -------------------
+PARALLEL_UPDATES = 1
 
-# ----------------------------------------------------------
-
-# ------------------- Helpers -------------------
-
-# --- Modbus Helpers (Holding) ---
-
-
-# --------------------------------
 
 # ---- Register ----
 REGISTER_START_PELLETSBEFUELLUNG_1 = 40062  # R/W Tageszeit, Minuten seit Mitternacht (0..1439)
@@ -34,25 +26,26 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         return
 
     translations = await async_get_translations(hass, hass.config.language, "entity")
-    client: ModbusTcpClient = hass.data[DOMAIN][f"{config_entry.entry_id}_client"]
-    lock = hass.data[DOMAIN].get(f"{config_entry.entry_id}_lock")
+    coordinator: FroelingCoordinator = hass.data[DOMAIN][
+        f"{config_entry.entry_id}_coordinator"
+    ]
 
     entities = [
         # 40062 – Start 1. Pelletsbefüllung (R/W, echte Tageszeit)
         FroelingAustragungTimeOfDay(
-            hass=hass, client=client, lock=lock, translations=translations, data=data,
+            coordinator=coordinator, translations=translations, data=data,
             entity_id="pelletsbefuellung_1_startzeit", register=REGISTER_START_PELLETSBEFUELLUNG_1,
             device_key="austragung",
         ),
         # 40095 – Start 2. Pelletsbefüllung (R, echte Tageszeit)
         FroelingAustragungTimeOfDayReadOnly(
-            hass=hass, client=client, lock=lock, translations=translations, data=data,
+            coordinator=coordinator, translations=translations, data=data,
             entity_id="pelletsbefuellung_2_startzeit", register=REGISTER_START_PELLETSBEFUELLUNG_2,
             device_key="austragung",
         ),
         # 40252 – Verzögerung als HH:MM anzeigen, intern 0,1 h schreiben/lesen
         FroelingAustragungDelayAsTime(
-            hass=hass, client=client, lock=lock, translations=translations, data=data,
+            coordinator=coordinator, translations=translations, data=data,
             entity_id="verzoegerung_pufferladung_nach_scheitholzbetrieb",
             register=REGISTER_VERZOEGERUNG_NACH_SCHEITHOLZ,
             device_key="austragung",
@@ -60,25 +53,23 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     ]
 
     async_add_entities(entities)
-    interval = timedelta(seconds=data.get("update_interval", 60))
-    for e in entities:
-        async_track_time_interval(hass, e.async_update, interval)
 
 # ---------------- Basisklasse: Tageszeit ----------------
-class _BaseTimeOfDay(TimeEntity):
+class _BaseTimeOfDay(CoordinatorEntity[FroelingCoordinator], TimeEntity):
+    """Tageszeit aus einem Holding-Register (Minuten seit Mitternacht)."""
+
     _attr_should_poll = False
 
-    def __init__(self, hass, client, lock, translations, data, entity_id: str, register: int, device_key="controller"):
-        self._hass = hass
-        self._client = client
-        self._lock = lock
+    def __init__(self, coordinator, translations, data, entity_id: str,
+                 register: int, device_key="controller"):
+        super().__init__(coordinator)
         self._translations = translations
         self._device_name = data["name"]
-        self._unit_id = data.get("unit_id", 2)
         self._entity_id = entity_id
         self._register = register
         self._device_key = device_key
-        self._value: time | None = None
+        # Gilt nach einem Schreibvorgang, bis der Coordinator neu gelesen hat.
+        self._optimistisch: time | None = None
 
     @property
     def unique_id(self) -> str:
@@ -87,8 +78,10 @@ class _BaseTimeOfDay(TimeEntity):
     @property
     def name(self) -> str:
         key = _tr_key(self._entity_id)
-        default_name = self._entity_id.replace("_", " ")
-        return self._translations.get(f"component.{DOMAIN}.entity.time.{key}.name", default_name)
+        return self._translations.get(
+            f"component.{DOMAIN}.entity.time.{key}.name",
+            self._entity_id.replace("_", " "),
+        )
 
     @property
     def device_info(self):
@@ -96,78 +89,48 @@ class _BaseTimeOfDay(TimeEntity):
 
     @property
     def native_value(self) -> time | None:
-        return self._value
+        if self._optimistisch is not None:
+            return self._optimistisch
+        roh = self.coordinator.rohwert(self._register)
+        return None if roh is None else register_to_time(roh)
 
-    def _push_state(self):
-        if getattr(self, "hass", None) is not None and getattr(self, "entity_id", None):
-            try:
-                self.async_write_ha_state()
-            except Exception:
-                pass
+    def _handle_coordinator_update(self) -> None:
+        self._optimistisch = None
+        super()._handle_coordinator_update()
 
-    async def _read_holding_1(self):
-        addr = self._register - 40001
-        if self._lock is not None:
-            async with self._lock:
-                return await self._hass.async_add_executor_job(_read_holding_sync, self._client, self._unit_id, addr, 1)
-        return await self._hass.async_add_executor_job(_read_holding_sync, self._client, self._unit_id, addr, 1)
 
-# --- Konkrete Tageszeit-Entities (40062/40095) ---
 class FroelingAustragungTimeOfDay(_BaseTimeOfDay):
     """R/W Tageszeit (40062)."""
-    async def async_update(self, *_):
-        res, err = await self._read_holding_1()
-        if err or not res or not hasattr(res, "registers"):
-            _LOGGER.debug("read_holding err @%s: %s", self._register, err)
-            return
-        try:
-            self._value = register_to_time(int(res.registers[0]))
-            self._push_state()
-        except Exception as e:
-            _LOGGER.debug("Tageszeit-Register %s nicht lesbar (%s): %s", self._register, self._entity_id, e)
 
     async def async_set_value(self, value: time) -> None:
-        write_val = time_to_register(value)
-        addr = self._register - 40001
-        if self._lock is not None:
-            async with self._lock:
-                _, err = await self._hass.async_add_executor_job(_write_register_sync, self._client, self._unit_id, addr, write_val)
-        else:
-            _, err = await self._hass.async_add_executor_job(_write_register_sync, self._client, self._unit_id, addr, write_val)
-        if err:
-            _LOGGER.error("write_holding err @%s: %s", self._register, err)
+        if await self.coordinator.schreibe(self._register, time_to_register(value)) is not None:
             return
-        self._value = value
-        self._push_state()
+        self._optimistisch = value
+        self.async_write_ha_state()
+
 
 class FroelingAustragungTimeOfDayReadOnly(_BaseTimeOfDay):
     """R/O Tageszeit (40095)."""
-    async def async_update(self, *_):
-        res, err = await self._read_holding_1()
-        if err or not res or not hasattr(res, "registers"):
-            _LOGGER.debug("read_holding err @%s: %s", self._register, err)
-            return
-        try:
-            self._value = register_to_time(int(res.registers[0]))
-            self._push_state()
-        except Exception as e:
-            _LOGGER.debug("Tageszeit-Register %s nicht lesbar (%s): %s", self._register, self._entity_id, e)
 
-# --- Speziell: 40252 als „Zeit-Feld“, intern 0,1 h (Dauer) ---
-class FroelingAustragungDelayAsTime(TimeEntity):
-    """Stellt die *Dauer* 40252 (0..24 h in 0,1 h) als HH:MM dar."""
+
+class FroelingAustragungDelayAsTime(CoordinatorEntity[FroelingCoordinator], TimeEntity):
+    """Dauer 40252 (0..24 h in 0,1-h-Schritten), dargestellt als HH:MM.
+
+    Keine Tageszeit: Der Rohwert zaehlt Zehntelstunden, deshalb eigene
+    Umrechnung statt register_to_time.
+    """
+
     _attr_should_poll = False
-    def __init__(self, hass, client, lock, translations, data, entity_id: str, register: int, device_key="controller"):
-        self._hass = hass
-        self._client = client
-        self._lock = lock
+
+    def __init__(self, coordinator, translations, data, entity_id: str,
+                 register: int, device_key="controller"):
+        super().__init__(coordinator)
         self._translations = translations
         self._device_name = data["name"]
-        self._unit_id = data.get("unit_id", 2)
         self._entity_id = entity_id
         self._register = register
         self._device_key = device_key
-        self._value: time | None = None
+        self._optimistisch: time | None = None
 
         key = _tr_key(self._entity_id)
         self._attr_name = self._translations.get(
@@ -183,54 +146,27 @@ class FroelingAustragungDelayAsTime(TimeEntity):
     def device_info(self):
         return device_info_for(self._device_key, self._device_name, DOMAIN)
 
+    @staticmethod
+    def _als_zeit(rohwert: int) -> time:
+        minuten = (max(0, min(240, rohwert)) * 6) % 1440   # 0,1 h = 6 min
+        return time(hour=(minuten // 60) % 24, minute=minuten % 60)
+
     @property
     def native_value(self) -> time | None:
-        return self._value
+        if self._optimistisch is not None:
+            return self._optimistisch
+        roh = self.coordinator.rohwert(self._register)
+        return None if roh is None else self._als_zeit(roh)
 
-    def _push_state(self):
-        if getattr(self, "hass", None) is not None and getattr(self, "entity_id", None):
-            try:
-                self.async_write_ha_state()
-            except Exception:
-                pass
-
-    async def async_update(self, *_):
-        """raw (0..240, =0..24,0 h) -> Minuten (= raw*6) -> HH:MM."""
-        addr = self._register - 40001
-        if self._lock is not None:
-            async with self._lock:
-                res, err = await self._hass.async_add_executor_job(_read_holding_sync, self._client, self._unit_id, addr, 1)
-        else:
-            res, err = await self._hass.async_add_executor_job(_read_holding_sync, self._client, self._unit_id, addr, 1)
-        if err or not res or not hasattr(res, "registers"):
-            _LOGGER.debug("read_holding err @%s: %s", self._register, err)
-            return
-        try:
-            raw = int(res.registers[0])  # 0..240 (Zehntelstunden)
-            raw = max(0, min(240, raw))
-            minutes = raw * 6  # 0,1 h = 6 min
-            # 1440 (=24:00) als 00:00 anzeigen (HA kennt 24:00 nicht)
-            minutes %= 1440
-            self._value = time(hour=(minutes // 60) % 24, minute=minutes % 60)
-            self._push_state()
-        except Exception as e:
-            _LOGGER.debug("parse delay failed (%s): %s", self._entity_id, e)
+    def _handle_coordinator_update(self) -> None:
+        self._optimistisch = None
+        super()._handle_coordinator_update()
 
     async def async_set_value(self, value: time) -> None:
-        """HH:MM -> Minuten -> raw=round(min/6), clamp 0..240."""
-        minutes = value.hour * 60 + value.minute
-        raw = int(round(minutes / 6.0))
-        raw = max(0, min(240, raw))
-        addr = self._register - 40001
-        if self._lock is not None:
-            async with self._lock:
-                _, err = await self._hass.async_add_executor_job(_write_register_sync, self._client, self._unit_id, addr, raw)
-        else:
-            _, err = await self._hass.async_add_executor_job(_write_register_sync, self._client, self._unit_id, addr, raw)
-        if err:
-            _LOGGER.error("write_holding err @%s: %s", self._register, err)
+        minuten = value.hour * 60 + value.minute
+        roh = max(0, min(240, int(round(minuten / 6.0))))
+        if await self.coordinator.schreibe(self._register, roh) is not None:
             return
-        # zurücksetzen auf gerasterten Wert (auf 6-min Snap)
-        minutes = (raw * 6) % 1440
-        self._value = time(hour=(minutes // 60) % 24, minute=minutes % 60)
-        self._push_state()
+        # Auf das 6-Minuten-Raster gerundet zurueckmelden.
+        self._optimistisch = self._als_zeit(roh)
+        self.async_write_ha_state()

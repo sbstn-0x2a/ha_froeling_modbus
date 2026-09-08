@@ -1,22 +1,17 @@
 from homeassistant.components.number import NumberEntity, NumberDeviceClass
-from pymodbus.client import ModbusTcpClient
 import logging
 from datetime import datetime, timezone, timedelta
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.translation import async_get_translations
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import DOMAIN
+from .coordinator import FroelingCoordinator
 from .device import tr_key as _tr_key, device_info_for
-from .modbus import read_holding_sync as _read_holding_sync, read_input_sync as _read_input_sync, write_register_sync as _write_register_sync
 
 _LOGGER = logging.getLogger(__name__)
 
-# ------------------- Geräte-Gruppierung -------------------
-
-# ----------------------------------------------------------
-
-# ---------------------------------------
-
-# --- HELPER: Modbus Calls (Input/Holding + Write) ---
+# Schreibzugriffe sind nicht gebuendelt, deshalb 1 statt 0.
+PARALLEL_UPDATES = 1
 
 
 # --- ENDE HELPER ---
@@ -25,8 +20,9 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, config_entry, async_add_entities):
     data = hass.data[DOMAIN][config_entry.entry_id]
     translations = await async_get_translations(hass, hass.config.language, "entity")
-    client: ModbusTcpClient = hass.data[DOMAIN][f"{config_entry.entry_id}_client"]
-    lock = hass.data[DOMAIN][f"{config_entry.entry_id}_lock"]
+    coordinator: FroelingCoordinator = hass.data[DOMAIN][
+        f"{config_entry.entry_id}_coordinator"
+    ]
 
     def create_numbers():
         nums: list[NumberEntity] = []
@@ -34,61 +30,61 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         # --- Kessel ---
         if data.get("kessel", False):
             nums.extend([
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "kessel_solltemperatur", 40001, "°C", 2, 0, 70, 90, device_key="kessel"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "bei_welcher_rl_temperatur_an_der_zirkulationsleitung_soll_die_pumpe_ausschalten", 40601, "°C", 2, 0, 20, 120, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, translations, data, "kessel_solltemperatur", 40001, "°C", 2, 0, 70, 90, device_key="kessel"),
+                FroelingNumberHolding(coordinator, translations, data, "bei_welcher_rl_temperatur_an_der_zirkulationsleitung_soll_die_pumpe_ausschalten", 40601, "°C", 2, 0, 20, 120, device_key="boiler01"),
             ])
 
         # --- Heizkreis 01 ---
         if data.get("hk01", False):
             nums.extend([
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_vorlauf_temperatur_10c_aussentemperatur", 41032, "°C", 2, 0, 10, 110, device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_vorlauf_temperatur_minus_10c_aussentemperatur", 41033, "°C", 2, 0, 10, 110, device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41040, "°C", 2, 0, 10, 30, device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41034, "°C", 2, 0, 0, 70, device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41037, "°C", 2, 0, -20, 50, device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41038, "°C", 2, 0, -20, 50, device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_frostschutztemperatur", 41039, "°C", 2, 0, -30, 20, device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41048, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk1_vorlauf_soll_modbus", 48001, "°C", 2, 0, 0, 75, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_vorlauf_temperatur_10c_aussentemperatur", 41032, "°C", 2, 0, 10, 110, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_vorlauf_temperatur_minus_10c_aussentemperatur", 41033, "°C", 2, 0, 10, 110, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41040, "°C", 2, 0, 10, 30, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41034, "°C", 2, 0, 0, 70, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41037, "°C", 2, 0, -20, 50, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41038, "°C", 2, 0, -20, 50, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_frostschutztemperatur", 41039, "°C", 2, 0, -30, 20, device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41048, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk01"),
+                FroelingNumberHolding(coordinator, translations, data, "hk1_vorlauf_soll_modbus", 48001, "°C", 2, 0, 0, 75, device_key="hk01"),
             ])
 
         # --- Heizkreis 02 ---
         if data.get("hk02", False):
             nums.extend([
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_vorlauf_temperatur_10c_aussentemperatur", 41062, "°C", 2, 0, 10, 110, device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_vorlauf_temperatur_minus_10c_aussentemperatur", 41063, "°C", 2, 0, 10, 110, device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41070, "°C", 2, 0, 10, 30, device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41064, "°C", 2, 0, 0, 70, device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41067, "°C", 2, 0, -20, 50, device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41068, "°C", 2, 0, -20, 50, device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_frostschutztemperatur", 41069, "°C", 2, 0, -10, 20, device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41079, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk02"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "hk2_vorlauf_soll_modbus", 48002, "°C", 2, 0, 0, 75, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_vorlauf_temperatur_10c_aussentemperatur", 41062, "°C", 2, 0, 10, 110, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_vorlauf_temperatur_minus_10c_aussentemperatur", 41063, "°C", 2, 0, 10, 110, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41070, "°C", 2, 0, 10, 30, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41064, "°C", 2, 0, 0, 70, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41067, "°C", 2, 0, -20, 50, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41068, "°C", 2, 0, -20, 50, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_frostschutztemperatur", 41069, "°C", 2, 0, -10, 20, device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41079, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk02"),
+                FroelingNumberHolding(coordinator, translations, data, "hk2_vorlauf_soll_modbus", 48002, "°C", 2, 0, 0, 75, device_key="hk02"),
             ])
 
         # --- Boiler 01 ---
         if data.get("boiler01", False):
             nums.extend([
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "boiler_1_gewuenschte_boilertemperatur", 41632, "°C", 2, 0, 10, 100, device_key="boiler01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "boiler_1_nachladen_wenn_boilertemperatur_unter", 41633, "°C", 2, 0, 1, 90, device_key="boiler01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "boiler_1_solltemperatur_modbus", 48019, "°C", 2, 0, 0, 65, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, translations, data, "boiler_1_gewuenschte_boilertemperatur", 41632, "°C", 2, 0, 10, 100, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, translations, data, "boiler_1_nachladen_wenn_boilertemperatur_unter", 41633, "°C", 2, 0, 1, 90, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, translations, data, "boiler_1_solltemperatur_modbus", 48019, "°C", 2, 0, 0, 65, device_key="boiler01"),
             ])
 
         # --- Puffer 01 ---
         if data.get("puffer01", False):
             nums.extend([
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "puffer_1_delta_t_kessel_vs_grenzschicht", 42003, "°C", 2, 0, 0, 120, device_key="puffer01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "puffer_1_start_pufferladung_ab_ladezustand", 42022, "%", 1, 0, 0, 100, device_key="puffer01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "puffer_1_100_prozent_kesselleistung_bis_ladezustand", 42027, "%", 1, 0, 0, 100, device_key="puffer01"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "puffer_1_0_prozent_kesselleistung_ab_ladezustand", 42028, "%", 1, 0, 0, 100, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, translations, data, "puffer_1_delta_t_kessel_vs_grenzschicht", 42003, "°C", 2, 0, 0, 120, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, translations, data, "puffer_1_start_pufferladung_ab_ladezustand", 42022, "%", 1, 0, 0, 100, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, translations, data, "puffer_1_100_prozent_kesselleistung_bis_ladezustand", 42027, "%", 1, 0, 0, 100, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, translations, data, "puffer_1_0_prozent_kesselleistung_ab_ladezustand", 42028, "%", 1, 0, 0, 100, device_key="puffer01"),
             ])
 
         # --- Austragung ---
         if data.get("austragung", False):
             nums.extend([
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "gefoerderte_pellets_100_prozent_einschub", 40319, "g", 1, 0, 0, 10000, device_key="austragung"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "pelletlager_restbestand", 40320, "t", 10, 1, 0, 100, device_key="austragung"),
-                FroelingNumberHolding(hass, config_entry, client, lock, translations, data, "pelletlager_mindestbestand", 40336, "t", 10, 1, 0, 100, device_key="austragung"),
+                FroelingNumberHolding(coordinator, translations, data, "gefoerderte_pellets_100_prozent_einschub", 40319, "g", 1, 0, 0, 10000, device_key="austragung"),
+                FroelingNumberHolding(coordinator, translations, data, "pelletlager_restbestand", 40320, "t", 10, 1, 0, 100, device_key="austragung"),
+                FroelingNumberHolding(coordinator, translations, data, "pelletlager_mindestbestand", 40336, "t", 10, 1, 0, 100, device_key="austragung"),
             ])
 
         return nums
@@ -96,21 +92,18 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     numbers = create_numbers()
     async_add_entities(numbers)
 
-    update_interval = timedelta(seconds=data.get("update_interval", 60))
-    for n in numbers:
-        async_track_time_interval(hass, n.async_update, update_interval)
 
-class _BaseNumber(NumberEntity):
+class _BaseNumber(CoordinatorEntity[FroelingCoordinator], NumberEntity):
+    """Gemeinsames Verhalten. Der Wert stammt aus dem Coordinator."""
+
     _attr_should_poll = False
-    def __init__(self, hass, config_entry, client, lock, translations, data, entity_id, register, unit,
+
+    def __init__(self, coordinator, translations, data, entity_id, register, unit,
                  scaling_factor, decimal_places=0, min_value=0, max_value=0,
                  device_key="controller", device_class: str | NumberDeviceClass | None = None):
-        self._hass = hass
-        self._client = client
-        self._lock = lock
+        super().__init__(coordinator)
         self._translations = translations
         self._device_name = data["name"]
-        self._unit_id = data.get("unit_id", 2)
         self._entity_id = entity_id
         self._register = register
         self._unit = unit
@@ -119,11 +112,13 @@ class _BaseNumber(NumberEntity):
         self._min_value = float(min_value)
         self._max_value = float(max_value)
         self._device_key = device_key
-        self._value = None
+        # Nach einem Schreibvorgang gilt dieser Wert, bis der Coordinator das
+        # Register erneut gelesen hat.
+        self._optimistisch: float | None = None
 
         key = _tr_key(self._entity_id)
         self._attr_name = self._translations.get(
-            f"component.froeling_s3200_modbus.entity.number.{key}.name",
+            f"component.{DOMAIN}.entity.number.{key}.name",
             self._entity_id.replace("_", " ")
         )
 
@@ -144,8 +139,19 @@ class _BaseNumber(NumberEntity):
 
     @property
     def unique_id(self): return f"{self._device_name}_{self._entity_id}"
+
     @property
-    def native_value(self): return self._value
+    def native_value(self):
+        if self._optimistisch is not None:
+            return self._optimistisch
+        roh = self.coordinator.rohwert(self._register)
+        if roh is None:
+            return None
+        if roh > 32767:
+            roh -= 65536
+        wert = roh / float(self._scaling_factor if self._scaling_factor else 1)
+        return round(wert, self._decimal_places)
+
     @property
     def native_unit_of_measurement(self): return self._unit
     @property
@@ -165,25 +171,22 @@ class _BaseNumber(NumberEntity):
     def device_info(self):
         return device_info_for(self._device_key, self._device_name, DOMAIN)
 
-class FroelingNumberInput(_BaseNumber):
-    async def async_set_native_value(self, value):
-        _LOGGER.debug("Attempt to write to Input-Register %s ignored", self._register)
+    def _handle_coordinator_update(self) -> None:
+        # Frische Registerwerte loesen die optimistische Anzeige ab.
+        self._optimistisch = None
+        super()._handle_coordinator_update()
 
-    async def async_update(self, _=None):
-        addr = self._register - 30001
-        async with self._lock:
-            res, err = await self._hass.async_add_executor_job(
-                _read_input_sync, self._client, self._unit_id, addr, 1
-            )
-        if err or not res or not hasattr(res, "registers"):
-            _LOGGER.debug("read_input addr=%s unit=%s failed: %s", addr, self._unit_id, err)
-            self._value = None
-            return
-        raw = int(res.registers[0])
-        self._value = round(raw / float(self._scaling_factor), self._decimal_places)
-        self.async_write_ha_state()
+
+class FroelingNumberInput(_BaseNumber):
+    """Input-Register (3xxxx) -- nur lesbar."""
+
+    async def async_set_native_value(self, value):
+        _LOGGER.debug("Schreibversuch auf Input-Register %s ignoriert", self._register)
+
 
 class FroelingNumberHolding(_BaseNumber):
+    """Holding-Register (4xxxx) -- les- und schreibbar."""
+
     _override_timeout = timedelta(minutes=2)
     _min_switch_interval = timedelta(minutes=10)
 
@@ -209,42 +212,17 @@ class FroelingNumberHolding(_BaseNumber):
     async def async_set_native_value(self, value):
         v = float(min(max(value, self._min_value), self._max_value))
         raw = int(round(v * float(self._scaling_factor)))
-        v_quant = raw / float(self._scaling_factor)
 
         now = datetime.now(timezone.utc)
         if self._last_write_utc and (now - self._last_write_utc) < self._min_switch_interval:
-            _LOGGER.warning("Write to %s (reg %s) innerhalb Mindestschaltdauer", self._entity_id, self._register)
-
-        addr = self._register - 40001
-        async with self._lock:
-            _, err = await self._hass.async_add_executor_job(
-                _write_register_sync, self._client, self._unit_id, addr, raw
+            _LOGGER.warning(
+                "Schreibzugriff auf %s (Register %s) innerhalb der Mindestschaltdauer",
+                self._entity_id, self._register,
             )
-        if err:
-            _LOGGER.error("write_holding addr=%s unit=%s failed: %s", addr, self._unit_id, err)
+
+        if await self.coordinator.schreibe(self._register, raw) is not None:
             return
 
         self._last_write_utc = now
-        self._value = round(v_quant, self._decimal_places)
-        self.async_write_ha_state()
-
-    async def async_update(self, _=None):
-        addr = self._register - 40001
-        async with self._lock:
-            res, err = await self._hass.async_add_executor_job(
-                _read_holding_sync, self._client, self._unit_id, addr, 1
-            )
-        if err or not res or not hasattr(res, "registers"):
-            _LOGGER.debug("read_holding addr=%s unit=%s failed: %s", addr, self._unit_id, err)
-            self._value = None
-            return
-
-        raw = int(res.registers[0])
-        if raw > 32767:
-            raw -= 65536
-        if raw == -1:
-            self._value = None
-            return
-
-        self._value = round(raw / float(self._scaling_factor), self._decimal_places)
+        self._optimistisch = round(raw / float(self._scaling_factor), self._decimal_places)
         self.async_write_ha_state()

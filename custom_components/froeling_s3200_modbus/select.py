@@ -1,25 +1,17 @@
 from __future__ import annotations
 import logging
-from datetime import timedelta
 from homeassistant.components.select import SelectEntity
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.translation import async_get_translations
-from pymodbus.client import ModbusTcpClient
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .const import DOMAIN
+from .coordinator import FroelingCoordinator
 from .device import tr_key as _tr_key, device_info_for
-from .modbus import read_holding_sync as _read_holding_sync, write_register_sync as _write_register_sync
 
 _LOGGER = logging.getLogger(__name__)
 
-# ------------------- Geräte-Gruppierung -------------------
+PARALLEL_UPDATES = 1
 
-
-# ------------------- Helpers -------------------
-
-# ---------------- Modbus Helpers (Holding lesen/schreiben) ----------------
-
-
-# -------------------------------------------------------------------------
 
 # ------------------------ Option-Definitionen (Codes → Keys) ----------------
 # HK-Betriebsarten (Register 48047/48048)
@@ -67,8 +59,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     # Übersetzungen: nur der erlaubte "entity"-Namespace
     translations = await async_get_translations(hass, hass.config.language, "entity")
 
-    client: ModbusTcpClient = hass.data[DOMAIN][f"{config_entry.entry_id}_client"]
-    lock = hass.data[DOMAIN][f"{config_entry.entry_id}_lock"]
+    coordinator: FroelingCoordinator = hass.data[DOMAIN][
+        f"{config_entry.entry_id}_coordinator"
+    ]
 
     def create_selects():
         entities: list[SelectEntity] = []
@@ -77,10 +70,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if data.get("hk01", False):
             entities.append(
                 FroelingSelect(
-                    hass=hass,
-                    config_entry=config_entry,
-                    client=client,
-                    lock=lock,
+                    coordinator=coordinator,
                     translations=translations,
                     data=data,
                     entity_id="betriebsart_heizkreis_01",
@@ -97,10 +87,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if data.get("hk02", False):
             entities.append(
                 FroelingSelect(
-                    hass=hass,
-                    config_entry=config_entry,
-                    client=client,
-                    lock=lock,
+                    coordinator=coordinator,
                     translations=translations,
                     data=data,
                     entity_id="betriebsart_heizkreis_02",
@@ -117,10 +104,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         if data.get("kessel", False):
             entities.append(
                 FroelingSelect(
-                    hass=hass,
-                    config_entry=config_entry,
-                    client=client,
-                    lock=lock,
+                    coordinator=coordinator,
                     translations=translations,
                     data=data,
                     entity_id="brennstoffauswahl",
@@ -138,155 +122,99 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     entities = create_selects()
     async_add_entities(entities)
 
-    interval = timedelta(seconds=data.get("update_interval", 60))
-    for e in entities:
-        async_track_time_interval(hass, e.async_update, interval)
 
 # --------------------------- Entity ---------------------------
-class FroelingSelect(SelectEntity):
+class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
+    """Auswahl auf einem Holding-Register.
+
+    Optionen und aktuelle Auswahl werden aus dem Rohwert abgeleitet. Ein Wert,
+    der in der Tabelle fehlt, erscheint als dynamische Option "Wert <n>" --
+    sonst liesse sich der Zustand der Anlage nicht anzeigen.
+    """
+
     _attr_should_poll = False
 
-    def __init__(
-        self,
-        hass,
-        config_entry,
-        client,
-        lock,
-        translations,
-        data,
-        entity_id: str,
-        register: int,
-        device_key: str,
-        group_key: str,
-        code_to_key: dict[int, str],
-        key_to_code: dict[str, int],
-        name_fallback: str,
-    ):
-        self._hass = hass
-        self._client = client
-        self._lock = lock
+    def __init__(self, coordinator, translations, data, entity_id: str,
+                 register: int, device_key: str, group_key: str,
+                 code_to_key: dict[int, str], key_to_code: dict[str, int],
+                 name_fallback: str):
+        super().__init__(coordinator)
         self._translations = translations
         self._device_name = data["name"]
-        self._unit_id = int(data.get("unit_id", 2))
         self._entity_id = entity_id
         self._register = register
         self._device_key = device_key
-
         self._group_key = group_key
         self._code_to_key = dict(code_to_key)
         self._key_to_code = dict(key_to_code)
-
-        # Optionen: Liste der bekannten Option-Keys (Reihenfolge wie keys())
         self._option_keys = list(self._key_to_code.keys())
-
-        self._current_key: str | None = None
         self._name_fallback = name_fallback
+        # Gilt nach einer Auswahl, bis der Coordinator neu gelesen hat.
+        self._optimistisch: int | None = None
 
         key = _tr_key(self._entity_id)
         self._attr_name = self._translations.get(
-            f"component.froeling_s3200_modbus.entity.select.{key}.name",
+            f"component.{DOMAIN}.entity.select.{key}.name",
             self._name_fallback,
         )
 
-    # ---------- Übersetzungs-Helfer ----------
     def _label_for_key(self, opt_key: str) -> str:
-        # Erlaubtes Schema: component.<domain>.entity.select.<entity_key>.state.<state_key>
         entity_key = _tr_key(self._entity_id)
-        tr_path = f"component.{DOMAIN}.entity.select.{entity_key}.state.{opt_key}"
-        # Fallback auf DEFAULT_LABELS, falls Übersetzung fehlt
         return self._translations.get(
-            tr_path,
+            f"component.{DOMAIN}.entity.select.{entity_key}.state.{opt_key}",
             DEFAULT_LABELS.get(self._group_key, {}).get(opt_key, opt_key),
         )
+
+    @property
+    def _rohwert(self) -> int | None:
+        if self._optimistisch is not None:
+            return self._optimistisch
+        return self.coordinator.rohwert(self._register)
+
     @property
     def unique_id(self) -> str:
         return f"{self._device_name}_{self._entity_id}"
 
     @property
     def options(self) -> list[str]:
-        return [self._label_for_key(k) for k in self._option_keys]
+        bekannt = [self._label_for_key(k) for k in self._option_keys]
+        roh = self._rohwert
+        if roh is not None and roh not in self._code_to_key:
+            bekannt.append(f"Wert {roh}")
+        return bekannt
 
     @property
     def current_option(self) -> str | None:
-        if self._current_key is None:
+        roh = self._rohwert
+        if roh is None:
             return None
-        return self._label_for_key(self._current_key)
+        schluessel = self._code_to_key.get(roh)
+        return self._label_for_key(schluessel) if schluessel else f"Wert {roh}"
 
     @property
     def device_info(self):
         return device_info_for(self._device_key, self._device_name, DOMAIN)
 
-    async def async_update(self, *_):
-        """Holding lesen und Option setzen."""
-        addr = self._register - 40001
-        async with self._lock:
-            res, err = await self._hass.async_add_executor_job(
-                _read_holding_sync, self._client, self._unit_id, addr, 1
-            )
-        if err or not res or not hasattr(res, "registers"):
-            _LOGGER.debug("read_holding addr=%s unit=%s failed: %s", addr, self._unit_id, err)
-            return
-        try:
-            raw = int(res.registers[0])
-            key = self._code_to_key.get(raw)
-            if key is None:
-                self._current_key = None
-                dyn_label = f"Wert {raw}"
-                if dyn_label not in self.options:
-                    pass
-                if getattr(self, "hass", None) is not None and getattr(self, "entity_id", None):
-                    self._attr_options = self.options + [dyn_label]
-                    self._attr_current_option = dyn_label
-                    self.async_write_ha_state()
-                return
-            else:
-                self._current_key = key
-                if getattr(self, "hass", None) is not None and getattr(self, "entity_id", None):
-                    self._attr_options = self.options
-                    self._attr_current_option = self.current_option
-                    self.async_write_ha_state()
-        except Exception as e:
-            _LOGGER.debug("parse error on select %s: %s", self._entity_id, e)
+    def _handle_coordinator_update(self) -> None:
+        self._optimistisch = None
+        super()._handle_coordinator_update()
 
     async def async_select_option(self, option: str):
-        """Holding schreiben aus ausgewählter (übersetzter) Option."""
-        key = None
+        code = None
         for k in self._option_keys:
             if self._label_for_key(k) == option:
-                key = k
+                code = int(self._key_to_code[k])
                 break
-
-        if key is None:
-            if option.startswith("Wert "):
-                try:
-                    code = int(option.split(" ", 1)[1])
-                except Exception:
-                    _LOGGER.error("invalid dynamic option %s", option)
-                    return
-            else:
-                _LOGGER.error("invalid option %s", option)
-                return
-        else:
-            code = int(self._key_to_code[key])
-
-        addr = self._register - 40001
-        async with self._lock:
-            _, err = await self._hass.async_add_executor_job(
-                _write_register_sync, self._client, self._unit_id, addr, code
-            )
-        if err:
-            _LOGGER.error("write_holding addr=%s unit=%s failed: %s", addr, self._unit_id, err)
+        if code is None and option.startswith("Wert "):
+            try:
+                code = int(option.split(" ", 1)[1])
+            except ValueError:
+                code = None
+        if code is None:
+            _LOGGER.error("Unbekannte Option %r für %s", option, self._entity_id)
             return
 
-        if key is None:
-            self._current_key = None
-            if getattr(self, "hass", None) is not None and getattr(self, "entity_id", None):
-                self._attr_options = self.options + [option]
-                self._attr_current_option = option
-                self.async_write_ha_state()
-        else:
-            self._current_key = key
-            if getattr(self, "hass", None) is not None and getattr(self, "entity_id", None):
-                self._attr_options = self.options
-                self._attr_current_option = self.current_option
-                self.async_write_ha_state()
+        if await self.coordinator.schreibe(self._register, code) is not None:
+            return
+        self._optimistisch = code
+        self.async_write_ha_state()
