@@ -4,7 +4,7 @@ import logging
 from datetime import datetime, timezone, timedelta
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.translation import async_get_translations
-from .const import DOMAIN
+from .const import DOMAIN, VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ def device_info_for(device_key: str, device_name_from_config: str, domain: str):
             "name": "SP Dual Compact",
             "manufacturer": "Fröling",
             "model": "SP Dual Compact",
-            "sw_version": "0.3.5",
+            "sw_version": VERSION,
         }
 
     return {
@@ -37,7 +37,7 @@ def device_info_for(device_key: str, device_name_from_config: str, domain: str):
         "manufacturer": "Fröling",
         "model": dev_name,
         "via_device": (domain, f"{device_name_from_config}:controller"),
-        "sw_version": "0.3.5",
+        "sw_version": VERSION,
     }
 # ----------------------------------------------------------
 
