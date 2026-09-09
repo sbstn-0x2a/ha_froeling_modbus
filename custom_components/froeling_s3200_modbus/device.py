@@ -6,8 +6,10 @@ abgedriftet (DEVICE_NAME fehlte ein Eintrag).
 
 from __future__ import annotations
 
+import inspect
 import re
 
+from homeassistant.helpers import device_registry as dr
 from homeassistant.util import slugify
 
 from .const import VERSION
@@ -28,13 +30,31 @@ DEVICE_NAME = {
 #: sind Teile derselben Anlage, kein eigenes Modell.
 MODELL = "SP Dual Compact"
 
+#: Ab Home Assistant 2026.9 nimmt die Registry die *id* des Elterngeraets
+#: entgegen statt seiner Identifier. Der alte Weg ueber ``via_device``
+#: funktioniert noch, warnt aber und verschwindet in 2027.8. Beides
+#: gleichzeitig zu uebergeben ist ein Fehler, deshalb hier die Abfrage:
+#: Aeltere Fassungen kennen ``via_device_id`` gar nicht.
+NEUE_VIA_API = "via_device_id" in inspect.signature(
+    dr.DeviceRegistry.async_get_or_create
+).parameters
 
-def device_info_for(device_key: str, device_name_from_config: str, domain: str):
+
+def device_info_for(
+    device_key: str,
+    device_name_from_config: str,
+    domain: str,
+    regler_id: str | None = None,
+):
     """Geraeteangaben fuer eine Entitaet.
 
     Der Regler ist das Hauptgeraet und traegt den bei der Einrichtung
     vergebenen Namen. Vorher stand dort fest "SP Dual Compact" -- wer seine
     Anlage anders nannte, fand den Namen nirgends wieder.
+
+    ``regler_id`` ist die Registry-id des Reglergeraets. Neuere Fassungen von
+    Home Assistant verlangen sie, um Untergeraete darunter einzuhaengen; ohne
+    sie faellt die Zuordnung auf den alten, veralteten Weg zurueck.
     """
     if device_key == "controller":
         return {
@@ -44,14 +64,18 @@ def device_info_for(device_key: str, device_name_from_config: str, domain: str):
             "model": MODELL,
             "sw_version": VERSION,
         }
-    return {
+    info = {
         "identifiers": {(domain, f"{device_name_from_config}:{device_key}")},
         "name": DEVICE_NAME.get(device_key, device_key),
         "manufacturer": "Fröling",
         "model": MODELL,
-        "via_device": (domain, f"{device_name_from_config}:controller"),
         "sw_version": VERSION,
     }
+    if NEUE_VIA_API and regler_id:
+        info["via_device_id"] = regler_id
+    else:
+        info["via_device"] = (domain, f"{device_name_from_config}:controller")
+    return info
 
 
 def tr_key(s: str) -> str:

@@ -79,6 +79,14 @@ Wer umstellen möchte, benennt die Entitäten über
   vorher abgewählt hatte, behielt ihre Entitäten dauerhaft als `unavailable`
   in der Registry — bei der Zirkulationspumpe drei Stück, weil sie kein
   eigenes Gerät hat und unter Boiler 01 hängt.
+* **Untergeräte hängen sich über die Geräte-id am Regler ein.** Home
+  Assistant 2026.9 erwartet `via_device_id` statt der bisherigen
+  `via_device`-Identifier; der alte Weg warnt bei jedem Start und verschwindet
+  in 2027.8. Die Integration erkennt selbst, welchen Weg die installierte
+  Fassung kennt, und bleibt damit zu älteren Versionen verträglich. Das
+  Reglergerät wird jetzt beim Einrichten ausdrücklich angelegt — vorher
+  entstand es beiläufig mit der ersten Entität, die Reihenfolge war dem Zufall
+  überlassen.
 * Deinstallationsanleitung in beiden READMEs, dazu ein Abschnitt zu den
   unterstützten Anlagen: Die Registerkarte gilt für die SP Dual Compact mit
   Lambdatronic S3200. Andere Baureihen verbinden sich zwar, liefern die Werte

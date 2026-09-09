@@ -57,4 +57,9 @@ class FroelingEntity(CoordinatorEntity[FroelingCoordinator]):
 
     @property
     def device_info(self):
-        return device_info_for(self._device_key, self._device_name, DOMAIN)
+        return device_info_for(
+            self._device_key,
+            self._device_name,
+            DOMAIN,
+            self.coordinator.regler_id,
+        )

@@ -11,6 +11,7 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
+from .device import device_info_for
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
     logging.getLogger(name).setLevel(logging.WARNING)
@@ -153,6 +154,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass, entry, client, data["unit_id"], data.get("update_interval", STANDARD_INTERVALL)
     )
     await coordinator.async_refresh()
+    # Das Reglergeraet zuerst anlegen: Untergeraete haengen sich seit
+    # HA 2026.9 ueber dessen Registry-id darunter, und die gibt es nur, wenn
+    # das Geraet schon existiert. Vorher entstand es beiläufig mit der ersten
+    # Entitaet -- die Reihenfolge war damit dem Zufall ueberlassen.
+    regler = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id,
+        **device_info_for("controller", data["name"], DOMAIN),
+    )
+    coordinator.regler_id = regler.id
+
     entry.runtime_data = FroelingRuntimeData(coordinator, data)
 
     # Reste abgewaehlter Anlagenteile entfernen. Bisher passierte das nur beim

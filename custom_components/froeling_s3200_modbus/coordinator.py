@@ -113,6 +113,10 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         self._blockfehler: dict[int, int] = {}
         #: Serialisiert den Zugriff auf den Client. Siehe _modbus().
         self._zugriff = asyncio.Lock()
+        #: Registry-id des Reglergeraets. Neuere Fassungen von Home
+        #: Assistant haengen Untergeraete darueber ein statt ueber die
+        #: Identifier. Wird beim Setup gesetzt.
+        self.regler_id: str | None = None
 
     async def _modbus(self, funktion, *args):
         """Ein Modbus-Vorgang, gegen gleichzeitige Nutzung abgesichert.
