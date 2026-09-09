@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0 – noch nicht veröffentlicht
+## 0.4.0 – 2026-09-09
 
 ### ⚠️ Was sich sichtbar ändert
 
