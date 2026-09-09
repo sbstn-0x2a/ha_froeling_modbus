@@ -1,60 +1,39 @@
-from homeassistant.components.switch import SwitchEntity
+"""Schalter aus der Registertabelle (Holding-Register 0/1, FC06)."""
+
+from __future__ import annotations
+
 import logging
 
-from .const import DOMAIN, FERNSTEUERUNG_HINWEIS
-from .entity import FroelingEntity
+from homeassistant.components.switch import SwitchEntity
+
+from .const import FERNSTEUERUNG_HINWEIS
+from .entitaeten import zeilen_der_plattform
+from .entity import FroelingRegisterEntity
 
 _LOGGER = logging.getLogger(__name__)
 
 PARALLEL_UPDATES = 1
 
 
-# --- ENDE HELPER ---
-
 async def async_setup_entry(hass, config_entry, async_add_entities):
     laufzeit = config_entry.runtime_data
     coordinator = laufzeit.coordinator
     data = laufzeit.konfiguration
-
-    def create_switches():
-        sw: list[SwitchEntity] = []
-
-        # --- Kessel ---
-        if data.get("kessel", False):
-            # 40136 Automatisch Zünden (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, data, "automatisch_zuenden", 40136, device_key="kessel"))
-
-        # --- Heizkreis 01 ---
-        if data.get("hk01", False):
-            # 48029 Freigabe Heizkreis 01 (R/W, 0/1) -- Kesselfernsteuerung
-            sw.append(FroelingFernsteuerSwitch(coordinator, data, "hk1_freigabe", 48029, device_key="hk01"))
-
-        # --- Heizkreis 02 ---
-        if data.get("hk02", False):
-            # 48030 Freigabe Heizkreis 02 (R/W, 0/1) -- Kesselfernsteuerung
-            sw.append(FroelingFernsteuerSwitch(coordinator, data, "hk2_freigabe", 48030, device_key="hk02"))
-
-        # --- Austragung ---
-        if data.get("austragung", False):
-            # 40265 Automatische Pelletsaustragung deaktivieren (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, data, "pelletsaustragung_deaktivieren", 40265, device_key="austragung"))
-
-        return sw
-
-    switches = create_switches()
-    async_add_entities(switches)
+    async_add_entities(
+        (RegisterFernsteuerSwitch if zeile.kategorie == "fernsteuerung" else RegisterSwitch)(
+            coordinator, data, zeile
+        )
+        for zeile in zeilen_der_plattform(data, "switch")
+    )
 
 
-# ---------------- Basisklasse ----------------
-class _BaseSwitch(FroelingEntity, SwitchEntity):
-    """Schalter auf einem Holding-Register. Wert aus dem Coordinator."""
+class RegisterSwitch(FroelingRegisterEntity, SwitchEntity):
+    """Holding-Register: FC=03 lesen, FC=06 schreiben."""
 
     _plattform = "switch"
 
-    def __init__(self, coordinator, data, entity_id: str,
-                 register: int, device_key="controller"):
-        super().__init__(coordinator, data, entity_id, device_key)
-        self._register = register
+    def __init__(self, coordinator, data, zeile) -> None:
+        super().__init__(coordinator, data, zeile)
         # Gilt nach einem Schaltvorgang, bis der Coordinator neu gelesen hat.
         self._optimistisch: bool | None = None
 
@@ -69,10 +48,6 @@ class _BaseSwitch(FroelingEntity, SwitchEntity):
         self._optimistisch = None
         super()._handle_coordinator_update()
 
-
-class FroelingHoldingSwitch(_BaseSwitch):
-    """Holding-Register: FC=03 lesen, FC=06 schreiben."""
-
     async def async_turn_on(self, **kwargs):
         await self._schalten(True)
 
@@ -86,7 +61,7 @@ class FroelingHoldingSwitch(_BaseSwitch):
         self.async_write_ha_state()
 
 
-class FroelingFernsteuerSwitch(FroelingHoldingSwitch):
+class RegisterFernsteuerSwitch(RegisterSwitch):
     """Freigabe eines Heizkreises über die Kesselfernsteuerung (48029-48046).
 
     Standardmäßig deaktiviert. Ein Klick schaltet die Sollwertvorgabe der
@@ -100,4 +75,4 @@ class FroelingFernsteuerSwitch(FroelingHoldingSwitch):
 
     @property
     def extra_state_attributes(self):
-        return {"register": self._register, "hinweis": FERNSTEUERUNG_HINWEIS}
+        return {**super().extra_state_attributes, "hinweis": FERNSTEUERUNG_HINWEIS}

@@ -16,6 +16,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import FroelingCoordinator
 from .device import device_info_for, objekt_id, tr_key
+from .registertabelle import Register
 
 
 class FroelingEntity(CoordinatorEntity[FroelingCoordinator]):
@@ -63,3 +64,32 @@ class FroelingEntity(CoordinatorEntity[FroelingCoordinator]):
             DOMAIN,
             self.coordinator.regler_id,
         )
+
+
+class FroelingRegisterEntity(FroelingEntity):
+    """Eine Entität, die aus einer Zeile der Registertabelle entsteht.
+
+    Kennung und Gerät kommen aus der Zeile: Für die Entitäten der 0.4.0
+    aus ``alter_schluessel`` und ``altes_geraet``, damit unique_id, entity_id
+    und Gerät exakt bleiben; für neue Instanzen aus Instanzkennung und
+    Schlüssel (``hk03_frostschutztemperatur`` am Gerät ``hk03``).
+    """
+
+    def __init__(self, coordinator, data, zeile: Register) -> None:
+        schluessel = zeile.alter_schluessel or f"{zeile.instanzkennung}_{zeile.schluessel}"
+        geraet = zeile.altes_geraet or zeile.instanzkennung
+        super().__init__(coordinator, data, schluessel, geraet)
+        self._zeile = zeile
+        self._register = zeile.nummer
+
+    @property
+    def extra_state_attributes(self):
+        """Register und Doku-Beschreibung, damit man in HA sieht, was dahintersteckt."""
+        return {"register": self._zeile.nummer, "beschreibung": self._zeile.name_de}
+
+    def _rohwert_vorzeichen(self) -> int | None:
+        """Rohwert als 16-Bit-Zweierkomplement."""
+        roh = self.coordinator.rohwert(self._register)
+        if roh is None:
+            return None
+        return roh - 65536 if roh > 32767 else roh

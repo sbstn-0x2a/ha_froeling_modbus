@@ -1,65 +1,59 @@
+"""Zeitentitäten aus der Registertabelle.
+
+Zwei Arten: Tageszeiten (Minuten seit Mitternacht, siehe Befund vom
+07.09.2026) und die Dauer 40252 in Zehntelstunden, als HH:MM dargestellt.
+"""
+
 from __future__ import annotations
+
 from datetime import time
 import logging
+
 from homeassistant.components.time import TimeEntity
 
-from .const import DOMAIN
-from .entity import FroelingEntity
+from .entitaeten import zeilen_der_plattform
+from .entity import FroelingRegisterEntity
 from .timeconv import register_to_time, time_to_register
 
 _LOGGER = logging.getLogger(__name__)
 
 PARALLEL_UPDATES = 1
 
+#: Register, die eine Dauer in 0,1 h enthalten statt einer Tageszeit.
+DAUER_REGISTER = {40252}
 
-# ---- Register ----
-REGISTER_START_PELLETSBEFUELLUNG_1 = 40062  # R/W Tageszeit, Minuten seit Mitternacht (0..1439)
-REGISTER_START_PELLETSBEFUELLUNG_2 = 40095  # R   Tageszeit, Minuten seit Mitternacht (0..1439)
-REGISTER_VERZOEGERUNG_NACH_SCHEITHOLZ = 40252  # R/W Dauer in 0,1 h (0..24, skaliert)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     laufzeit = config_entry.runtime_data
     coordinator = laufzeit.coordinator
     data = laufzeit.konfiguration
-    if not data.get("austragung", False):
-        return
-
-    entities = [
-        # 40062 – Start 1. Pelletsbefüllung (R/W, echte Tageszeit)
-        FroelingAustragungTimeOfDay(
-            coordinator=coordinator, data=data,
-            entity_id="pelletsbefuellung_1_startzeit", register=REGISTER_START_PELLETSBEFUELLUNG_1,
-            device_key="austragung",
-        ),
-        # 40095 – Start 2. Pelletsbefüllung (R, echte Tageszeit)
-        FroelingAustragungTimeOfDayReadOnly(
-            coordinator=coordinator, data=data,
-            entity_id="pelletsbefuellung_2_startzeit", register=REGISTER_START_PELLETSBEFUELLUNG_2,
-            device_key="austragung",
-        ),
-        # 40252 – Verzögerung als HH:MM anzeigen, intern 0,1 h schreiben/lesen
-        FroelingAustragungDelayAsTime(
-            coordinator=coordinator, data=data,
-            entity_id="verzoegerung_pufferladung_nach_scheitholzbetrieb",
-            register=REGISTER_VERZOEGERUNG_NACH_SCHEITHOLZ,
-            device_key="austragung",
-        ),
-    ]
-
+    entities = []
+    for zeile in zeilen_der_plattform(data, "time"):
+        if zeile.nummer in DAUER_REGISTER:
+            klasse = RegisterDauer
+        elif zeile.rw == "R/W":
+            klasse = RegisterTageszeit
+        else:
+            klasse = RegisterTageszeitNurLesen
+        entities.append(klasse(coordinator, data, zeile))
     async_add_entities(entities)
 
-# ---------------- Basisklasse: Tageszeit ----------------
-class _BaseTimeOfDay(FroelingEntity, TimeEntity):
-    """Tageszeit aus einem Holding-Register (Minuten seit Mitternacht)."""
 
+class _Basis(FroelingRegisterEntity, TimeEntity):
     _plattform = "time"
 
-    def __init__(self, coordinator, data, entity_id: str,
-                 register: int, device_key="controller"):
-        super().__init__(coordinator, data, entity_id, device_key)
-        self._register = register
+    def __init__(self, coordinator, data, zeile) -> None:
+        super().__init__(coordinator, data, zeile)
         # Gilt nach einem Schreibvorgang, bis der Coordinator neu gelesen hat.
         self._optimistisch: time | None = None
+
+    def _handle_coordinator_update(self) -> None:
+        self._optimistisch = None
+        super()._handle_coordinator_update()
+
+
+class RegisterTageszeitNurLesen(_Basis):
+    """Tageszeit aus einem Holding-Register (Minuten seit Mitternacht), nur lesbar."""
 
     @property
     def native_value(self) -> time | None:
@@ -68,13 +62,9 @@ class _BaseTimeOfDay(FroelingEntity, TimeEntity):
         roh = self.coordinator.rohwert(self._register)
         return None if roh is None else register_to_time(roh)
 
-    def _handle_coordinator_update(self) -> None:
-        self._optimistisch = None
-        super()._handle_coordinator_update()
 
-
-class FroelingAustragungTimeOfDay(_BaseTimeOfDay):
-    """R/W Tageszeit (40062)."""
+class RegisterTageszeit(RegisterTageszeitNurLesen):
+    """Tageszeit, schreibbar."""
 
     async def async_set_value(self, value: time) -> None:
         if await self.coordinator.schreibe(self._register, time_to_register(value)) is not None:
@@ -83,24 +73,12 @@ class FroelingAustragungTimeOfDay(_BaseTimeOfDay):
         self.async_write_ha_state()
 
 
-class FroelingAustragungTimeOfDayReadOnly(_BaseTimeOfDay):
-    """R/O Tageszeit (40095)."""
-
-
-class FroelingAustragungDelayAsTime(FroelingEntity, TimeEntity):
-    """Dauer 40252 (0..24 h in 0,1-h-Schritten), dargestellt als HH:MM.
+class RegisterDauer(_Basis):
+    """Dauer 0..24 h in 0,1-h-Schritten, dargestellt als HH:MM.
 
     Keine Tageszeit: Der Rohwert zaehlt Zehntelstunden, deshalb eigene
     Umrechnung statt register_to_time.
     """
-
-    _plattform = "time"
-
-    def __init__(self, coordinator, data, entity_id: str,
-                 register: int, device_key="controller"):
-        super().__init__(coordinator, data, entity_id, device_key)
-        self._register = register
-        self._optimistisch: time | None = None
 
     @staticmethod
     def _als_zeit(rohwert: int) -> time:
@@ -113,10 +91,6 @@ class FroelingAustragungDelayAsTime(FroelingEntity, TimeEntity):
             return self._optimistisch
         roh = self.coordinator.rohwert(self._register)
         return None if roh is None else self._als_zeit(roh)
-
-    def _handle_coordinator_update(self) -> None:
-        self._optimistisch = None
-        super()._handle_coordinator_update()
 
     async def async_set_value(self, value: time) -> None:
         minuten = value.hour * 60 + value.minute

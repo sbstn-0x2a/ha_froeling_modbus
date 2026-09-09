@@ -1,37 +1,28 @@
+"""Auswahlentitäten aus der Registertabelle (Holding-Register mit Werteliste)."""
+
 from __future__ import annotations
+
 import logging
+
 from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.translation import async_get_translations
 
 from .const import DOMAIN
 from .device import tr_key as _tr_key
-from .entity import FroelingEntity
+from .entitaeten import zeilen_der_plattform
+from .entity import FroelingRegisterEntity
 
 _LOGGER = logging.getLogger(__name__)
 
 PARALLEL_UPDATES = 1
 
-
 # ------------------------ Option-Definitionen (Codes → Keys) ----------------
-# HK-Betriebsarten (Register 48047/48048)
-HK_MODE_CODE_TO_KEY = {
-    0: "off",
-    1: "auto",
-    2: "extra",
-    3: "eco",
-    4: "eco_permanent",
-    5: "party",
-}
-HK_MODE_KEY_TO_CODE = {v: k for k, v in HK_MODE_CODE_TO_KEY.items()}
+# Die Übersetzungsschlüssel je Werteliste. Die Anzeigetexte stehen in
+# translations/*.json unter entity.select.<entity>.state.<key>; die
+# deutschen Texte der Doku dienen als Rückfall.
+HK_MODE_CODE_TO_KEY = {0: "off", 1: "auto", 2: "extra", 3: "eco", 4: "eco_permanent", 5: "party"}
+FUEL_CODE_TO_KEY = {0: "softwood", 1: "hardwood"}
 
-# Brennstoffauswahl (Register 40441)
-FUEL_CODE_TO_KEY = {
-    0: "softwood",
-    1: "hardwood",
-}
-FUEL_KEY_TO_CODE = {v: k for k, v in FUEL_CODE_TO_KEY.items()}
-
-# Fallback-Labels (falls Übersetzung fehlt)
 DEFAULT_LABELS = {
     "hk_mode": {
         "off": "Aus",
@@ -47,10 +38,12 @@ DEFAULT_LABELS = {
     },
 }
 
-# ------------------------ Register (Holding) ------------------------
-REG_HK1_BETRIEBSART = 48047     # Select HK1 - Betriebsart
-REG_HK2_BETRIEBSART = 48048     # Select HK2 - Betriebsart
-REG_BRENNSTOFFAUSWAHL = 40441   # Select Brennstoffauswahl
+#: Werteliste der Registertabelle -> (Übersetzungsgruppe, Code -> Key)
+OPTIONEN = {
+    "betriebsart": ("hk_mode", HK_MODE_CODE_TO_KEY),
+    "brennstoffauswahl": ("fuel", FUEL_CODE_TO_KEY),
+}
+
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     laufzeit = config_entry.runtime_data
@@ -60,68 +53,14 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     # Übersetzungen: nur der erlaubte "entity"-Namespace
     translations = await async_get_translations(hass, hass.config.language, "entity")
 
-    def create_selects():
-        entities: list[SelectEntity] = []
-
-        # 48047 – HK1 Betriebsart
-        if data.get("hk01", False):
-            entities.append(
-                FroelingSelect(
-                    coordinator=coordinator,
-                    translations=translations,
-                    data=data,
-                    entity_id="betriebsart_heizkreis_01",
-                    register=REG_HK1_BETRIEBSART,
-                    device_key="hk01",
-                    group_key="hk_mode",
-                    code_to_key=HK_MODE_CODE_TO_KEY,
-                    key_to_code=HK_MODE_KEY_TO_CODE,
-                    name_fallback="Betriebsart Heizkreis 01",
-                )
-            )
-
-        # 48048 – HK2 Betriebsart
-        if data.get("hk02", False):
-            entities.append(
-                FroelingSelect(
-                    coordinator=coordinator,
-                    translations=translations,
-                    data=data,
-                    entity_id="betriebsart_heizkreis_02",
-                    register=REG_HK2_BETRIEBSART,
-                    device_key="hk02",
-                    group_key="hk_mode",
-                    code_to_key=HK_MODE_CODE_TO_KEY,
-                    key_to_code=HK_MODE_KEY_TO_CODE,
-                    name_fallback="Betriebsart Heizkreis 02",
-                )
-            )
-
-        # 40441 – Brennstoffauswahl (Kessel)
-        if data.get("kessel", False):
-            entities.append(
-                FroelingSelect(
-                    coordinator=coordinator,
-                    translations=translations,
-                    data=data,
-                    entity_id="brennstoffauswahl",
-                    register=REG_BRENNSTOFFAUSWAHL,
-                    device_key="kessel",
-                    group_key="fuel",
-                    code_to_key=FUEL_CODE_TO_KEY,
-                    key_to_code=FUEL_KEY_TO_CODE,
-                    name_fallback="Brennstoffauswahl",
-                )
-            )
-
-        return entities
-
-    entities = create_selects()
-    async_add_entities(entities)
+    async_add_entities(
+        RegisterSelect(coordinator, translations, data, zeile)
+        for zeile in zeilen_der_plattform(data, "select")
+        if zeile.werteliste in OPTIONEN
+    )
 
 
-# --------------------------- Entity ---------------------------
-class FroelingSelect(FroelingEntity, SelectEntity):
+class RegisterSelect(FroelingRegisterEntity, SelectEntity):
     """Auswahl auf einem Holding-Register.
 
     Optionen und aktuelle Auswahl werden aus dem Rohwert abgeleitet. Ein Wert,
@@ -131,18 +70,13 @@ class FroelingSelect(FroelingEntity, SelectEntity):
 
     _plattform = "select"
 
-    def __init__(self, coordinator, translations, data, entity_id: str,
-                 register: int, device_key: str, group_key: str,
-                 code_to_key: dict[int, str], key_to_code: dict[str, int],
-                 name_fallback: str):
-        super().__init__(coordinator, data, entity_id, device_key)
+    def __init__(self, coordinator, translations, data, zeile) -> None:
+        super().__init__(coordinator, data, zeile)
         self._translations = translations
-        self._register = register
-        self._group_key = group_key
+        self._group_key, code_to_key = OPTIONEN[zeile.werteliste]
         self._code_to_key = dict(code_to_key)
-        self._key_to_code = dict(key_to_code)
+        self._key_to_code = {v: k for k, v in code_to_key.items()}
         self._option_keys = list(self._key_to_code.keys())
-        self._name_fallback = name_fallback
         # Gilt nach einer Auswahl, bis der Coordinator neu gelesen hat.
         self._optimistisch: int | None = None
 
@@ -193,7 +127,6 @@ class FroelingSelect(FroelingEntity, SelectEntity):
         if code is None:
             _LOGGER.error("Unbekannte Option %r für %s", option, self._entity_id)
             return
-
         if await self.coordinator.schreibe(self._register, code) is not None:
             return
         self._optimistisch = code
