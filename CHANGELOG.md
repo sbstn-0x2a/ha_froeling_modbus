@@ -60,8 +60,22 @@ Wer umstellen möchte, benennt die Entitäten über
 * **Langzeitstatistik für Sensoren ohne Einheit.** In 0.3.6 bekamen nur
   Sensoren *mit* Einheit eine `state_class`. Die Bedingung war falsch — der
   Recorder braucht keine Einheit, nur eine `state_class`. Damit führen jetzt
-  auch Brennerstarts und Reinigungen Statistik, beide als
-  `total_increasing`.
+  auch Brennerstarts und Reinigungen Statistik.
+* **Zähler als `total_increasing`.** 18 weitere Sensoren waren als
+  `measurement` eingetragen, obwohl sie nur aufwärts laufen: sämtliche
+  `betriebsstunden_*`, die vier Stundenzähler für Pellets-, Heiz-,
+  Teillast- und Scheitholzbetrieb sowie der Gesamt-Pelletverbrauch. Als
+  `measurement` bildete die Statistik daraus Mittelwerte statt Zuwächse —
+  Verbrauchsauswertungen waren damit nicht möglich.
+
+  Bewusst weiterhin `measurement`: die beiden `resetierbar*`-Zähler und
+  `stunden_seit_letzter_wartung`, weil sie zurückgesetzt werden, sowie
+  `tagesertrag`, `gesamtertrag` und `kessel_waermemenge_vom_kessel`, weil
+  ungeklärt ist, ob eine Anlage ohne Wärmemengenzähler sie überhaupt füllt.
+
+  Beim Wechsel der `state_class` beginnt der Recorder für die betroffenen
+  Sensoren eine neue Statistikreihe. Die bisher gesammelten Mittelwerte
+  bleiben liegen und werden nicht in Summen umgerechnet.
 * **Karteileichen.** Wird ein Anlagenteil in den Optionen abgewählt,
   verschwinden seine Entitäten jetzt auch aus der Registry.
 
