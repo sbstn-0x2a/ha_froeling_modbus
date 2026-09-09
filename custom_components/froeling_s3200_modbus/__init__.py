@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 
-from .const import STANDARD_INTERVALL
+from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
@@ -61,6 +61,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if entry.options:
         data.update(entry.options)
     data.setdefault("unit_id", 2)
+
+    # Eintraege aus aelteren Fassungen haben keine Kennung. Ohne sie greift die
+    # Dublettenpruefung im Config-Flow nicht. Bewusst hier oben, bevor der
+    # Update-Listener haengt -- sonst loeste die Aenderung einen Reload aus.
+    if entry.unique_id is None:
+        hass.config_entries.async_update_entry(
+            entry,
+            unique_id=eindeutige_kennung(data["host"], data.get("port", 502), data["unit_id"]),
+        )
 
     # Gemeinsamer Modbus-Client + Lock für diese Entry-ID (einmalig verbinden)
     client = ModbusTcpClient(

@@ -41,3 +41,13 @@ def _version_aus_manifest() -> str:
 
 
 VERSION = _version_aus_manifest()
+
+
+def eindeutige_kennung(host: str, port, unit_id) -> str:
+    """Kennung eines Config-Entries.
+
+    Der Registersatz der Anlage enthaelt keine Serien- oder Anlagennummer,
+    deshalb identifiziert die Verbindung das Geraet: Wer zweimal denselben
+    Modbus-Endpunkt einrichtet, meint dieselbe Heizung.
+    """
+    return f"{host}:{int(port)}:{int(unit_id)}"

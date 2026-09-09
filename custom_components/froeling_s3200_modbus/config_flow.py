@@ -14,7 +14,13 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
 from pymodbus.client import ModbusTcpClient
 
-from .const import DOMAIN, MAX_INTERVALL, MIN_INTERVALL, STANDARD_INTERVALL
+from .const import (
+    DOMAIN,
+    MAX_INTERVALL,
+    MIN_INTERVALL,
+    STANDARD_INTERVALL,
+    eindeutige_kennung,
+)
 from .modbus import read_input_sync
 from .registers import INPUT_BASE, INPUT_REGISTERS
 
@@ -87,6 +93,16 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
+            # Dieselbe Anlage nicht zweimal einrichten. Ohne diese Pruefung
+            # entstehen zwei Hubs mit denselben Geraeten und Entitaeten, nur
+            # unter verschiedenen Namen.
+            await self.async_set_unique_id(eindeutige_kennung(
+                user_input["host"],
+                user_input.get("port", 502),
+                user_input.get("unit_id", 2),
+            ))
+            self._abort_if_unique_id_configured()
+
             fehler = await pruefe_verbindung(self.hass, user_input)
             if fehler is None:
                 return self.async_create_entry(title=user_input["name"], data=user_input)
