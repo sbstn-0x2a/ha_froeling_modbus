@@ -17,6 +17,28 @@ for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.fr
 DOMAIN = "froeling_s3200_modbus"
 _LOGGER = logging.getLogger(__name__)
 
+#: Gruppen, deren Entitaeten unter einem fremden Geraet haengen.
+#:
+#: Das Aufraeumen beim Abwaehlen einer Gruppe laeuft ueber deren Geraet: alle
+#: Entitaeten daran werden entfernt. Die Zirkulationspumpe hat aber bewusst
+#: kein eigenes Geraet, ihre Sensoren sitzen unter Boiler 01. Ohne diese Liste
+#: bleiben sie beim Abwaehlen als unavailable in der Registry stehen.
+GRUPPEN_OHNE_EIGENES_GERAET: dict[str, tuple[tuple[str, str], ...]] = {
+    "zirkulationspumpe": (
+        # Kein eigenes Geraet, die drei sitzen unter Boiler 01.
+        ("sensor", "ruecklauftemperatur_an_der_zirkulations_leitung"),
+        ("sensor", "stoemungsschalter_an_der_brauchwasser_leitung"),
+        ("sensor", "drehzahl_der_zirkulations_pumpe"),
+    ),
+    "kessel": (
+        # Inhaltlich bewusst woanders einsortiert: die Nachlegeberechnung
+        # gehoert zum Puffer, die Ruecklauftemperatur der Zirkulationsleitung
+        # zum Boiler.
+        ("binary_sensor", "nachlegeberechnung_aktiv"),
+        ("number", "bei_welcher_rl_temperatur_an_der_zirkulationsleitung_soll_die_pumpe_ausschalten"),
+    ),
+}
+
 
 PLATFORMS = [
     Platform.SENSOR,
@@ -97,6 +119,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         to_remove = [g for g in groups if old_cfg.get(g, False) and not new_cfg.get(g, False)]
 
         for g in to_remove:
+            # Zuerst die Ausnahmen: Entitaeten ohne eigenes Gruppengeraet.
+            for entity_domain, schluessel in GRUPPEN_OHNE_EIGENES_GERAET.get(g, ()):
+                eindeutig = f"{name}_{schluessel}"
+                entity_id = ent_reg.async_get_entity_id(entity_domain, DOMAIN, eindeutig)
+                if entity_id:
+                    ent_reg.async_remove(entity_id)
+
             ident = (DOMAIN, f"{name}:{g}")
             device = dev_reg.async_get_device({ident})
             if not device:
