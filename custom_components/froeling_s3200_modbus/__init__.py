@@ -75,11 +75,25 @@ def _gruppen_entfernen(hass: HomeAssistant, entry: ConfigEntry, name: str,
     Entitaeten ohne eigenes Gruppengeraet stehen in
     GRUPPEN_OHNE_EIGENES_GERAET und werden vorher einzeln entfernt.
 
+    Gesucht wird ausschliesslich unter den Geraeten des eigenen Config-Entry.
+    ``dev_reg.async_get_device`` waere kuerzer, sucht aber ueber alle Eintraege
+    hinweg -- und Identifier sind seit HA 2026.9 nicht mehr eindeutig. Bei
+    Mehrdeutigkeit raet die Registry ("falling back to the first match"), und
+    hier wird geloescht: Ein falscher Treffer wuerde die Entitaeten einer
+    fremden Anlage mitnehmen. Der Aufruf ist ausserdem als veraltet markiert
+    und verschwindet in HA 2027.8.
+
     Rueckgabe ist die Zahl der entfernten Entitaeten.
     """
     ent_reg = er.async_get(hass)
     dev_reg = dr.async_get(hass)
     entfernt = 0
+
+    eigene = {
+        kennung: geraet
+        for geraet in dr.async_entries_for_config_entry(dev_reg, entry.entry_id)
+        for kennung in geraet.identifiers
+    }
 
     for gruppe in gruppen:
         for entity_domain, schluessel in GRUPPEN_OHNE_EIGENES_GERAET.get(gruppe, ()):
@@ -90,7 +104,7 @@ def _gruppen_entfernen(hass: HomeAssistant, entry: ConfigEntry, name: str,
                 ent_reg.async_remove(entity_id)
                 entfernt += 1
 
-        device = dev_reg.async_get_device({(DOMAIN, f"{name}:{gruppe}")})
+        device = eigene.get((DOMAIN, f"{name}:{gruppe}"))
         if not device:
             continue
 

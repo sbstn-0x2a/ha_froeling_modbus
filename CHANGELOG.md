@@ -74,6 +74,12 @@ Wer umstellen möchte, benennt die Entitäten über
   gleichzeitig auf denselben Socket und die Antworten kamen vermischt zurück —
   ein Wert konnte am falschen Register landen. Der Coordinator serialisiert
   die Zugriffe jetzt je Vorgang.
+* **Das Aufräumen sucht nur noch im eigenen Config-Entry.** Bisher lief die
+  Gerätesuche über `async_get_device`, das alle Einträge durchsucht — und
+  Geräte-Identifier sind seit HA 2026.9 nicht mehr eindeutig. Bei
+  Mehrdeutigkeit rät die Registry. Da an dieser Stelle gelöscht wird, hätte
+  ein falscher Treffer die Entitäten einer fremden Anlage mitgenommen. Der
+  Aufruf ist zudem als veraltet markiert und verschwindet in HA 2027.8.
 * **Reste abgewählter Anlagenteile verschwinden beim Start.** Bisher räumte
   die Integration nur auf, wenn eine Gruppe gerade abgewählt wurde. Wer sie
   vorher abgewählt hatte, behielt ihre Entitäten dauerhaft als `unavailable`
