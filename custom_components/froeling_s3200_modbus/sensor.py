@@ -64,7 +64,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             FroelingSensor(coordinator, translations, data, "boardtemperatur", 30003, "°C", 2, 0, device_class="temperature", device_key="controller"),
             FroelingSensor(coordinator, translations, data, "boardtemperatur_pelletsmodul", 30018, "°C", 2, 0, device_class="temperature", device_key="controller"),
             FroelingSensor(coordinator, translations, data, "betriebsstunden", 30021, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "anzahl_der_brennerstarts", 30023, "", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, translations, data, "anzahl_der_brennerstarts", 30023, "", 1, 0, device_key="controller",
+                           state_class=SensorStateClass.TOTAL_INCREASING),
             FroelingSensor(coordinator, translations, data, "betriebsstunden_in_der_feuererhaltung", 30025, "h", 1, 0, device_key="controller"),
             FroelingSensor(coordinator, translations, data, "betriebsstunden_stokerschnecke", 30040, "h", 1, 0, device_key="controller"),
             FroelingSensor(coordinator, translations, data, "betriebsstunden_foerderschnecke", 30041, "h", 1, 0, device_key="controller"),
@@ -84,7 +85,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             FroelingSensor(coordinator, translations, data, "tagesertrag", 30085, "kWh", 1, 0, device_key="controller"),
             FroelingSensor(coordinator, translations, data, "gesamtertrag", 30086, "kWh", 1, 0, device_key="controller"),
             FroelingSensor(coordinator, translations, data, "betriebsstunden_saugturbine", 30098, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "anzahl_der_reinigungen", 30102, "", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, translations, data, "anzahl_der_reinigungen", 30102, "", 1, 0, device_key="controller",
+                           state_class=SensorStateClass.TOTAL_INCREASING),
             FroelingSensor(coordinator, translations, data, "zeit_bis_zur_naechsten_reinigung", 30103, "min", 1, 0, device_key="controller"),
             FroelingSensor(coordinator, translations, data, "betriebsstunden_e_filter", 30104, "h", 1, 0, device_key="controller"),
             FroelingSensor(coordinator, translations, data, "aussentemperatur", 31001, "°C", 2, 0, device_class="temperature", device_key="controller"),
@@ -266,12 +268,14 @@ class _FroelingZahl(_FroelingBasis):
 
     def __init__(self, coordinator, translations, data, entity_id, register,
                  unit, scaling_factor, decimal_places=0, device_class=None,
-                 device_key="controller"):
+                 device_key="controller",
+                 state_class=SensorStateClass.MEASUREMENT):
         super().__init__(coordinator, translations, data, entity_id, register, device_key)
         self._unit = unit
         self._scaling_factor = scaling_factor
         self._decimal_places = decimal_places
         self._device_class = device_class
+        self._state_class = state_class
 
     @property
     def unit_of_measurement(self):
@@ -283,9 +287,12 @@ class _FroelingZahl(_FroelingBasis):
 
     @property
     def state_class(self):
-        # Der Recorder legt nur Statistik an, wenn eine Einheit vorhanden ist.
-        # Ohne Einheit daher None statt MEASUREMENT - sonst nur Log-Warnungen.
-        return SensorStateClass.MEASUREMENT if self._unit else None
+        # Eine Einheit ist fuer die Langzeitstatistik nicht noetig: Die
+        # HA-Dokumentation nennt als Bedingung allein die state_class, und der
+        # Recorder prueft in _is_numeric nur, ob der Wert eine endliche Zahl
+        # ist. Auf der Anlage bestaetigt -- 56 von 60 einheitenlosen Sensoren
+        # anderer Integrationen fuehren dort Statistik.
+        return self._state_class
 
     @property
     def state(self):
