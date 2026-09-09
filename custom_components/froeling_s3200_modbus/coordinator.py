@@ -6,9 +6,20 @@ das ebenso viele Timer und 143 einzelne Modbus-Anfragen je Durchlauf. Fiel die
 Verbindung aus, lief jede dieser Anfragen in ihren Timeout, während der nächste
 Zyklus bereits nachrückte -- die Warteschlange am Lock wuchs unbegrenzt.
 
-Jetzt liest ein Coordinator alle Register in 19 Blöcken und verteilt die Werte
-an die Entitäten. Überzieht ein Durchlauf das Intervall, überspringt Home
+Jetzt liest ein Coordinator alle Register in Blöcken und verteilt die Werte an
+die Entitäten. Überzieht ein Durchlauf das Intervall, überspringt Home
 Assistant den nächsten, statt ihn aufzustauen.
+
+Ein einzelner fehlgeschlagener Block macht dabei nicht die ganze Anlage
+unverfügbar. Vorher las jede Entität ihr Register selbst: Ein Aussetzer am
+Gateway setzte genau diesen einen Wert auf ``unknown``, alle anderen liefen
+weiter. Würde der Coordinator beim ersten Fehler abbrechen, gingen
+stattdessen alle 177 Entitäten gleichzeitig auf ``unavailable`` -- und
+Automationen, die auf einen Zustandswechsel lauschen, feuerten bei jedem
+Netzwerkhusten. Deshalb behält ein fehlgeschlagener Block seine zuletzt
+gelesenen Werte; erst nach ``MAX_BLOCKFEHLER`` Durchläufen in Folge gibt der
+Coordinator ihn auf. Nur wenn kein einziger Block antwortet, ist die
+Verbindung wirklich weg.
 """
 
 from __future__ import annotations
@@ -42,6 +53,12 @@ from .registers import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+#: So oft darf ein Block hintereinander ausfallen, bevor seine Werte
+#: verworfen werden und die betroffenen Entitäten "unknown" melden.
+#: Drei Durchläufe sind bei 30 s Intervall anderthalb Minuten -- lang genug
+#: für einen Aussetzer, kurz genug, um keine veralteten Werte zu zeigen.
+MAX_BLOCKFEHLER = 3
 
 
 @dataclass(slots=True)
@@ -82,9 +99,26 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         )
         self._client = client
         self._unit_id = unit_id
+        #: Fehlversuche in Folge je Block, Schlüssel ist die Startadresse.
+        self._blockfehler: dict[int, int] = {}
 
     async def _async_update_data(self) -> dict[int, int]:
+        vorher = self.data or {}
         werte: dict[int, int] = {}
+        erfolge = 0
+        gescheitert: list[str] = []
+
+        def uebernehmen(start: int, anzahl: int, fehler: str) -> None:
+            """Behält die zuletzt gelesenen Werte eines Blocks -- oder gibt ihn auf."""
+            gescheitert.append(fehler)
+            zaehler = self._blockfehler.get(start, 0) + 1
+            self._blockfehler[start] = zaehler
+            if zaehler > MAX_BLOCKFEHLER:
+                return          # Werte verwerfen: Entitäten melden "unknown"
+            for nummer in range(start, start + anzahl):
+                if nummer in vorher:
+                    werte[nummer] = vorher[nummer]
+
         for basis, bloecke, lese in (
             (INPUT_BASE, INPUT_BLOCKS, read_input_sync),
             (HOLDING_BASE, HOLDING_BLOCKS, read_holding_sync),
@@ -94,9 +128,11 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
                     lese, self._client, self._unit_id, start - basis, anzahl
                 )
                 if err or res is None or not hasattr(res, "registers"):
-                    raise UpdateFailed(
-                        f"Block ab {start} ({anzahl} Register) nicht lesbar: {err}"
-                    )
+                    uebernehmen(start, anzahl,
+                                f"Block ab {start} ({anzahl} Register): {err}")
+                    continue
+                erfolge += 1
+                self._blockfehler.pop(start, None)
                 for versatz, rohwert in enumerate(res.registers):
                     werte[start + versatz] = rohwert
 
@@ -111,19 +147,27 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
                     lese, self._client, self._unit_id, start - basis, anzahl
                 )
                 if err or res is None or not hasattr(res, "bits"):
-                    raise UpdateFailed(
-                        f"Bitblock ab {start} ({anzahl} Bits) nicht lesbar: {err}"
-                    )
+                    uebernehmen(start, anzahl,
+                                f"Bitblock ab {start} ({anzahl} Bits): {err}")
+                    continue
+                erfolge += 1
+                self._blockfehler.pop(start, None)
                 # bits ist auf ganze Bytes aufgefuellt, deshalb abschneiden.
                 for versatz, bit in enumerate(res.bits[:anzahl]):
                     werte[start + versatz] = int(bit)
 
-        _LOGGER.debug(
-            "%d Werte in %d Anfragen gelesen",
-            len(werte),
-            len(INPUT_BLOCKS) + len(HOLDING_BLOCKS)
-            + len(COIL_BLOCKS) + len(DISCRETE_BLOCKS),
-        )
+        if erfolge == 0:
+            # Kein einziger Block hat geantwortet -- die Verbindung ist weg.
+            # Erst hier gehen die Entitaeten auf "unavailable".
+            raise UpdateFailed("; ".join(gescheitert) or "keine Antwort von der Anlage")
+
+        if gescheitert:
+            _LOGGER.warning(
+                "%d von %d Bloecken nicht lesbar, letzte Werte bleiben stehen: %s",
+                len(gescheitert), erfolge + len(gescheitert), "; ".join(gescheitert),
+            )
+        else:
+            _LOGGER.debug("%d Werte in %d Anfragen gelesen", len(werte), erfolge)
         return werte
 
     def rohwert(self, register: int) -> int | None:

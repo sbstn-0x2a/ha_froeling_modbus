@@ -47,6 +47,15 @@ Wer umstellen möchte, benennt die Entitäten über
   statt 60 s. An der Anlage gemessen ändern sich Werte im 2-Sekunden-Takt,
   und ein Schneckenlauf von 11 s fiel bei 60 s regelmäßig zwischen zwei
   Abfragen.
+* **Ein gestörter Registerblock legt nicht mehr die ganze Anlage lahm.**
+  Vorher las jede Entität ihr Register selbst; ein Aussetzer am Gateway setzte
+  genau diesen einen Wert auf `unknown`. Mit dem Coordinator hätte ein
+  einzelner Fehler alle 177 Entitäten gleichzeitig auf `unavailable` gesetzt —
+  Automationen mit Zustandstriggern wären bei jedem Netzwerkhusten
+  losgelaufen. Jetzt behält ein fehlgeschlagener Block seine letzten Werte;
+  erst nach drei Fehlversuchen in Folge melden die betroffenen Entitäten
+  `unknown`. Nur wenn kein einziger Block antwortet, gilt die Anlage als
+  nicht erreichbar.
 * Deinstallationsanleitung in beiden READMEs.
 * Die Testsuite liegt im Repository (83 Tests, ohne Anlage und ohne
   Home-Assistant-Installation lauffähig).
