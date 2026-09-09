@@ -104,7 +104,7 @@ class _BaseNumber(CoordinatorEntity[FroelingCoordinator], NumberEntity):
         super().__init__(coordinator)
         self._device_name = data["name"]
         self._entity_id = entity_id
-        self.entity_id = objekt_id("number", self._device_name, self._entity_id)
+        self.entity_id = objekt_id("number", self._device_name, device_key, self._entity_id)
         self._attr_translation_key = _tr_key(self._entity_id)
         self._register = register
         self._unit = unit
