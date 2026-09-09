@@ -22,6 +22,22 @@ Damit lassen sich Zustände und Messwerte der Heizanlage (Kessel, Heizkreise, Pu
 
 ---
 
+## ⚠️ Unterstützte Anlagen
+
+Entwickelt und geprüft an einer **Fröling SP Dual Compact mit Lambdatronic
+S3200**, angebunden über Modbus TCP an einem RS485-Gateway.
+
+Die Registerkarte ist auf dieses Layout festgelegt. Andere Baureihen nutzen
+andere Adressen — die P5 / Lambdatronic P3200 etwa mit einem Versatz von 1000,
+die S3100 weicht ebenfalls ab. Eine solche Anlage verbindet sich zwar, die
+Werte gehören dann aber zu den falschen Größen. Mehr als zwei Heizkreise und
+Solarmodule sind ebenfalls nicht abgedeckt.
+
+Wenn deine Anlage abweicht: bitte ein Issue mit der Typenbezeichnung öffnen,
+statt den angezeigten Werten zu vertrauen.
+
+---
+
 ## 📦 Installation
 
 ### Variante 1: Über HACS (empfohlen)

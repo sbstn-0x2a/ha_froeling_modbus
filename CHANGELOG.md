@@ -74,7 +74,15 @@ Wer umstellen möchte, benennt die Entitäten über
   gleichzeitig auf denselben Socket und die Antworten kamen vermischt zurück —
   ein Wert konnte am falschen Register landen. Der Coordinator serialisiert
   die Zugriffe jetzt je Vorgang.
-* Deinstallationsanleitung in beiden READMEs.
+* **Reste abgewählter Anlagenteile verschwinden beim Start.** Bisher räumte
+  die Integration nur auf, wenn eine Gruppe gerade abgewählt wurde. Wer sie
+  vorher abgewählt hatte, behielt ihre Entitäten dauerhaft als `unavailable`
+  in der Registry — bei der Zirkulationspumpe drei Stück, weil sie kein
+  eigenes Gerät hat und unter Boiler 01 hängt.
+* Deinstallationsanleitung in beiden READMEs, dazu ein Abschnitt zu den
+  unterstützten Anlagen: Die Registerkarte gilt für die SP Dual Compact mit
+  Lambdatronic S3200. Andere Baureihen verbinden sich zwar, liefern die Werte
+  dann aber zu den falschen Größen.
 * Die Testsuite liegt im Repository (83 Tests, ohne Anlage und ohne
   Home-Assistant-Installation lauffähig).
 

@@ -22,6 +22,22 @@ It allows you to read states and sensor values of your heating system (boiler, h
 
 ---
 
+## ⚠️ Supported equipment
+
+Developed and tested against a **Fröling SP Dual Compact with Lambdatronic
+S3200**, connected over Modbus TCP through an RS485 gateway.
+
+The register map is fixed to that layout. Other models use different
+addresses — the P5 / Lambdatronic P3200 for instance shifts them by an offset
+of 1000, and the S3100 differs as well. Such a device will connect, but the
+values will belong to the wrong quantities. More than two heating circuits and
+solar modules are not covered either.
+
+If your plant differs, please open an issue with the model designation rather
+than relying on the readings.
+
+---
+
 ## 📦 Installation
 
 ### Option 1 – via HACS (recommended)

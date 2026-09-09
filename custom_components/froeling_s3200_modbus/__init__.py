@@ -41,6 +41,18 @@ GRUPPEN_OHNE_EIGENES_GERAET: dict[str, tuple[tuple[str, str], ...]] = {
 }
 
 
+#: Die sieben Anlagenteile, die sich ein- und ausblenden lassen.
+GRUPPEN = (
+    "kessel",
+    "boiler01",
+    "hk01",
+    "hk02",
+    "austragung",
+    "puffer01",
+    "zirkulationspumpe",
+)
+
+
 PLATFORMS = [
     Platform.SENSOR,
     Platform.NUMBER,
@@ -52,6 +64,45 @@ PLATFORMS = [
 
 async def async_setup(hass: HomeAssistant, config: dict):
     return True
+
+
+def _gruppen_entfernen(hass: HomeAssistant, entry: ConfigEntry, name: str,
+                       gruppen) -> int:
+    """Entfernt Geraete und Entitaeten abgewaehlter Anlagenteile.
+
+    Laeuft ueber das Geraet der Gruppe: alles, was daran haengt, verschwindet.
+    Entitaeten ohne eigenes Gruppengeraet stehen in
+    GRUPPEN_OHNE_EIGENES_GERAET und werden vorher einzeln entfernt.
+
+    Rueckgabe ist die Zahl der entfernten Entitaeten.
+    """
+    ent_reg = er.async_get(hass)
+    dev_reg = dr.async_get(hass)
+    entfernt = 0
+
+    for gruppe in gruppen:
+        for entity_domain, schluessel in GRUPPEN_OHNE_EIGENES_GERAET.get(gruppe, ()):
+            entity_id = ent_reg.async_get_entity_id(
+                entity_domain, DOMAIN, f"{name}_{schluessel}"
+            )
+            if entity_id:
+                ent_reg.async_remove(entity_id)
+                entfernt += 1
+
+        device = dev_reg.async_get_device({(DOMAIN, f"{name}:{gruppe}")})
+        if not device:
+            continue
+
+        for ent in list(ent_reg.entities.values()):
+            if ent.config_entry_id == entry.entry_id and ent.device_id == device.id:
+                ent_reg.async_remove(ent.entity_id)
+                entfernt += 1
+        try:
+            dev_reg.async_remove_device(device.id)
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Geraet %s liess sich nicht entfernen", device.id)
+
+    return entfernt
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -104,6 +155,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await coordinator.async_refresh()
     entry.runtime_data = FroelingRuntimeData(coordinator, data)
 
+    # Reste abgewaehlter Anlagenteile entfernen. Bisher passierte das nur beim
+    # Aendern der Optionen -- wer eine Gruppe vor diesem Update abgewaehlt
+    # hatte, behielt deren Entitaeten dauerhaft als "unavailable" in der
+    # Registry.
+    abgewaehlt = [g for g in GRUPPEN if not data.get(g, False)]
+    if abgewaehlt and (weg := _gruppen_entfernen(hass, entry, data["name"], abgewaehlt)):
+        _LOGGER.info(
+            "%d verwaiste Entitaet(en) abgewaehlter Anlagenteile entfernt: %s",
+            weg, ", ".join(abgewaehlt),
+        )
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # ---- Options-Update: deaktivierte Gruppen aufräumen und reloaden ----
@@ -118,39 +180,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         ent_reg = er.async_get(hass)
         dev_reg = dr.async_get(hass)
 
-        groups = [
-            "kessel",
-            "boiler01",
-            "hk01",
-            "hk02",
-            "austragung",
-            "puffer01",
-            "zirkulationspumpe",
+        neu_abgewaehlt = [
+            g for g in GRUPPEN
+            if old_cfg.get(g, False) and not new_cfg.get(g, False)
         ]
-
-        to_remove = [g for g in groups if old_cfg.get(g, False) and not new_cfg.get(g, False)]
-
-        for g in to_remove:
-            # Zuerst die Ausnahmen: Entitaeten ohne eigenes Gruppengeraet.
-            for entity_domain, schluessel in GRUPPEN_OHNE_EIGENES_GERAET.get(g, ()):
-                eindeutig = f"{name}_{schluessel}"
-                entity_id = ent_reg.async_get_entity_id(entity_domain, DOMAIN, eindeutig)
-                if entity_id:
-                    ent_reg.async_remove(entity_id)
-
-            ident = (DOMAIN, f"{name}:{g}")
-            device = dev_reg.async_get_device({ident})
-            if not device:
-                continue
-
-            for ent in list(ent_reg.entities.values()):
-                if ent.config_entry_id == updated_entry.entry_id and ent.device_id == device.id:
-                    ent_reg.async_remove(ent.entity_id)
-
-            try:
-                dev_reg.async_remove_device(device.id)
-            except Exception:
-                _LOGGER.debug("Device %s konnte nicht entfernt werden", device.id)
+        _gruppen_entfernen(hass, updated_entry, name, neu_abgewaehlt)
 
         await hass.config_entries.async_reload(updated_entry.entry_id)
 
