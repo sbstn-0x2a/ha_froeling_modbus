@@ -61,17 +61,25 @@ Wer umstellen möchte, benennt die Entitäten über
   Sensoren *mit* Einheit eine `state_class`. Die Bedingung war falsch — der
   Recorder braucht keine Einheit, nur eine `state_class`. Damit führen jetzt
   auch Brennerstarts und Reinigungen Statistik.
-* **Zähler als `total_increasing`.** 18 weitere Sensoren waren als
-  `measurement` eingetragen, obwohl sie nur aufwärts laufen: sämtliche
-  `betriebsstunden_*`, die vier Stundenzähler für Pellets-, Heiz-,
-  Teillast- und Scheitholzbetrieb sowie der Gesamt-Pelletverbrauch. Als
-  `measurement` bildete die Statistik daraus Mittelwerte statt Zuwächse —
-  Verbrauchsauswertungen waren damit nicht möglich.
+* **Zähler als `total_increasing`.** 24 Sensoren waren als `measurement`
+  eingetragen, obwohl sie nur aufwärts laufen: sämtliche
+  `betriebsstunden_*`, die Stundenzähler für Pellets-, Heiz-, Teillast- und
+  Scheitholzbetrieb, die Stunden seit der letzten Wartung, der
+  Pelletverbrauch, die beiden rücksetzbaren Mengenzähler sowie Tages- und
+  Gesamtertrag und die vom Kessel erzeugte Wärmemenge. Als `measurement`
+  bildete die Statistik daraus Mittelwerte statt Zuwächse — für
+  Verbrauchsauswertungen brauchte man Hilfsentitäten.
 
-  Bewusst weiterhin `measurement`: die beiden `resetierbar*`-Zähler und
-  `stunden_seit_letzter_wartung`, weil sie zurückgesetzt werden, sowie
-  `tagesertrag`, `gesamtertrag` und `kessel_waermemenge_vom_kessel`, weil
-  ungeklärt ist, ob eine Anlage ohne Wärmemengenzähler sie überhaupt füllt.
+  Dass einige davon zurückgesetzt werden (Wartung, die `resetierbar*`-Zähler,
+  der Tagesertrag), spricht nicht dagegen: Genau dafür gibt es
+  `total_increasing` neben `total` — der Recorder erkennt den Rücksprung als
+  Reset und zählt den Zuwachs korrekt weiter.
+
+  `measurement` bleiben nur die beiden Abwärtszähler
+  (`zeit_bis_zur_naechsten_reinigung`,
+  `kessel_verbleibende_heizstunden_bis_asche_entleeren`) und neun
+  Einstellwerte auf Holding-Registern, die trotz Minuten-Einheit keine
+  Laufzeiten sind.
 
   Beim Wechsel der `state_class` beginnt der Recorder für die betroffenen
   Sensoren eine neue Statistikreihe. Die bisher gesammelten Mittelwerte
