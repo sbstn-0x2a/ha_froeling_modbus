@@ -10,7 +10,12 @@
 Installationen**. Die `entity_id` ändert sich dabei nicht, Automationen und
 Dashboards funktionieren weiter — nur die angezeigte Beschriftung ist neu.
 Wer die alte Beschriftung behalten will, kann die Entität in Home Assistant
-umbenennen; eine gesetzte Bezeichnung gewinnt.
+umbenennen; eine gesetzte Bezeichnung gewinnt und bekommt kein Präfix.
+
+Bei einem langen Anlagennamen wird das schnell unhandlich — aus
+„Anlagenzustand" wird dann etwa „Froeling SP Dual compact Anlagenzustand".
+In dem Fall lohnt es sich, das Gerät in den Geräteeinstellungen kürzer zu
+benennen; der Anzeigename der Entitäten folgt dem sofort.
 
 **Neue Installationen bekommen andere `entity_id`.** Sie sind jetzt nach
 Anlage, Gerät und Größe gegliedert:
