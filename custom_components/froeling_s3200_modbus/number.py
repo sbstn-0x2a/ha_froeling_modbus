@@ -6,7 +6,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import FroelingCoordinator
-from .device import tr_key as _tr_key, device_info_for
+from .device import tr_key as _tr_key, device_info_for, objekt_id
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -104,6 +104,7 @@ class _BaseNumber(CoordinatorEntity[FroelingCoordinator], NumberEntity):
         self._translations = translations
         self._device_name = data["name"]
         self._entity_id = entity_id
+        self.entity_id = objekt_id("number", self._device_name, self._entity_id)
         self._register = register
         self._unit = unit
         self._scaling_factor = scaling_factor

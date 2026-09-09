@@ -7,7 +7,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import FroelingCoordinator
-from .device import tr_key as _tr_key, device_info_for
+from .device import tr_key as _tr_key, device_info_for, objekt_id
 from .timeconv import register_to_time, time_to_register
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,6 +65,7 @@ class _BaseTimeOfDay(CoordinatorEntity[FroelingCoordinator], TimeEntity):
         self._translations = translations
         self._device_name = data["name"]
         self._entity_id = entity_id
+        self.entity_id = objekt_id("time", self._device_name, self._entity_id)
         self._register = register
         self._device_key = device_key
         # Gilt nach einem Schreibvorgang, bis der Coordinator neu gelesen hat.
@@ -127,6 +128,7 @@ class FroelingAustragungDelayAsTime(CoordinatorEntity[FroelingCoordinator], Time
         self._translations = translations
         self._device_name = data["name"]
         self._entity_id = entity_id
+        self.entity_id = objekt_id("time", self._device_name, self._entity_id)
         self._register = register
         self._device_key = device_key
         self._optimistisch: time | None = None

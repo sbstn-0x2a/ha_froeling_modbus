@@ -6,6 +6,8 @@ abgedriftet (DEVICE_NAME fehlte ein Eintrag).
 
 from __future__ import annotations
 
+from homeassistant.util import slugify
+
 from .const import VERSION
 
 #: Anzeigenamen der Untergeräte. Der Regler selbst traegt den Namen, den der
@@ -52,3 +54,18 @@ def device_info_for(device_key: str, device_name_from_config: str, domain: str):
 
 def tr_key(s: str) -> str:
     return "".join(ch.lower() if ch.isalnum() else "_" for ch in s)
+
+
+def objekt_id(plattform: str, device_name_from_config: str, entity_key: str) -> str:
+    """Vorschlag fuer die entity_id einer Entitaet.
+
+    Gebildet aus dem bei der Einrichtung vergebenen Anlagennamen und dem
+    internen Schluessel -- nicht aus dem uebersetzten Anzeigenamen. Sonst
+    haengt die entity_id an der Sprache von Home Assistant, und dieselbe
+    Anlage traegt in zwei Installationen verschiedene Kennungen.
+
+    Home Assistant nimmt den Vorschlag nur an, wenn die Entitaet neu
+    angelegt wird; ein bestehender Registry-Eintrag behaelt seine
+    entity_id. Bestandsinstallationen aendern sich also nicht.
+    """
+    return f"{plattform}.{slugify(device_name_from_config)}_{slugify(entity_key)}"
