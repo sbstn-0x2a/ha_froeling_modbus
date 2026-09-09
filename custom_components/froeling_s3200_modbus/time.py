@@ -2,11 +2,9 @@ from __future__ import annotations
 from datetime import time
 import logging
 from homeassistant.components.time import TimeEntity
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
-from .coordinator import FroelingCoordinator
-from .device import tr_key as _tr_key, device_info_for, objekt_id
+from .entity import FroelingEntity
 from .timeconv import register_to_time, time_to_register
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,7 +23,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     data = laufzeit.konfiguration
     if not data.get("austragung", False):
         return
-
 
     entities = [
         # 40062 – Start 1. Pelletsbefüllung (R/W, echte Tageszeit)
@@ -52,33 +49,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(entities)
 
 # ---------------- Basisklasse: Tageszeit ----------------
-class _BaseTimeOfDay(CoordinatorEntity[FroelingCoordinator], TimeEntity):
+class _BaseTimeOfDay(FroelingEntity, TimeEntity):
     """Tageszeit aus einem Holding-Register (Minuten seit Mitternacht)."""
 
-    _attr_should_poll = False
-    # Der Anzeigename beschreibt nur die Entität; Home Assistant
-    # stellt den Gerätenamen voran.
-    _attr_has_entity_name = True
+    _plattform = "time"
 
     def __init__(self, coordinator, data, entity_id: str,
                  register: int, device_key="controller"):
-        super().__init__(coordinator)
-        self._device_name = data["name"]
-        self._entity_id = entity_id
-        self.entity_id = objekt_id("time", self._device_name, device_key, self._entity_id)
-        self._attr_translation_key = _tr_key(self._entity_id)
+        super().__init__(coordinator, data, entity_id, device_key)
         self._register = register
-        self._device_key = device_key
         # Gilt nach einem Schreibvorgang, bis der Coordinator neu gelesen hat.
         self._optimistisch: time | None = None
-
-    @property
-    def unique_id(self) -> str:
-        return f"{self._device_name}_{self._entity_id}"
-
-    @property
-    def device_info(self):
-        return device_info_for(self._device_key, self._device_name, DOMAIN)
 
     @property
     def native_value(self) -> time | None:
@@ -106,37 +87,20 @@ class FroelingAustragungTimeOfDayReadOnly(_BaseTimeOfDay):
     """R/O Tageszeit (40095)."""
 
 
-class FroelingAustragungDelayAsTime(CoordinatorEntity[FroelingCoordinator], TimeEntity):
+class FroelingAustragungDelayAsTime(FroelingEntity, TimeEntity):
     """Dauer 40252 (0..24 h in 0,1-h-Schritten), dargestellt als HH:MM.
 
     Keine Tageszeit: Der Rohwert zaehlt Zehntelstunden, deshalb eigene
     Umrechnung statt register_to_time.
     """
 
-    _attr_should_poll = False
-    # Der Anzeigename beschreibt nur die Entität; Home Assistant
-    # stellt den Gerätenamen voran.
-    _attr_has_entity_name = True
+    _plattform = "time"
 
     def __init__(self, coordinator, data, entity_id: str,
                  register: int, device_key="controller"):
-        super().__init__(coordinator)
-        self._device_name = data["name"]
-        self._entity_id = entity_id
-        self.entity_id = objekt_id("time", self._device_name, device_key, self._entity_id)
-        self._attr_translation_key = _tr_key(self._entity_id)
+        super().__init__(coordinator, data, entity_id, device_key)
         self._register = register
-        self._device_key = device_key
         self._optimistisch: time | None = None
-
-
-    @property
-    def unique_id(self) -> str:
-        return f"{self._device_name}_{self._entity_id}"
-
-    @property
-    def device_info(self):
-        return device_info_for(self._device_key, self._device_name, DOMAIN)
 
     @staticmethod
     def _als_zeit(rohwert: int) -> time:

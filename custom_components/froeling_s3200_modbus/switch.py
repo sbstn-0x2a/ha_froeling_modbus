@@ -1,10 +1,8 @@
 from homeassistant.components.switch import SwitchEntity
 import logging
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
-from .coordinator import FroelingCoordinator
-from .device import tr_key as _tr_key, device_info_for, objekt_id
+from .entity import FroelingEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,30 +46,17 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 # ---------------- Basisklasse ----------------
-class _BaseSwitch(CoordinatorEntity[FroelingCoordinator], SwitchEntity):
+class _BaseSwitch(FroelingEntity, SwitchEntity):
     """Schalter auf einem Holding-Register. Wert aus dem Coordinator."""
 
-    _attr_should_poll = False
-    # Der Anzeigename beschreibt nur die Entität; Home Assistant
-    # stellt den Gerätenamen voran.
-    _attr_has_entity_name = True
+    _plattform = "switch"
 
     def __init__(self, coordinator, data, entity_id: str,
                  register: int, device_key="controller"):
-        super().__init__(coordinator)
-        self._device_name = data["name"]
-        self._entity_id = entity_id
-        self.entity_id = objekt_id("switch", self._device_name, device_key, self._entity_id)
-        self._attr_translation_key = _tr_key(self._entity_id)
+        super().__init__(coordinator, data, entity_id, device_key)
         self._register = register
-        self._device_key = device_key
         # Gilt nach einem Schaltvorgang, bis der Coordinator neu gelesen hat.
         self._optimistisch: bool | None = None
-
-
-    @property
-    def unique_id(self):
-        return f"{self._device_name}_{self._entity_id}"
 
     @property
     def is_on(self):
@@ -79,10 +64,6 @@ class _BaseSwitch(CoordinatorEntity[FroelingCoordinator], SwitchEntity):
             return self._optimistisch
         roh = self.coordinator.rohwert(self._register)
         return None if roh is None else bool(roh)
-
-    @property
-    def device_info(self):
-        return device_info_for(self._device_key, self._device_name, DOMAIN)
 
     def _handle_coordinator_update(self) -> None:
         self._optimistisch = None

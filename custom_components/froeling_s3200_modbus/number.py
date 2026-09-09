@@ -1,11 +1,9 @@
 from homeassistant.components.number import NumberEntity, NumberDeviceClass
 import logging
 from datetime import datetime, timezone, timedelta
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
-from .coordinator import FroelingCoordinator
-from .device import tr_key as _tr_key, device_info_for, objekt_id
+from .entity import FroelingEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -90,33 +88,24 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(numbers)
 
 
-class _BaseNumber(CoordinatorEntity[FroelingCoordinator], NumberEntity):
+class _BaseNumber(FroelingEntity, NumberEntity):
     """Gemeinsames Verhalten. Der Wert stammt aus dem Coordinator."""
 
-    _attr_should_poll = False
-    # Der Anzeigename beschreibt nur die Entität; Home Assistant
-    # stellt den Gerätenamen voran.
-    _attr_has_entity_name = True
+    _plattform = "number"
 
     def __init__(self, coordinator, data, entity_id, register, unit,
                  scaling_factor, decimal_places=0, min_value=0, max_value=0,
                  device_key="controller", device_class: str | NumberDeviceClass | None = None):
-        super().__init__(coordinator)
-        self._device_name = data["name"]
-        self._entity_id = entity_id
-        self.entity_id = objekt_id("number", self._device_name, device_key, self._entity_id)
-        self._attr_translation_key = _tr_key(self._entity_id)
+        super().__init__(coordinator, data, entity_id, device_key)
         self._register = register
         self._unit = unit
         self._scaling_factor = scaling_factor
         self._decimal_places = decimal_places
         self._min_value = float(min_value)
         self._max_value = float(max_value)
-        self._device_key = device_key
         # Nach einem Schreibvorgang gilt dieser Wert, bis der Coordinator das
         # Register erneut gelesen hat.
         self._optimistisch: float | None = None
-
 
         dc = device_class
         if isinstance(device_class, str):
@@ -162,10 +151,6 @@ class _BaseNumber(CoordinatorEntity[FroelingCoordinator], NumberEntity):
             return int(step) if step.is_integer() else round(step, max(0, self._decimal_places))
         except Exception:
             return None
-
-    @property
-    def device_info(self):
-        return device_info_for(self._device_key, self._device_name, DOMAIN)
 
     def _handle_coordinator_update(self) -> None:
         # Frische Registerwerte loesen die optimistische Anzeige ab.

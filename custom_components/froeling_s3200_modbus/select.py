@@ -2,11 +2,10 @@ from __future__ import annotations
 import logging
 from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.translation import async_get_translations
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
-from .coordinator import FroelingCoordinator
-from .device import tr_key as _tr_key, device_info_for, objekt_id
+from .device import tr_key as _tr_key
+from .entity import FroelingEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,7 +59,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     # Übersetzungen: nur der erlaubte "entity"-Namespace
     translations = await async_get_translations(hass, hass.config.language, "entity")
-
 
     def create_selects():
         entities: list[SelectEntity] = []
@@ -123,7 +121,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 # --------------------------- Entity ---------------------------
-class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
+class FroelingSelect(FroelingEntity, SelectEntity):
     """Auswahl auf einem Holding-Register.
 
     Optionen und aktuelle Auswahl werden aus dem Rohwert abgeleitet. Ein Wert,
@@ -131,23 +129,15 @@ class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
     sonst liesse sich der Zustand der Anlage nicht anzeigen.
     """
 
-    _attr_should_poll = False
-    # Der Anzeigename beschreibt nur die Entität; Home Assistant
-    # stellt den Gerätenamen voran.
-    _attr_has_entity_name = True
+    _plattform = "select"
 
     def __init__(self, coordinator, translations, data, entity_id: str,
                  register: int, device_key: str, group_key: str,
                  code_to_key: dict[int, str], key_to_code: dict[str, int],
                  name_fallback: str):
-        super().__init__(coordinator)
+        super().__init__(coordinator, data, entity_id, device_key)
         self._translations = translations
-        self._device_name = data["name"]
-        self._entity_id = entity_id
-        self.entity_id = objekt_id("select", self._device_name, device_key, self._entity_id)
-        self._attr_translation_key = _tr_key(self._entity_id)
         self._register = register
-        self._device_key = device_key
         self._group_key = group_key
         self._code_to_key = dict(code_to_key)
         self._key_to_code = dict(key_to_code)
@@ -155,7 +145,6 @@ class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
         self._name_fallback = name_fallback
         # Gilt nach einer Auswahl, bis der Coordinator neu gelesen hat.
         self._optimistisch: int | None = None
-
 
     def _label_for_key(self, opt_key: str) -> str:
         entity_key = _tr_key(self._entity_id)
@@ -169,10 +158,6 @@ class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
         if self._optimistisch is not None:
             return self._optimistisch
         return self.coordinator.rohwert(self._register)
-
-    @property
-    def unique_id(self) -> str:
-        return f"{self._device_name}_{self._entity_id}"
 
     @property
     def options(self) -> list[str]:
@@ -189,10 +174,6 @@ class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
             return None
         schluessel = self._code_to_key.get(roh)
         return self._label_for_key(schluessel) if schluessel else f"Wert {roh}"
-
-    @property
-    def device_info(self):
-        return device_info_for(self._device_key, self._device_name, DOMAIN)
 
     def _handle_coordinator_update(self) -> None:
         self._optimistisch = None
