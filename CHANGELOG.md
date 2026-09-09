@@ -100,6 +100,24 @@ Wer umstellen möchte, benennt die Entitäten über
 * Die Testsuite liegt im Repository (83 Tests, ohne Anlage und ohne
   Home-Assistant-Installation lauffähig).
 
+### Kesselfernsteuerung
+
+* Die fünf Entitäten auf den Fernsteuerregistern (48001, 48002, 48019, 48029,
+  48030) sind **standardmäßig deaktiviert** und heißen jetzt „… (Fernsteuerung)“.
+  Am Gerät gemessen: Ein einzelner Schreibzugriff schaltet die Sollwertvorgabe
+  für alle Heizkreise und Boiler gleichzeitig ein, und nach zwei Minuten ohne
+  weiteren Schreibzugriff fällt die Anlage zurück, während Home Assistant den
+  Wert weiter anzeigt. Bestehende Registry-Einträge bleiben, wie sie sind.
+  Einzelheiten im README-Abschnitt „Kesselfernsteuerung“.
+* Das FC06-Echo wird geprüft. Antwortet die Anlage mit 0xFFFF (Wert innerhalb
+  der Mindestschaltdauer verworfen), meldet die Integration das als Fehler,
+  statt den nie übernommenen Wert anzuzeigen. Abweichende Echo-Adresse oder
+  ein abweichender Echo-Wert gelten ebenfalls als Fehler.
+* Die Attribute `modbus_override_active`, `min_switch_interval_min` und
+  `override_timeout_min` an allen Zahlen-Entitäten sind entfernt. Sie
+  stammten aus einem früheren Ansatz, standen auch an der
+  Kessel-Solltemperatur und sagten nichts Wahres.
+
 ### Behoben
 
 * **Der Regler trug den falschen Namen.** Am Hauptgerät stand fest

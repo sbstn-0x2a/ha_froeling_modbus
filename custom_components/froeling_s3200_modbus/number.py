@@ -1,8 +1,7 @@
 from homeassistant.components.number import NumberEntity, NumberDeviceClass
 import logging
-from datetime import datetime, timezone, timedelta
 
-from .const import DOMAIN
+from .const import DOMAIN, FERNSTEUERUNG_HINWEIS
 from .entity import FroelingEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,7 +39,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 FroelingNumberHolding(coordinator, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41038, "°C", 2, 0, -20, 50, device_key="hk01"),
                 FroelingNumberHolding(coordinator, data, "hk1_frostschutztemperatur", 41039, "°C", 2, 0, -30, 20, device_key="hk01"),
                 FroelingNumberHolding(coordinator, data, "hk1_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41048, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk01"),
-                FroelingNumberHolding(coordinator, data, "hk1_vorlauf_soll_modbus", 48001, "°C", 2, 0, 0, 75, device_key="hk01"),
+                FroelingNumberFernsteuerung(coordinator, data, "hk1_vorlauf_soll_modbus", 48001, "°C", 2, 0, 0, 75, device_key="hk01"),
             ])
 
         # --- Heizkreis 02 ---
@@ -54,7 +53,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 FroelingNumberHolding(coordinator, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41068, "°C", 2, 0, -20, 50, device_key="hk02"),
                 FroelingNumberHolding(coordinator, data, "hk2_frostschutztemperatur", 41069, "°C", 2, 0, -10, 20, device_key="hk02"),
                 FroelingNumberHolding(coordinator, data, "hk2_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41079, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk02"),
-                FroelingNumberHolding(coordinator, data, "hk2_vorlauf_soll_modbus", 48002, "°C", 2, 0, 0, 75, device_key="hk02"),
+                FroelingNumberFernsteuerung(coordinator, data, "hk2_vorlauf_soll_modbus", 48002, "°C", 2, 0, 0, 75, device_key="hk02"),
             ])
 
         # --- Boiler 01 ---
@@ -62,7 +61,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             nums.extend([
                 FroelingNumberHolding(coordinator, data, "boiler_1_gewuenschte_boilertemperatur", 41632, "°C", 2, 0, 10, 100, device_key="boiler01"),
                 FroelingNumberHolding(coordinator, data, "boiler_1_nachladen_wenn_boilertemperatur_unter", 41633, "°C", 2, 0, 1, 90, device_key="boiler01"),
-                FroelingNumberHolding(coordinator, data, "boiler_1_solltemperatur_modbus", 48019, "°C", 2, 0, 0, 65, device_key="boiler01"),
+                FroelingNumberFernsteuerung(coordinator, data, "boiler_1_solltemperatur_modbus", 48019, "°C", 2, 0, 0, 65, device_key="boiler01"),
             ])
 
         # --- Puffer 01 ---
@@ -166,44 +165,42 @@ class FroelingNumberInput(_BaseNumber):
 
 
 class FroelingNumberHolding(_BaseNumber):
-    """Holding-Register (4xxxx) -- les- und schreibbar."""
+    """Holding-Register (4xxxx) -- les- und schreibbar.
 
-    _override_timeout = timedelta(minutes=2)
-    _min_switch_interval = timedelta(minutes=10)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._last_write_utc: datetime | None = None
+    Vorher trug jede Instanz die Attribute ``modbus_override_active``,
+    ``min_switch_interval_min`` und ``override_timeout_min`` -- Reste eines
+    Ansatzes für die Kesselfernsteuerung, berechnet nur aus dem eigenen
+    letzten Schreibzeitpunkt. An der Kessel-Solltemperatur hatten sie keine
+    Bedeutung, und an den Fernsteuerregistern stimmten sie nicht: Die
+    Sollwertvorgabe wird von *jedem* Register 48001-48046 aktiviert, nicht nur
+    vom eigenen. Sie sind entfernt.
+    """
 
     @property
     def extra_state_attributes(self):
-        now = datetime.now(timezone.utc)
-        override_active = (
-            self._last_write_utc is not None
-            and now - self._last_write_utc <= self._override_timeout
-        )
-        return {
-            "register": self._register,
-            "last_write_utc": self._last_write_utc.isoformat() if self._last_write_utc else None,
-            "modbus_override_active": override_active,
-            "min_switch_interval_min": int(self._min_switch_interval.total_seconds() // 60),
-            "override_timeout_min": int(self._override_timeout.total_seconds() // 60),
-        }
+        return {"register": self._register}
 
     async def async_set_native_value(self, value):
         v = float(min(max(value, self._min_value), self._max_value))
         raw = int(round(v * float(self._scaling_factor)))
-
-        now = datetime.now(timezone.utc)
-        if self._last_write_utc and (now - self._last_write_utc) < self._min_switch_interval:
-            _LOGGER.warning(
-                "Schreibzugriff auf %s (Register %s) innerhalb der Mindestschaltdauer",
-                self._entity_id, self._register,
-            )
-
         if await self.coordinator.schreibe(self._register, raw) is not None:
             return
-
-        self._last_write_utc = now
         self._optimistisch = round(raw / float(self._scaling_factor), self._decimal_places)
         self.async_write_ha_state()
+
+
+class FroelingNumberFernsteuerung(FroelingNumberHolding):
+    """Sollwert der Kesselfernsteuerung (48001-48026).
+
+    Standardmäßig deaktiviert: Ein einzelner Schreibzugriff aktiviert die
+    Sollwertvorgabe der Anlage global und nur für zwei Minuten (B1200522
+    Kap. 2.6, am Gerät 09.09.2026 gemessen). Als Einzelentität ohne zyklisches
+    Nachschreiben ist das irreführend. Wer es bewusst nutzt, kann die Entität
+    in der Registry einschalten.
+    """
+
+    _attr_entity_registry_enabled_default = False
+
+    @property
+    def extra_state_attributes(self):
+        return {"register": self._register, "hinweis": FERNSTEUERUNG_HINWEIS}

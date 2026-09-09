@@ -122,6 +122,33 @@ These options are also located in:
 
 ---
 
+## 🔁 Boiler remote control (registers 48001–48046)
+
+Besides the ordinary parameters the controller offers an **external setpoint
+mode**: flow setpoint and enable flag per heating circuit plus the DHW
+setpoint (registers 48001–48046). It behaves unlike anything else in this
+integration, so the related entities ("Enable (remote control)", "Flow
+setpoint (remote control)", "Setpoint (remote control)") are **disabled by
+default**.
+
+Measured on the device (SP Dual Compact, 2026-09-09):
+
+* **A single write** to any of these registers activates the external
+  setpoints **for all heating circuits and DHW tanks at once**, using whatever
+  the other registers currently hold. Writing only the DHW setpoint also puts
+  the heating circuits onto their remote values.
+* If **more than two minutes** pass without another write, the controller
+  falls back to its own regulation. The entity in Home Assistant keeps showing
+  the written value anyway.
+* Toggling again **within ten minutes** is rejected by the controller (the
+  integration now reports that as an error) but still keeps the external mode
+  alive for another two minutes.
+
+For everyday needs (setback a circuit, change the DHW setpoint) the
+**operating mode** and the ordinary parameters are the right tools; they act
+permanently. A proper implementation with cyclic rewriting is planned as an
+optional feature.
+
 ## 🌐 Translations
 
 This integration includes full English translations for all configuration texts and entity names.  

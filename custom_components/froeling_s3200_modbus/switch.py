@@ -1,7 +1,7 @@
 from homeassistant.components.switch import SwitchEntity
 import logging
 
-from .const import DOMAIN
+from .const import DOMAIN, FERNSTEUERUNG_HINWEIS
 from .entity import FroelingEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,13 +26,13 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
         # --- Heizkreis 01 ---
         if data.get("hk01", False):
-            # 48029 Freigabe Heizkreis 01 (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, data, "hk1_freigabe", 48029, device_key="hk01"))
+            # 48029 Freigabe Heizkreis 01 (R/W, 0/1) -- Kesselfernsteuerung
+            sw.append(FroelingFernsteuerSwitch(coordinator, data, "hk1_freigabe", 48029, device_key="hk01"))
 
         # --- Heizkreis 02 ---
         if data.get("hk02", False):
-            # 48030 Freigabe Heizkreis 02 (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, data, "hk2_freigabe", 48030, device_key="hk02"))
+            # 48030 Freigabe Heizkreis 02 (R/W, 0/1) -- Kesselfernsteuerung
+            sw.append(FroelingFernsteuerSwitch(coordinator, data, "hk2_freigabe", 48030, device_key="hk02"))
 
         # --- Austragung ---
         if data.get("austragung", False):
@@ -84,3 +84,20 @@ class FroelingHoldingSwitch(_BaseSwitch):
             return
         self._optimistisch = ein
         self.async_write_ha_state()
+
+
+class FroelingFernsteuerSwitch(FroelingHoldingSwitch):
+    """Freigabe eines Heizkreises über die Kesselfernsteuerung (48029-48046).
+
+    Standardmäßig deaktiviert. Ein Klick schaltet die Sollwertvorgabe der
+    Anlage für alle Heizkreise und Boiler ein, mit dem aktuellen Inhalt der
+    übrigen Fernsteuerregister; nach zwei Minuten ohne weiteren Schreibzugriff
+    fällt die Anlage zurück, während der Schalter weiter "an" zeigt. Am Gerät
+    am 09.09.2026 gemessen, Einzelheiten im Befund zur Parameteranalyse.
+    """
+
+    _attr_entity_registry_enabled_default = False
+
+    @property
+    def extra_state_attributes(self):
+        return {"register": self._register, "hinweis": FERNSTEUERUNG_HINWEIS}

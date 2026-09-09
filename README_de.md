@@ -123,6 +123,33 @@ Diese Optionen befinden sich ebenfalls im Menü:
 
 ---
 
+## 🔁 Kesselfernsteuerung (Register 48001–48046)
+
+Die Anlage kennt neben den normalen Parametern eine **Sollwertvorgabe von
+außen**: Vorlauf-Solltemperatur und Freigabe je Heizkreis sowie die
+Boiler-Solltemperatur (Register 48001–48046). Sie verhält sich anders als
+alles andere in dieser Integration, deshalb sind die zugehörigen Entitäten
+(„Freigabe (Fernsteuerung)“, „Vorlauf-Soll (Fernsteuerung)“, „Solltemperatur
+(Fernsteuerung)“) **standardmäßig deaktiviert**.
+
+Was am Gerät gemessen wurde (SP Dual Compact, 09.09.2026):
+
+* **Ein einziger Schreibzugriff** auf eines dieser Register schaltet die
+  Vorgabe **für alle vorhandenen Heizkreise und Boiler gleichzeitig** ein, mit
+  dem aktuellen Inhalt der übrigen Register. Wer nur die Boiler-Solltemperatur
+  schreibt, schaltet damit auch die Heizkreise auf ihre Fernsteuer-Werte.
+* Bleibt danach **mehr als zwei Minuten** jeder weitere Schreibzugriff aus,
+  regelt die Anlage wieder selbst. Die Entität in Home Assistant zeigt den
+  geschriebenen Wert trotzdem weiter an.
+* Ein Schaltwechsel **innerhalb von zehn Minuten** wird von der Anlage
+  verworfen (die Integration meldet das seit dieser Version als Fehler), hält
+  die Vorgabe aber trotzdem für weitere zwei Minuten am Leben.
+
+Für die üblichen Wünsche (Heizkreis absenken, Boiler-Solltemperatur ändern)
+sind die **Betriebsart** und die normalen Parameter das richtige Werkzeug;
+sie wirken dauerhaft. Eine echte Umsetzung der Fernsteuerung mit zyklischem
+Nachschreiben ist als optionale Funktion geplant.
+
 ## 📚 Herstellerdokumentation
 
 Die Fröling-Handbücher und die Modbus-Registerliste liegen im Ordner

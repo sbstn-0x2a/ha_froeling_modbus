@@ -37,6 +37,7 @@ from pymodbus.client import ModbusTcpClient
 
 from .const import DOMAIN
 from .modbus import (
+    VERWORFEN,
     read_coils_sync,
     read_discrete_sync,
     read_holding_sync,
@@ -227,6 +228,15 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         _, err = await self._modbus(
             write_register_sync, register - HOLDING_BASE, rohwert
         )
+        if err == VERWORFEN:
+            # Kein Verbindungs- oder Adressfehler: Die Anlage hat den Wert
+            # bewusst nicht übernommen (Mindestschaltdauer der Fernsteuerung).
+            _LOGGER.warning(
+                "Register %s: Wert %s von der Regelung verworfen "
+                "(Mindestschaltdauer 10 min der Kesselfernsteuerung)",
+                register, rohwert,
+            )
+            return err
         if err:
             _LOGGER.error("Register %s nicht beschreibbar: %s", register, err)
             return err

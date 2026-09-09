@@ -22,6 +22,17 @@ MIN_INTERVALL = 15
 STANDARD_INTERVALL = 30
 MAX_INTERVALL = 3600
 
+#: Attribut der Entitaeten auf den Fernsteuerregistern 48001-48046. Sie sind
+#: standardmaessig deaktiviert; wer sie einschaltet, soll wissen, was sie tun.
+#: Verhalten laut B1200522 Kap. 2.6, am Geraet am 09.09.2026 bestaetigt.
+FERNSTEUERUNG_HINWEIS = (
+    "Kesselfernsteuerung: Jeder Schreibzugriff auf ein Register 48001-48046 "
+    "schaltet die Sollwertvorgabe für alle Heizkreise und Boiler ein. Ohne "
+    "weiteren Schreibzugriff fällt die Anlage nach zwei Minuten in ihre "
+    "eigene Regelung zurück; der hier gezeigte Wert bleibt trotzdem stehen. "
+    "Ein Wechsel innerhalb von zehn Minuten wird verworfen."
+)
+
 _LOGGER = logging.getLogger(__name__)
 _MANIFEST = Path(__file__).parent / "manifest.json"
 

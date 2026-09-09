@@ -471,13 +471,13 @@
         "name": "Pellet Storage – Remaining Stock"
       },
       "hk1_vorlauf_soll_modbus": {
-        "name": "Flow Setpoint (Modbus)"
+        "name": "Flow setpoint (remote control)"
       },
       "hk2_vorlauf_soll_modbus": {
-        "name": "Flow Setpoint (Modbus)"
+        "name": "Flow setpoint (remote control)"
       },
       "boiler_1_solltemperatur_modbus": {
-        "name": "Setpoint (Modbus)"
+        "name": "Setpoint (remote control)"
       },
       "puffer_1_delta_t_kessel_vs_grenzschicht": {
         "name": "ΔT Boiler vs. Stratification Layer"
@@ -602,10 +602,10 @@
         "name": "Automatic Log Ignition"
       },
       "hk1_freigabe": {
-        "name": "Enable"
+        "name": "Enable (remote control)"
       },
       "hk2_freigabe": {
-        "name": "Enable"
+        "name": "Enable (remote control)"
       }
     },
     "time": {

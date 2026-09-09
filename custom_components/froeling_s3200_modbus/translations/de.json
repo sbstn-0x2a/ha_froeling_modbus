@@ -471,13 +471,13 @@
         "name": "Pelletlager – Restbestand"
       },
       "hk1_vorlauf_soll_modbus": {
-        "name": "Vorlauf-Soll (Modbus)"
+        "name": "Vorlauf-Soll (Fernsteuerung)"
       },
       "hk2_vorlauf_soll_modbus": {
-        "name": "Vorlauf-Soll (Modbus)"
+        "name": "Vorlauf-Soll (Fernsteuerung)"
       },
       "boiler_1_solltemperatur_modbus": {
-        "name": "Solltemperatur (Modbus)"
+        "name": "Solltemperatur (Fernsteuerung)"
       },
       "puffer_1_delta_t_kessel_vs_grenzschicht": {
         "name": "ΔT Kessel/Grenzschicht"
@@ -602,10 +602,10 @@
         "name": "Automatische Scheitholzzündung"
       },
       "hk1_freigabe": {
-        "name": "Freigabe"
+        "name": "Freigabe (Fernsteuerung)"
       },
       "hk2_freigabe": {
-        "name": "Freigabe"
+        "name": "Freigabe (Fernsteuerung)"
       }
     },
     "time": {
