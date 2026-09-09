@@ -156,15 +156,21 @@ def _zustand(befund: erkennung.Befund | None, gruppe: str) -> str | None:
 
 
 def _vorbelegung(befund: erkennung.Befund | None, gruppe: str, bisher: bool | None = None) -> bool:
-    """Haken aus der Erkennung: vorhanden -> an, nicht vorhanden -> aus,
-    unsicher oder unbekannt -> wie bisher, sonst aus. Kessel immer an."""
+    """Haken aus der Erkennung.
+
+    Vorhanden -> an. Nicht vorhanden -> aus, **außer** das Teil ist bereits
+    aktiv: Ein abgewähltes Teil wird samt Entitäten entfernt, und das nimmt
+    die Historie mit. Deshalb schlägt das Neu-Einlesen kein Entfernen vor,
+    sondern nennt es nur in der Beschreibung; der Nutzer nimmt den Haken
+    selbst heraus. Unsicher oder unbekannt -> wie bisher. Kessel immer an.
+    """
     if gruppe == "kessel":
         return True
     zustand = _zustand(befund, gruppe)
     if zustand == erkennung.VORHANDEN:
         return True
     if zustand == erkennung.NICHT_VORHANDEN:
-        return False
+        return bool(bisher)
     return bool(bisher) if bisher is not None else befund is None
 
 
@@ -175,7 +181,7 @@ def _sichtbar(befund: erkennung.Befund | None, gruppe: str, bisher: bool | None 
     return _zustand(befund, gruppe) in (erkennung.VORHANDEN, erkennung.UNSICHER)
 
 
-def belege_text(befund: erkennung.Befund | None, gruppen=GRUPPEN) -> str:
+def belege_text(befund: erkennung.Befund | None, gruppen=GRUPPEN, bisher: dict | None = None) -> str:
     """Eine Zeile je Anlagenteil, für die Beschreibung des Formulars."""
     if befund is None:
         return "Die Anlage konnte nicht gelesen werden; alle Teile sind vorbelegt."
@@ -187,7 +193,10 @@ def belege_text(befund: erkennung.Befund | None, gruppen=GRUPPEN) -> str:
             continue
         name = DEVICE_NAME.get(gruppe, gruppe)
         marke = {erkennung.VORHANDEN: "✔", erkennung.NICHT_VORHANDEN: "✘", erkennung.UNSICHER: "?"}[eintrag.zustand]
-        zeilen.append(f"{marke} {name}: {eintrag.beleg}" if eintrag.beleg else f"{marke} {name}")
+        zeile = f"{marke} {name}: {eintrag.beleg}" if eintrag.beleg else f"{marke} {name}"
+        if bisher and bisher.get(gruppe) and eintrag.zustand == erkennung.NICHT_VORHANDEN:
+            zeile += " — bisher aktiv; Haken entfernen löscht die Entitäten samt Historie"
+        zeilen.append(zeile)
     if befund.fehlende_bloecke:
         zeilen.append(f"⚠ {len(befund.fehlende_bloecke)} Registerblock/-blöcke ohne Antwort")
     return "\n".join(zeilen)
@@ -364,5 +373,5 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 _gruppen_schema(GRUPPEN, lambda g: _vorbelegung(self._befund, g, cfg.get(g)))
             ),
-            description_placeholders={"belege": belege_text(self._befund)},
+            description_placeholders={"belege": belege_text(self._befund, bisher=cfg)},
         )
