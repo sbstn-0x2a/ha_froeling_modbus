@@ -42,6 +42,22 @@ Damit lassen sich Zustände und Messwerte der Heizanlage (Kessel, Heizkreise, Pu
 
 ---
 
+## 🗑️ Deinstallation
+
+1. Unter **Einstellungen → Geräte & Dienste** die Integration
+   **Froeling S3200 Modbus** öffnen, am Eintrag das Drei-Punkte-Menü
+   aufrufen und **Löschen** wählen. Damit verschwinden der Eintrag und alle
+   zugehörigen Geräte und Entitäten.
+2. Bei Installation über HACS zusätzlich: **HACS → Integrationen →
+   Froeling S3200 Modbus → Drei-Punkte-Menü → Entfernen**.
+3. Bei manueller Installation den Ordner
+   `config/custom_components/froeling_s3200_modbus` löschen.
+4. Home Assistant neu starten.
+
+Aufgezeichnete Historie und Langzeitstatistik bleiben erhalten, bis der
+Recorder sie regulär aufräumt. Auf die Heizung wird beim Deinstallieren
+nichts geschrieben.
+
 ## ⚙️ Konfiguration
 
 1. Gehe in Home Assistant auf:  

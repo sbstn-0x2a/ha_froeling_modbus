@@ -44,6 +44,20 @@ It allows you to read states and sensor values of your heating system (boiler, h
 
 ---
 
+## 🗑️ Removal
+
+1. Go to **Settings → Devices & Services**, open **Froeling S3200 Modbus**,
+   then use the three-dot menu on the entry and choose **Delete**.
+   This removes the config entry together with all its devices and entities.
+2. If the integration was installed through HACS: **HACS → Integrations →
+   Froeling S3200 Modbus → three-dot menu → Remove**.
+3. For a manual installation, delete the folder
+   `config/custom_components/froeling_s3200_modbus`.
+4. Restart Home Assistant.
+
+Recorded history and long-term statistics are kept until the recorder purges
+them. Nothing is written to the boiler during removal.
+
 ## ⚙️ Configuration
 
 1. In Home Assistant go to:  
