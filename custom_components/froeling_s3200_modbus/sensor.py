@@ -1,6 +1,5 @@
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 import logging
-from homeassistant.helpers.translation import async_get_translations
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -20,7 +19,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     laufzeit = config_entry.runtime_data
     coordinator = laufzeit.coordinator
     data = laufzeit.konfiguration
-    translations = await async_get_translations(hass, hass.config.language, "entity")
 
     ent_reg = er.async_get(hass)
     dev_name = data["name"]
@@ -40,56 +38,56 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     # ---------- TEXT-SENSOREN ----------
     def create_text_sensors():
         items = []
-        items.append(FroelingTextSensor(coordinator, translations, data, "anlagenzustand", 34001, ANLAGENZUSTAND_MAPPING, device_key="controller"))
+        items.append(FroelingTextSensor(coordinator, data, "anlagenzustand", 34001, ANLAGENZUSTAND_MAPPING, device_key="controller"))
         if data.get("kessel", False):
             items.append(
-                FroelingTextSensor(coordinator, translations, data, "kesselzustand", 34002, KESSELZUSTAND_MAPPING, device_key="kessel")
+                FroelingTextSensor(coordinator, data, "kesselzustand", 34002, KESSELZUSTAND_MAPPING, device_key="kessel")
                 )
         if data.get("boiler01", False):
             items.append(
-                FroelingTextHoldingSensor(coordinator, translations, data, "legionellentag", 41638, LEGIONELLENTAG_MAPPING, device_key="boiler01")
+                FroelingTextHoldingSensor(coordinator, data, "legionellentag", 41638, LEGIONELLENTAG_MAPPING, device_key="boiler01")
                 )
         if data.get("hk01", False):
             items.append(
-                FroelingTextHoldingSensor(coordinator, translations, data, "hk_01_pufferversorgung", 41045, HK01PUFFERVERSORGUNG_MAPPING, device_key="hk01")
+                FroelingTextHoldingSensor(coordinator, data, "hk_01_pufferversorgung", 41045, HK01PUFFERVERSORGUNG_MAPPING, device_key="hk01")
                 )
         if data.get("hk02", False):
             items.append(
-                FroelingTextHoldingSensor(coordinator, translations, data, "hk_02_pufferversorgung", 41075, HK02PUFFERVERSORGUNG_MAPPING, device_key="hk02")
+                FroelingTextHoldingSensor(coordinator, data, "hk_02_pufferversorgung", 41075, HK02PUFFERVERSORGUNG_MAPPING, device_key="hk02")
                 )
         return items
     # ---------- CONTROLLER-SENSOREN ----------
     def create_controller_sensors():
         return [
-            FroelingSensor(coordinator, translations, data, "boardtemperatur", 30003, "°C", 2, 0, device_class="temperature", device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "boardtemperatur_pelletsmodul", 30018, "°C", 2, 0, device_class="temperature", device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden", 30021, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "anzahl_der_brennerstarts", 30023, "", 1, 0, device_key="controller",
+            FroelingSensor(coordinator, data, "boardtemperatur", 30003, "°C", 2, 0, device_class="temperature", device_key="controller"),
+            FroelingSensor(coordinator, data, "boardtemperatur_pelletsmodul", 30018, "°C", 2, 0, device_class="temperature", device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden", 30021, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "anzahl_der_brennerstarts", 30023, "", 1, 0, device_key="controller",
                            state_class=SensorStateClass.TOTAL_INCREASING),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_in_der_feuererhaltung", 30025, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_stokerschnecke", 30040, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_foerderschnecke", 30041, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_ruettler", 30043, "min", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_wos", 30045, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_ascheschnecke", 30046, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_zuendung", 30047, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_lambdasonde", 30048, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_saugturbinen", 30049, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_austragsschnecke", 30050, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "lambdasondenspannung_gemessen", 30055, "mV", 100, 2, device_class="voltage", device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "stunden_seit_letzter_wartung", 30056, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "stunden_im_pelletsbetrieb", 30063, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "stunden_im_heizen", 30064, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "stunden_in_teillastbetrieb", 30075, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "stunden_im_scheitholzbetrieb", 30077, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "tagesertrag", 30085, "kWh", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "gesamtertrag", 30086, "kWh", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_saugturbine", 30098, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "anzahl_der_reinigungen", 30102, "", 1, 0, device_key="controller",
+            FroelingSensor(coordinator, data, "betriebsstunden_in_der_feuererhaltung", 30025, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_stokerschnecke", 30040, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_foerderschnecke", 30041, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_ruettler", 30043, "min", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_wos", 30045, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_ascheschnecke", 30046, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_zuendung", 30047, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_lambdasonde", 30048, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_saugturbinen", 30049, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_austragsschnecke", 30050, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "lambdasondenspannung_gemessen", 30055, "mV", 100, 2, device_class="voltage", device_key="controller"),
+            FroelingSensor(coordinator, data, "stunden_seit_letzter_wartung", 30056, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "stunden_im_pelletsbetrieb", 30063, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "stunden_im_heizen", 30064, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "stunden_in_teillastbetrieb", 30075, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "stunden_im_scheitholzbetrieb", 30077, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "tagesertrag", 30085, "kWh", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "gesamtertrag", 30086, "kWh", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_saugturbine", 30098, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "anzahl_der_reinigungen", 30102, "", 1, 0, device_key="controller",
                            state_class=SensorStateClass.TOTAL_INCREASING),
-            FroelingSensor(coordinator, translations, data, "zeit_bis_zur_naechsten_reinigung", 30103, "min", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "betriebsstunden_e_filter", 30104, "h", 1, 0, device_key="controller"),
-            FroelingSensor(coordinator, translations, data, "aussentemperatur", 31001, "°C", 2, 0, device_class="temperature", device_key="controller"),
+            FroelingSensor(coordinator, data, "zeit_bis_zur_naechsten_reinigung", 30103, "min", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "betriebsstunden_e_filter", 30104, "h", 1, 0, device_key="controller"),
+            FroelingSensor(coordinator, data, "aussentemperatur", 31001, "°C", 2, 0, device_class="temperature", device_key="controller"),
         ]
 
     # ---------- KOMPLETTER SENSOR-AUFBAU ----------
@@ -101,122 +99,122 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         # KESSEL
         if data.get("kessel", False):
             sensors.extend([
-                FroelingSensor(coordinator, translations, data, "kessel_kesseltemperatur", 30001, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_abgastemperatur", 30002, "°C", 1, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_restsauerstoffgehalt", 30004, "%", 10, 1, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_position_primaerluftklappe", 30005, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_saugzugdrehzahl", 30007, "Upm", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_fuehler_1", 30008, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_abgastemperatur_nach_brennwertwaermetauscher", 30009, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_ruecklauffuehler", 30010, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_luftgeschwindigkeit_ansaug", 30011, "m/s", 100, 2, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_primaerluft", 30012, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_saugzug_ansteuerung", 30013, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_sekundaerluft", 30014, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_kesselstellgroesse", 30015, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_abgas_solltemperatur", 30016, "°C", 1, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_sauerstoffregler", 30017, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_ansauglufttemperatur", 30019, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_errechnete_kesselsolltemperatur", 30028, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_ruecklaufpumpen_ansteuerung", 30037, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_drehzahl_kesselladepumpe", 30068, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_verbleibende_heizstunden_bis_asche_entleeren", 30087, "h", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_feuerraumtemperatur", 30089, "°C", 1, 0, device_class="temperature", device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_saugzug_ansteuerung_alt", 30105, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, translations, data, "kessel_waermemenge_vom_kessel", 30171, "MWh", 10, 1, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_kesseltemperatur", 30001, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_abgastemperatur", 30002, "°C", 1, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_restsauerstoffgehalt", 30004, "%", 10, 1, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_position_primaerluftklappe", 30005, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_saugzugdrehzahl", 30007, "Upm", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_fuehler_1", 30008, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_abgastemperatur_nach_brennwertwaermetauscher", 30009, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_ruecklauffuehler", 30010, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_luftgeschwindigkeit_ansaug", 30011, "m/s", 100, 2, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_primaerluft", 30012, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_saugzug_ansteuerung", 30013, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_sekundaerluft", 30014, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_kesselstellgroesse", 30015, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_abgas_solltemperatur", 30016, "°C", 1, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_sauerstoffregler", 30017, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_ansauglufttemperatur", 30019, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_errechnete_kesselsolltemperatur", 30028, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_ruecklaufpumpen_ansteuerung", 30037, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_drehzahl_kesselladepumpe", 30068, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_verbleibende_heizstunden_bis_asche_entleeren", 30087, "h", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_feuerraumtemperatur", 30089, "°C", 1, 0, device_class="temperature", device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_saugzug_ansteuerung_alt", 30105, "%", 1, 0, device_key="kessel"),
+                FroelingSensor(coordinator, data, "kessel_waermemenge_vom_kessel", 30171, "MWh", 10, 1, device_key="kessel"),
 
                 # Holding 4xxxx -> eigene Klasse
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_abschalten_wenn_kesseltemperatur_ueber_soll", 40002, "°C", 2, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_maximale_anheizzeit", 40003, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_kesseltemperatur_ab_pumpen_freigabe", 40008, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_immer_abschalten_ueber_kesselsoll_plus", 40009, "°C", 2, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_sollwert_restsauerstoff", 40027, "%", 10, 1, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_restsauerstoff_fuer_feuer_aus", 40028, "%", 10, 1, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_restsauerstoff_ohne_verbrennung", 40029, "%", 10, 1, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_dauer_vorwaermen", 40043, "s", 1, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_maximale_zuenddauer", 40045, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_abstellen_warten_1", 40046, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_mind_dauer_geblaesenachlauf1", 40047, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_mind_dauer_abstellen", 40048, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_abstellen_warten_2", 40049, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_mind_dauer_geblaesenachlauf2", 40050, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_sicherheitszeit", 40051, "min", 60, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_wos_laufzeit", 40061, "s", 1, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_mindesttemperatur_ruecklauf", 40067, "°C", 2, 0, device_class="temperature", device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_laufzeit_mischer", 40070, "s", 1, 0, device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_abgastemperatur_feuer_aus", 40073, "°C", 1, 0, device_class="temperature", device_key="kessel"),
-                FroelingHoldingSensor(coordinator, translations, data, "kessel_nach_wie_viel_mal_abstellen_abreinigen", 40085, "", 1, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_abschalten_wenn_kesseltemperatur_ueber_soll", 40002, "°C", 2, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_maximale_anheizzeit", 40003, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_kesseltemperatur_ab_pumpen_freigabe", 40008, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_immer_abschalten_ueber_kesselsoll_plus", 40009, "°C", 2, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_sollwert_restsauerstoff", 40027, "%", 10, 1, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_restsauerstoff_fuer_feuer_aus", 40028, "%", 10, 1, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_restsauerstoff_ohne_verbrennung", 40029, "%", 10, 1, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_dauer_vorwaermen", 40043, "s", 1, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_maximale_zuenddauer", 40045, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_abstellen_warten_1", 40046, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_mind_dauer_geblaesenachlauf1", 40047, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_mind_dauer_abstellen", 40048, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_abstellen_warten_2", 40049, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_mind_dauer_geblaesenachlauf2", 40050, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_sicherheitszeit", 40051, "min", 60, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_wos_laufzeit", 40061, "s", 1, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_mindesttemperatur_ruecklauf", 40067, "°C", 2, 0, device_class="temperature", device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_laufzeit_mischer", 40070, "s", 1, 0, device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_abgastemperatur_feuer_aus", 40073, "°C", 1, 0, device_class="temperature", device_key="kessel"),
+                FroelingHoldingSensor(coordinator, data, "kessel_nach_wie_viel_mal_abstellen_abreinigen", 40085, "", 1, 0, device_key="kessel"),
             ])
 
         # HEIZKREIS 01
         if data.get("hk01", False):
             sensors.extend([
-                FroelingSensor(coordinator, translations, data, "hk01_vorlauf_isttemperatur", 31031, "°C", 2, 0, device_class="temperature", device_key="hk01"),
-                FroelingSensor(coordinator, translations, data, "hk01_vorlauf_solltemperatur", 31032, "°C", 2, 0, device_class="temperature", device_key="hk01"),
-                FroelingHoldingSensor(coordinator, translations, data, "hk01_maximale_vorlauftemperatur", 41035, "°C", 2, 0, device_class="temperature", device_key="hk01"),
-                FroelingHoldingSensor(coordinator, translations, data, "hk01_laufzeit_mischer", 41043, "s", 1, 0, device_key="hk01"),
-                FroelingHoldingSensor(coordinator, translations, data, "hk01_maximale_boiler_vorlauftemperatur", 41047, "°C", 2, 0, device_class="temperature", device_key="hk01"),
+                FroelingSensor(coordinator, data, "hk01_vorlauf_isttemperatur", 31031, "°C", 2, 0, device_class="temperature", device_key="hk01"),
+                FroelingSensor(coordinator, data, "hk01_vorlauf_solltemperatur", 31032, "°C", 2, 0, device_class="temperature", device_key="hk01"),
+                FroelingHoldingSensor(coordinator, data, "hk01_maximale_vorlauftemperatur", 41035, "°C", 2, 0, device_class="temperature", device_key="hk01"),
+                FroelingHoldingSensor(coordinator, data, "hk01_laufzeit_mischer", 41043, "s", 1, 0, device_key="hk01"),
+                FroelingHoldingSensor(coordinator, data, "hk01_maximale_boiler_vorlauftemperatur", 41047, "°C", 2, 0, device_class="temperature", device_key="hk01"),
             ])
 
         # HEIZKREIS 02
         if data.get("hk02", False):
             sensors.extend([
-                FroelingSensor(coordinator, translations, data, "hk02_vorlauf_isttemperatur", 31061, "°C", 2, 0, device_class="temperature", device_key="hk02"),
-                FroelingSensor(coordinator, translations, data, "hk02_vorlauf_solltemperatur", 31062, "°C", 2, 0, device_class="temperature", device_key="hk02"),
-                FroelingHoldingSensor(coordinator, translations, data, "hk02_maximale_vorlauftemperatur", 41065, "°C", 2, 0, device_class="temperature", device_key="hk02"),
-                FroelingHoldingSensor(coordinator, translations, data, "hk02_laufzeit_mischer", 41073, "s", 1, 0, device_key="hk02"),
-                FroelingHoldingSensor(coordinator, translations, data, "hk02_maximale_boiler_vorlauftemperatur", 41078, "°C", 2, 0, device_class="temperature", device_key="hk02"),
+                FroelingSensor(coordinator, data, "hk02_vorlauf_isttemperatur", 31061, "°C", 2, 0, device_class="temperature", device_key="hk02"),
+                FroelingSensor(coordinator, data, "hk02_vorlauf_solltemperatur", 31062, "°C", 2, 0, device_class="temperature", device_key="hk02"),
+                FroelingHoldingSensor(coordinator, data, "hk02_maximale_vorlauftemperatur", 41065, "°C", 2, 0, device_class="temperature", device_key="hk02"),
+                FroelingHoldingSensor(coordinator, data, "hk02_laufzeit_mischer", 41073, "s", 1, 0, device_key="hk02"),
+                FroelingHoldingSensor(coordinator, data, "hk02_maximale_boiler_vorlauftemperatur", 41078, "°C", 2, 0, device_class="temperature", device_key="hk02"),
             ])
 
         # PUFFER 01
         if data.get("puffer01", False):
             sensors.extend([
-                FroelingSensor(coordinator, translations, data, "puffer_1_temperatur_oben", 32001, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingSensor(coordinator, translations, data, "puffer_1_temperatur_mitte", 32002, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingSensor(coordinator, translations, data, "puffer_1_temperatur_unten", 32003, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingSensor(coordinator, translations, data, "puffer_1_pufferpumpen_ansteuerung", 32004, "%", 1, 0, device_key="puffer01"),
-                FroelingSensor(coordinator, translations, data, "puffer_1_ladezustand", 32007, "%", 1, 0, device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_heizkreisfreigabe_ab_puffertemperatur", 42001, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_minimale_drehzahl_pufferpumpe", 42004, "%", 1, 0, device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_kesselstart_diff_kesselsoll_oben", 42005, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_durchgeladen_diff_kesselsoll_unten", 42006, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_maximale_drehzahl_pufferpumpe", 42012, "%", 1, 0, device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_puffer_puffer_diff", 42018, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_ladezustand_100_prozent_beikesselsoll", 42020, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_ladezustand_0_prozent_ab_temp", 42021, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_systemumfeld_ausschaltverzoegerung", 42026, "min", 60, 0, device_key="puffer01"),
-                FroelingHoldingSensor(coordinator, translations, data, "puffer_1_volumen", 42029, "l", 1, 0, device_key="puffer01"),
+                FroelingSensor(coordinator, data, "puffer_1_temperatur_oben", 32001, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingSensor(coordinator, data, "puffer_1_temperatur_mitte", 32002, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingSensor(coordinator, data, "puffer_1_temperatur_unten", 32003, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingSensor(coordinator, data, "puffer_1_pufferpumpen_ansteuerung", 32004, "%", 1, 0, device_key="puffer01"),
+                FroelingSensor(coordinator, data, "puffer_1_ladezustand", 32007, "%", 1, 0, device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_heizkreisfreigabe_ab_puffertemperatur", 42001, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_minimale_drehzahl_pufferpumpe", 42004, "%", 1, 0, device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_kesselstart_diff_kesselsoll_oben", 42005, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_durchgeladen_diff_kesselsoll_unten", 42006, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_maximale_drehzahl_pufferpumpe", 42012, "%", 1, 0, device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_puffer_puffer_diff", 42018, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_ladezustand_100_prozent_beikesselsoll", 42020, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_ladezustand_0_prozent_ab_temp", 42021, "°C", 2, 0, device_class="temperature", device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_systemumfeld_ausschaltverzoegerung", 42026, "min", 60, 0, device_key="puffer01"),
+                FroelingHoldingSensor(coordinator, data, "puffer_1_volumen", 42029, "l", 1, 0, device_key="puffer01"),
             ])
 
         # BOILER 01
         if data.get("boiler01", False):
             sensors.extend([
-                FroelingSensor(coordinator, translations, data, "boiler_1_temperatur_oben", 31631, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
-                FroelingSensor(coordinator, translations, data, "boiler_1_pumpe_ansteuerung", 31633, "%", 1, 0, device_key="boiler01"),
-                FroelingHoldingSensor(coordinator, translations, data, "boiler_1_laden_bei_puffer_und_boiler_tempdiff_von", 41634, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
-                FroelingHoldingSensor(coordinator, translations, data, "boiler_1_laden_bei_kessel_und_boiler_tempdiff_von", 41639, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
-                FroelingHoldingSensor(coordinator, translations, data, "boiler_1_soll_diff_kessel_boiler", 41640, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
-                FroelingHoldingSensor(coordinator, translations, data, "boiler_1_min_drehzahl_boilerpumpe", 41641, "%", 1, 0, device_key="boiler01"),
-                FroelingHoldingSensor(coordinator, translations, data, "boiler_1_max_drehzahl_boilerpumpe", 41646, "%", 1, 0, device_key="boiler01"),
+                FroelingSensor(coordinator, data, "boiler_1_temperatur_oben", 31631, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
+                FroelingSensor(coordinator, data, "boiler_1_pumpe_ansteuerung", 31633, "%", 1, 0, device_key="boiler01"),
+                FroelingHoldingSensor(coordinator, data, "boiler_1_laden_bei_puffer_und_boiler_tempdiff_von", 41634, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
+                FroelingHoldingSensor(coordinator, data, "boiler_1_laden_bei_kessel_und_boiler_tempdiff_von", 41639, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
+                FroelingHoldingSensor(coordinator, data, "boiler_1_soll_diff_kessel_boiler", 41640, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
+                FroelingHoldingSensor(coordinator, data, "boiler_1_min_drehzahl_boilerpumpe", 41641, "%", 1, 0, device_key="boiler01"),
+                FroelingHoldingSensor(coordinator, data, "boiler_1_max_drehzahl_boilerpumpe", 41646, "%", 1, 0, device_key="boiler01"),
             ])
 
         # AUSTRAGUNG
         if data.get("austragung", False):
             sensors.extend([
-                FroelingSensor(coordinator, translations, data, "stromaufnahme_der_austragsschnecke", 30020, "A", 1000, 2, device_key="austragung"),
-                FroelingSensor(coordinator, translations, data, "fuellstand_im_pelletsbehaelter", 30022, "%", 207, 1, device_key="austragung"),
-                FroelingSensor(coordinator, translations, data, "resetierbarer_kg_zaehler", 30082, "kg", 1, 0, device_key="austragung"),
-                FroelingSensor(coordinator, translations, data, "resetierbarer_t_zaehler", 30083, "t", 1, 0, device_key="austragung"),
-                FroelingSensor(coordinator, translations, data, "pelletverbrauch_gesamt", 30084, "t", 10, 1, device_key="austragung"),
-                FroelingHoldingSensor(coordinator, translations, data, "dauer_des_ruettelns", 40125, "s", 1, 0, device_key="austragung"),  # Holding
+                FroelingSensor(coordinator, data, "stromaufnahme_der_austragsschnecke", 30020, "A", 1000, 2, device_key="austragung"),
+                FroelingSensor(coordinator, data, "fuellstand_im_pelletsbehaelter", 30022, "%", 207, 1, device_key="austragung"),
+                FroelingSensor(coordinator, data, "resetierbarer_kg_zaehler", 30082, "kg", 1, 0, device_key="austragung"),
+                FroelingSensor(coordinator, data, "resetierbarer_t_zaehler", 30083, "t", 1, 0, device_key="austragung"),
+                FroelingSensor(coordinator, data, "pelletverbrauch_gesamt", 30084, "t", 10, 1, device_key="austragung"),
+                FroelingHoldingSensor(coordinator, data, "dauer_des_ruettelns", 40125, "s", 1, 0, device_key="austragung"),  # Holding
             ])
 
         # ZIRKULATIONSPUMPE (unter Boiler 01 gruppiert)
         if data.get("zirkulationspumpe", False):
             sensors.extend([
-                FroelingSensor(coordinator, translations, data, "ruecklauftemperatur_an_der_zirkulations_leitung", 30712, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
-                FroelingSensor(coordinator, translations, data, "stoemungsschalter_an_der_brauchwasser_leitung", 30601, "", 2, 0, device_key="boiler01"),
-                FroelingSensor(coordinator, translations, data, "drehzahl_der_zirkulations_pumpe", 30711, "%", 1, 0, device_key="boiler01"),
+                FroelingSensor(coordinator, data, "ruecklauftemperatur_an_der_zirkulations_leitung", 30712, "°C", 2, 0, device_class="temperature", device_key="boiler01"),
+                FroelingSensor(coordinator, data, "stoemungsschalter_an_der_brauchwasser_leitung", 30601, "", 2, 0, device_key="boiler01"),
+                FroelingSensor(coordinator, data, "drehzahl_der_zirkulations_pumpe", 30711, "%", 1, 0, device_key="boiler01"),
             ])
 
         return sensors
@@ -240,20 +238,18 @@ class _FroelingBasis(CoordinatorEntity[FroelingCoordinator], SensorEntity):
     """
 
     _attr_should_poll = False
+    # Der Anzeigename beschreibt nur die Entität; Home Assistant
+    # stellt den Gerätenamen voran.
+    _attr_has_entity_name = True
 
-    def __init__(self, coordinator, translations, data, entity_id, register, device_key):
+    def __init__(self, coordinator, data, entity_id, register, device_key):
         super().__init__(coordinator)
-        self._translations = translations
         self._device_name = data["name"]
         self._entity_id = entity_id
         self.entity_id = objekt_id("sensor", self._device_name, self._entity_id)
+        self._attr_translation_key = _tr_key(self._entity_id)
         self._register = register
         self._device_key = device_key
-        key = _tr_key(entity_id)
-        self._attr_name = translations.get(
-            f"component.{DOMAIN}.entity.sensor.{key}.name",
-            entity_id.replace("_", " "),
-        )
 
     @property
     def unique_id(self):
@@ -267,11 +263,11 @@ class _FroelingBasis(CoordinatorEntity[FroelingCoordinator], SensorEntity):
 class _FroelingZahl(_FroelingBasis):
     """Zahlenwert mit Skalierung und Vorzeichenbehandlung."""
 
-    def __init__(self, coordinator, translations, data, entity_id, register,
+    def __init__(self, coordinator, data, entity_id, register,
                  unit, scaling_factor, decimal_places=0, device_class=None,
                  device_key="controller",
                  state_class=SensorStateClass.MEASUREMENT):
-        super().__init__(coordinator, translations, data, entity_id, register, device_key)
+        super().__init__(coordinator, data, entity_id, register, device_key)
         self._unit = unit
         self._scaling_factor = scaling_factor
         self._decimal_places = decimal_places
@@ -311,9 +307,9 @@ class _FroelingZahl(_FroelingBasis):
 class _FroelingText(_FroelingBasis):
     """Zustandstext über eine Wertetabelle."""
 
-    def __init__(self, coordinator, translations, data, entity_id, register,
+    def __init__(self, coordinator, data, entity_id, register,
                  mapping, device_key="controller"):
-        super().__init__(coordinator, translations, data, entity_id, register, device_key)
+        super().__init__(coordinator, data, entity_id, register, device_key)
         self._mapping = mapping
 
     @property

@@ -132,6 +132,9 @@ class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
     """
 
     _attr_should_poll = False
+    # Der Anzeigename beschreibt nur die Entität; Home Assistant
+    # stellt den Gerätenamen voran.
+    _attr_has_entity_name = True
 
     def __init__(self, coordinator, translations, data, entity_id: str,
                  register: int, device_key: str, group_key: str,
@@ -142,6 +145,7 @@ class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
         self._device_name = data["name"]
         self._entity_id = entity_id
         self.entity_id = objekt_id("select", self._device_name, self._entity_id)
+        self._attr_translation_key = _tr_key(self._entity_id)
         self._register = register
         self._device_key = device_key
         self._group_key = group_key
@@ -152,11 +156,6 @@ class FroelingSelect(CoordinatorEntity[FroelingCoordinator], SelectEntity):
         # Gilt nach einer Auswahl, bis der Coordinator neu gelesen hat.
         self._optimistisch: int | None = None
 
-        key = _tr_key(self._entity_id)
-        self._attr_name = self._translations.get(
-            f"component.{DOMAIN}.entity.select.{key}.name",
-            self._name_fallback,
-        )
 
     def _label_for_key(self, opt_key: str) -> str:
         entity_key = _tr_key(self._entity_id)

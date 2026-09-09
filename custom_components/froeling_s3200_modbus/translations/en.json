@@ -187,106 +187,106 @@
         "name": "Clean after How Many Shutdowns"
       },
       "hk01_vorlauf_isttemperatur": {
-        "name": "HK01 – Flow Actual Temperature"
+        "name": "Flow Actual Temperature"
       },
       "hk01_vorlauf_solltemperatur": {
-        "name": "HK01 – Flow Setpoint Temperature"
+        "name": "Flow Setpoint Temperature"
       },
       "hk_01_pufferversorgung": {
-        "name": "HK01 – Buffer Supply"
+        "name": "Buffer Supply"
       },
       "hk01_maximale_vorlauftemperatur": {
-        "name": "HK01 – Maximum Flow Temperature"
+        "name": "Maximum Flow Temperature"
       },
       "hk01_laufzeit_mischer": {
-        "name": "HK01 – Mixer Running Time"
+        "name": "Mixer Running Time"
       },
       "hk01_maximale_boiler_vorlauftemperatur": {
-        "name": "HK01 – Maximum DHW Flow Temperature"
+        "name": "Maximum DHW Flow Temperature"
       },
       "hk_02_pufferversorgung": {
-        "name": "HK02 – Buffer Supply"
+        "name": "Buffer Supply"
       },
       "hk02_vorlauf_isttemperatur": {
-        "name": "HK02 – Flow Actual Temperature"
+        "name": "Flow Actual Temperature"
       },
       "hk02_vorlauf_solltemperatur": {
-        "name": "HK02 – Flow Setpoint Temperature"
+        "name": "Flow Setpoint Temperature"
       },
       "hk02_maximale_vorlauftemperatur": {
-        "name": "HK02 – Maximum Flow Temperature"
+        "name": "Maximum Flow Temperature"
       },
       "hk02_laufzeit_mischer": {
-        "name": "HK02 – Mixer Running Time"
+        "name": "Mixer Running Time"
       },
       "hk02_maximale_boiler_vorlauftemperatur": {
-        "name": "HK02 – Maximum DHW Flow Temperature"
+        "name": "Maximum DHW Flow Temperature"
       },
       "puffer_1_temperatur_oben": {
-        "name": "Buffer 1 – Top Temperature"
+        "name": "Top Temperature"
       },
       "puffer_1_temperatur_mitte": {
-        "name": "Buffer 1 – Middle Temperature"
+        "name": "Middle Temperature"
       },
       "puffer_1_temperatur_unten": {
-        "name": "Buffer 1 – Bottom Temperature"
+        "name": "Bottom Temperature"
       },
       "puffer_1_pufferpumpen_ansteuerung": {
-        "name": "Buffer 1 – Buffer Pump Control"
+        "name": "Buffer Pump Control"
       },
       "puffer_1_ladezustand": {
-        "name": "Buffer 1 – State of Charge"
+        "name": "State of Charge"
       },
       "puffer_1_heizkreisfreigabe_ab_puffertemperatur": {
-        "name": "Buffer 1 – Heating Circuit Enable from Buffer Temperature"
+        "name": "Heating Circuit Enable from Buffer Temperature"
       },
       "puffer_1_minimale_drehzahl_pufferpumpe": {
-        "name": "Buffer 1 – Minimum Buffer Pump Speed"
+        "name": "Minimum Buffer Pump Speed"
       },
       "puffer_1_kesselstart_diff_kesselsoll_oben": {
-        "name": "Buffer 1 – Boiler Start at Δ Boiler Setpoint/Top"
+        "name": "Boiler Start at Δ Boiler Setpoint/Top"
       },
       "puffer_1_durchgeladen_diff_kesselsoll_unten": {
-        "name": "Buffer 1 – Fully Charged at Δ Boiler Setpoint/Bottom"
+        "name": "Fully Charged at Δ Boiler Setpoint/Bottom"
       },
       "puffer_1_maximale_drehzahl_pufferpumpe": {
-        "name": "Buffer 1 – Maximum Buffer Pump Speed"
+        "name": "Maximum Buffer Pump Speed"
       },
       "puffer_1_puffer_puffer_diff": {
-        "name": "Buffer 1 – Buffer/Buffer Differential"
+        "name": "Buffer/Buffer Differential"
       },
       "puffer_1_ladezustand_100_prozent_beikesselsoll": {
-        "name": "Buffer 1 – 100% SOC at Boiler Setpoint"
+        "name": "100% SOC at Boiler Setpoint"
       },
       "puffer_1_ladezustand_0_prozent_ab_temp": {
-        "name": "Buffer 1 – 0% SOC from Temperature"
+        "name": "0% SOC from Temperature"
       },
       "puffer_1_systemumfeld_ausschaltverzoegerung": {
-        "name": "Buffer 1 – System Environment Switch-off Delay"
+        "name": "System Environment Switch-off Delay"
       },
       "puffer_1_volumen": {
-        "name": "Buffer 1 – Volume"
+        "name": "Volume"
       },
       "boiler_1_temperatur_oben": {
-        "name": "DHW 1 Top Temperature"
+        "name": "Top Temperature"
       },
       "boiler_1_pumpe_ansteuerung": {
-        "name": "DHW 1 Pump Control"
+        "name": "Pump Control"
       },
       "boiler_1_laden_bei_puffer_und_boiler_tempdiff_von": {
-        "name": "DHW 1 – Charge at Buffer/DHW Temperature Difference"
+        "name": "Charge at Buffer/DHW Temperature Difference"
       },
       "boiler_1_laden_bei_kessel_und_boiler_tempdiff_von": {
-        "name": "DHW 1 – Charge at Boiler/DHW Temperature Difference"
+        "name": "Charge at Boiler/DHW Temperature Difference"
       },
       "boiler_1_soll_diff_kessel_boiler": {
-        "name": "DHW 1 – Setpoint Differential Boiler/DHW"
+        "name": "Setpoint Differential Boiler/DHW"
       },
       "boiler_1_min_drehzahl_boilerpumpe": {
-        "name": "DHW 1 – Min. DHW Pump Speed"
+        "name": "Min. DHW Pump Speed"
       },
       "boiler_1_max_drehzahl_boilerpumpe": {
-        "name": "DHW 1 – Max. DHW Pump Speed"
+        "name": "Max. DHW Pump Speed"
       },
       "boardtemperatur": {
         "name": "Board Temperature"
@@ -414,82 +414,82 @@
         "name": "Return-line Temperature to Switch Off Circulation Pump"
       },
       "hk1_vorlauf_temperatur_10c_aussentemperatur": {
-        "name": "HK1 Flow at 10°C Outside"
+        "name": "Flow at 10°C Outside"
       },
       "hk1_vorlauf_temperatur_minus_10c_aussentemperatur": {
-        "name": "HK1 Flow at −10°C Outside"
+        "name": "Flow at −10°C Outside"
       },
       "hk1_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
-        "name": "HK1 Pump OFF when Flow Setpoint below"
+        "name": "Pump OFF when Flow Setpoint below"
       },
       "hk1_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
-        "name": "HK1 Flow Temperature Reduction (Setback)"
+        "name": "Flow Temperature Reduction (Setback)"
       },
       "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet": {
-        "name": "HK1 Outside Temp to Turn Pump ON (Heating)"
+        "name": "Outside Temp to Turn Pump ON (Heating)"
       },
       "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet": {
-        "name": "HK1 Outside Temp to Turn Pump ON (Setback)"
+        "name": "Outside Temp to Turn Pump ON (Setback)"
       },
       "hk1_frostschutztemperatur": {
-        "name": "HK1 Frost Protection Temperature"
+        "name": "Frost Protection Temperature"
       },
       "hk1_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird": {
-        "name": "HK1 Buffer Top Temp for Overheat Protection"
+        "name": "Buffer Top Temp for Overheat Protection"
       },
       "hk2_vorlauf_temperatur_10c_aussentemperatur": {
-        "name": "HK2 Flow at 10°C Outside"
+        "name": "Flow at 10°C Outside"
       },
       "hk2_vorlauf_temperatur_minus_10c_aussentemperatur": {
-        "name": "HK2 Flow at −10°C Outside"
+        "name": "Flow at −10°C Outside"
       },
       "hk2_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
-        "name": "HK2 Pump OFF when Flow Setpoint below"
+        "name": "Pump OFF when Flow Setpoint below"
       },
       "hk2_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
-        "name": "HK2 Flow Temperature Reduction (Setback)"
+        "name": "Flow Temperature Reduction (Setback)"
       },
       "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet": {
-        "name": "HK2 Outside Temp to Turn Pump ON (Heating)"
+        "name": "Outside Temp to Turn Pump ON (Heating)"
       },
       "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet": {
-        "name": "HK2 Outside Temp to Turn Pump ON (Setback)"
+        "name": "Outside Temp to Turn Pump ON (Setback)"
       },
       "hk2_frostschutztemperatur": {
-        "name": "HK2 Frost Protection Temperature"
+        "name": "Frost Protection Temperature"
       },
       "hk2_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird": {
-        "name": "HK2 Buffer Top Temp for Overheat Protection"
+        "name": "Buffer Top Temp for Overheat Protection"
       },
       "boiler_1_gewuenschte_boilertemperatur": {
-        "name": "DHW 1 Desired Temperature"
+        "name": "Desired Temperature"
       },
       "boiler_1_nachladen_wenn_boilertemperatur_unter": {
-        "name": "DHW 1 Recharge when Temperature below"
+        "name": "Recharge when Temperature below"
       },
       "pelletlager_restbestand": {
         "name": "Pellet Storage – Remaining Stock"
       },
       "hk1_vorlauf_soll_modbus": {
-        "name": "HK1 Flow Setpoint (Modbus)"
+        "name": "Flow Setpoint (Modbus)"
       },
       "hk2_vorlauf_soll_modbus": {
-        "name": "HK2 Flow Setpoint (Modbus)"
+        "name": "Flow Setpoint (Modbus)"
       },
       "boiler_1_solltemperatur_modbus": {
-        "name": "DHW 1 Setpoint (Modbus)"
+        "name": "Setpoint (Modbus)"
       },
       "puffer_1_delta_t_kessel_vs_grenzschicht": {
-        "name": "Buffer 1 ΔT Boiler vs. Stratification Layer"
+        "name": "ΔT Boiler vs. Stratification Layer"
       },
       "puffer_1_start_pufferladung_ab_ladezustand": {
-        "name": "Buffer 1 Start Charging from State of Charge (%)"
+        "name": "Start Charging from State of Charge (%)"
       },
       "puffer_1_100_prozent_kesselleistung_bis_ladezustand": {
-        "name": "Buffer 1 100% Boiler Output up to SOC (%)"
+        "name": "100% Boiler Output up to SOC (%)"
       },
       "puffer_1_0_prozent_kesselleistung_ab_ladezustand": {
-        "name": "Buffer 1 0% Boiler Output from SOC (%)"
+        "name": "0% Boiler Output from SOC (%)"
       },
       "gefoerderte_pellets_100_prozent_einschub": {
         "name": "Pellets Conveyed at 100% Feed (g)"
@@ -500,10 +500,10 @@
     },
     "binary_sensor": {
       "hk1_pumpe_an_aus": {
-        "name": "HK01 - Pump ON/OFF"
+        "name": "Pump ON/OFF"
       },
       "hk2_pumpe_an_aus": {
-        "name": "HK02 - Pump ON/OFF"
+        "name": "Pump ON/OFF"
       },
       "tuerkontaktschalter": {
         "name": "Door Contact Switch"
@@ -521,43 +521,43 @@
         "name": "Boiler Demand Present"
       },
       "boiler1_restwaermenutzung": {
-        "name": "DHW 1 – Use Residual Heat"
+        "name": "Use Residual Heat"
       },
       "boiler1_nur_einmal_pro_tag_aufladen": {
-        "name": "DHW 1 – Charge Only Once per Day"
+        "name": "Charge Only Once per Day"
       },
       "boiler1_legionellen_aufheizung_aktiv": {
-        "name": "DHW 1 – Legionella Heating Active"
+        "name": "Legionella Heating Active"
       },
       "lambda_auto_kalibrierung_aktiv": {
         "name": "Lambda Auto-Calibration Active"
       },
       "hk1_boilervorrang_heizen_erlaubt": {
-        "name": "HK01 – DHW Priority Heating Allowed"
+        "name": "DHW Priority Heating Allowed"
       },
       "hk1_hochtemperatur_anforderung_boilerladung": {
-        "name": "HK01 – High-Temperature Demand for DHW Charging"
+        "name": "High-Temperature Demand for DHW Charging"
       },
       "hk2_boilervorrang_heizen_erlaubt": {
-        "name": "HK02 – DHW Priority Heating Allowed"
+        "name": "DHW Priority Heating Allowed"
       },
       "hk2_hochtemperatur_anforderung_boilerladung": {
-        "name": "HK02 – High-Temperature Demand for DHW Charging"
+        "name": "High-Temperature Demand for DHW Charging"
       },
       "puffer1_restwaermenutzung": {
-        "name": "Buffer 1 – Use Residual Heat"
+        "name": "Use Residual Heat"
       },
       "puffer1_puffermitte_regelung_aktiv": {
-        "name": "Buffer 1 – Mid-Buffer Control Active"
+        "name": "Mid-Buffer Control Active"
       },
       "puffer1_sp_dual_nach_puffermitte_beenden": {
-        "name": "Buffer 1 – End SP Dual after Mid-Buffer"
+        "name": "End SP Dual after Mid-Buffer"
       },
       "pufferanforderung_nach_systemumfeld": {
         "name": "Buffer Demand by System Environment"
       },
       "puffer1_hygienespeicher_verwendet": {
-        "name": "Buffer 1 – Hygiene Tank Used"
+        "name": "Hygiene Tank Used"
       },
       "nachlegeberechnung_aktiv": {
         "name": "Refill Calculation Active"
@@ -565,7 +565,7 @@
     },
     "select": {
       "betriebsart_heizkreis_01": {
-        "name": "Heating Circuit 01 Mode",
+        "name": "Mode",
         "state": {
           "off": "Off",
           "auto": "Automatic",
@@ -576,7 +576,7 @@
         }
       },
       "betriebsart_heizkreis_02": {
-        "name": "Heating Circuit 02 Mode",
+        "name": "Mode",
         "state": {
           "off": "Off",
           "auto": "Automatic",
@@ -602,10 +602,10 @@
         "name": "Automatic Log Ignition"
       },
       "hk1_freigabe": {
-        "name": "HK01 – Enable"
+        "name": "Enable"
       },
       "hk2_freigabe": {
-        "name": "HK02 – Enable"
+        "name": "Enable"
       }
     },
     "time": {
@@ -617,6 +617,9 @@
       },
       "nach_scheitholzbetrieb_pufferladung_verzoegern_um": {
         "name": "After Log Operation: Delay Pellet Buffer Charging by"
+      },
+      "verzoegerung_pufferladung_nach_scheitholzbetrieb": {
+        "name": "After log wood operation: delay buffer charging with pellets by"
       }
     }
   }

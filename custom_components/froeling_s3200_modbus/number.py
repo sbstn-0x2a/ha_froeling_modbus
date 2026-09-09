@@ -1,7 +1,6 @@
 from homeassistant.components.number import NumberEntity, NumberDeviceClass
 import logging
 from datetime import datetime, timezone, timedelta
-from homeassistant.helpers.translation import async_get_translations
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
@@ -21,7 +20,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     laufzeit = config_entry.runtime_data
     coordinator = laufzeit.coordinator
     data = laufzeit.konfiguration
-    translations = await async_get_translations(hass, hass.config.language, "entity")
 
     def create_numbers():
         nums: list[NumberEntity] = []
@@ -29,61 +27,61 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         # --- Kessel ---
         if data.get("kessel", False):
             nums.extend([
-                FroelingNumberHolding(coordinator, translations, data, "kessel_solltemperatur", 40001, "°C", 2, 0, 70, 90, device_key="kessel"),
-                FroelingNumberHolding(coordinator, translations, data, "bei_welcher_rl_temperatur_an_der_zirkulationsleitung_soll_die_pumpe_ausschalten", 40601, "°C", 2, 0, 20, 120, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, data, "kessel_solltemperatur", 40001, "°C", 2, 0, 70, 90, device_key="kessel"),
+                FroelingNumberHolding(coordinator, data, "bei_welcher_rl_temperatur_an_der_zirkulationsleitung_soll_die_pumpe_ausschalten", 40601, "°C", 2, 0, 20, 120, device_key="boiler01"),
             ])
 
         # --- Heizkreis 01 ---
         if data.get("hk01", False):
             nums.extend([
-                FroelingNumberHolding(coordinator, translations, data, "hk1_vorlauf_temperatur_10c_aussentemperatur", 41032, "°C", 2, 0, 10, 110, device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_vorlauf_temperatur_minus_10c_aussentemperatur", 41033, "°C", 2, 0, 10, 110, device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41040, "°C", 2, 0, 10, 30, device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41034, "°C", 2, 0, 0, 70, device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41037, "°C", 2, 0, -20, 50, device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41038, "°C", 2, 0, -20, 50, device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_frostschutztemperatur", 41039, "°C", 2, 0, -30, 20, device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41048, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk01"),
-                FroelingNumberHolding(coordinator, translations, data, "hk1_vorlauf_soll_modbus", 48001, "°C", 2, 0, 0, 75, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_vorlauf_temperatur_10c_aussentemperatur", 41032, "°C", 2, 0, 10, 110, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_vorlauf_temperatur_minus_10c_aussentemperatur", 41033, "°C", 2, 0, 10, 110, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41040, "°C", 2, 0, 10, 30, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41034, "°C", 2, 0, 0, 70, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41037, "°C", 2, 0, -20, 50, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41038, "°C", 2, 0, -20, 50, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_frostschutztemperatur", 41039, "°C", 2, 0, -30, 20, device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41048, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk01"),
+                FroelingNumberHolding(coordinator, data, "hk1_vorlauf_soll_modbus", 48001, "°C", 2, 0, 0, 75, device_key="hk01"),
             ])
 
         # --- Heizkreis 02 ---
         if data.get("hk02", False):
             nums.extend([
-                FroelingNumberHolding(coordinator, translations, data, "hk2_vorlauf_temperatur_10c_aussentemperatur", 41062, "°C", 2, 0, 10, 110, device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_vorlauf_temperatur_minus_10c_aussentemperatur", 41063, "°C", 2, 0, 10, 110, device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41070, "°C", 2, 0, 10, 30, device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41064, "°C", 2, 0, 0, 70, device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41067, "°C", 2, 0, -20, 50, device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41068, "°C", 2, 0, -20, 50, device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_frostschutztemperatur", 41069, "°C", 2, 0, -10, 20, device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41079, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk02"),
-                FroelingNumberHolding(coordinator, translations, data, "hk2_vorlauf_soll_modbus", 48002, "°C", 2, 0, 0, 75, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_vorlauf_temperatur_10c_aussentemperatur", 41062, "°C", 2, 0, 10, 110, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_vorlauf_temperatur_minus_10c_aussentemperatur", 41063, "°C", 2, 0, 10, 110, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als", 41070, "°C", 2, 0, 10, 30, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_absenkung_der_vorlauftemperatur_im_absenkbetrieb", 41064, "°C", 2, 0, 0, 70, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb_einschaltet", 41067, "°C", 2, 0, -20, 50, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetrieb_einschaltet", 41068, "°C", 2, 0, -20, 50, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_frostschutztemperatur", 41069, "°C", 2, 0, -10, 20, device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wird", 41079, "°C", 1, 0, 60, 120, device_class="temperature", device_key="hk02"),
+                FroelingNumberHolding(coordinator, data, "hk2_vorlauf_soll_modbus", 48002, "°C", 2, 0, 0, 75, device_key="hk02"),
             ])
 
         # --- Boiler 01 ---
         if data.get("boiler01", False):
             nums.extend([
-                FroelingNumberHolding(coordinator, translations, data, "boiler_1_gewuenschte_boilertemperatur", 41632, "°C", 2, 0, 10, 100, device_key="boiler01"),
-                FroelingNumberHolding(coordinator, translations, data, "boiler_1_nachladen_wenn_boilertemperatur_unter", 41633, "°C", 2, 0, 1, 90, device_key="boiler01"),
-                FroelingNumberHolding(coordinator, translations, data, "boiler_1_solltemperatur_modbus", 48019, "°C", 2, 0, 0, 65, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, data, "boiler_1_gewuenschte_boilertemperatur", 41632, "°C", 2, 0, 10, 100, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, data, "boiler_1_nachladen_wenn_boilertemperatur_unter", 41633, "°C", 2, 0, 1, 90, device_key="boiler01"),
+                FroelingNumberHolding(coordinator, data, "boiler_1_solltemperatur_modbus", 48019, "°C", 2, 0, 0, 65, device_key="boiler01"),
             ])
 
         # --- Puffer 01 ---
         if data.get("puffer01", False):
             nums.extend([
-                FroelingNumberHolding(coordinator, translations, data, "puffer_1_delta_t_kessel_vs_grenzschicht", 42003, "°C", 2, 0, 0, 120, device_key="puffer01"),
-                FroelingNumberHolding(coordinator, translations, data, "puffer_1_start_pufferladung_ab_ladezustand", 42022, "%", 1, 0, 0, 100, device_key="puffer01"),
-                FroelingNumberHolding(coordinator, translations, data, "puffer_1_100_prozent_kesselleistung_bis_ladezustand", 42027, "%", 1, 0, 0, 100, device_key="puffer01"),
-                FroelingNumberHolding(coordinator, translations, data, "puffer_1_0_prozent_kesselleistung_ab_ladezustand", 42028, "%", 1, 0, 0, 100, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, data, "puffer_1_delta_t_kessel_vs_grenzschicht", 42003, "°C", 2, 0, 0, 120, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, data, "puffer_1_start_pufferladung_ab_ladezustand", 42022, "%", 1, 0, 0, 100, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, data, "puffer_1_100_prozent_kesselleistung_bis_ladezustand", 42027, "%", 1, 0, 0, 100, device_key="puffer01"),
+                FroelingNumberHolding(coordinator, data, "puffer_1_0_prozent_kesselleistung_ab_ladezustand", 42028, "%", 1, 0, 0, 100, device_key="puffer01"),
             ])
 
         # --- Austragung ---
         if data.get("austragung", False):
             nums.extend([
-                FroelingNumberHolding(coordinator, translations, data, "gefoerderte_pellets_100_prozent_einschub", 40319, "g", 1, 0, 0, 10000, device_key="austragung"),
-                FroelingNumberHolding(coordinator, translations, data, "pelletlager_restbestand", 40320, "t", 10, 1, 0, 100, device_key="austragung"),
-                FroelingNumberHolding(coordinator, translations, data, "pelletlager_mindestbestand", 40336, "t", 10, 1, 0, 100, device_key="austragung"),
+                FroelingNumberHolding(coordinator, data, "gefoerderte_pellets_100_prozent_einschub", 40319, "g", 1, 0, 0, 10000, device_key="austragung"),
+                FroelingNumberHolding(coordinator, data, "pelletlager_restbestand", 40320, "t", 10, 1, 0, 100, device_key="austragung"),
+                FroelingNumberHolding(coordinator, data, "pelletlager_mindestbestand", 40336, "t", 10, 1, 0, 100, device_key="austragung"),
             ])
 
         return nums
@@ -96,15 +94,18 @@ class _BaseNumber(CoordinatorEntity[FroelingCoordinator], NumberEntity):
     """Gemeinsames Verhalten. Der Wert stammt aus dem Coordinator."""
 
     _attr_should_poll = False
+    # Der Anzeigename beschreibt nur die Entität; Home Assistant
+    # stellt den Gerätenamen voran.
+    _attr_has_entity_name = True
 
-    def __init__(self, coordinator, translations, data, entity_id, register, unit,
+    def __init__(self, coordinator, data, entity_id, register, unit,
                  scaling_factor, decimal_places=0, min_value=0, max_value=0,
                  device_key="controller", device_class: str | NumberDeviceClass | None = None):
         super().__init__(coordinator)
-        self._translations = translations
         self._device_name = data["name"]
         self._entity_id = entity_id
         self.entity_id = objekt_id("number", self._device_name, self._entity_id)
+        self._attr_translation_key = _tr_key(self._entity_id)
         self._register = register
         self._unit = unit
         self._scaling_factor = scaling_factor
@@ -116,11 +117,6 @@ class _BaseNumber(CoordinatorEntity[FroelingCoordinator], NumberEntity):
         # Register erneut gelesen hat.
         self._optimistisch: float | None = None
 
-        key = _tr_key(self._entity_id)
-        self._attr_name = self._translations.get(
-            f"component.{DOMAIN}.entity.number.{key}.name",
-            self._entity_id.replace("_", " ")
-        )
 
         dc = device_class
         if isinstance(device_class, str):

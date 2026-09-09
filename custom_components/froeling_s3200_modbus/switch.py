@@ -1,6 +1,5 @@
 from homeassistant.components.switch import SwitchEntity
 import logging
-from homeassistant.helpers.translation import async_get_translations
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
@@ -18,7 +17,6 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     laufzeit = config_entry.runtime_data
     coordinator = laufzeit.coordinator
     data = laufzeit.konfiguration
-    translations = await async_get_translations(hass, hass.config.language, "entity")
 
     def create_switches():
         sw: list[SwitchEntity] = []
@@ -26,22 +24,22 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         # --- Kessel ---
         if data.get("kessel", False):
             # 40136 Automatisch Zünden (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, translations, data, "automatisch_zuenden", 40136, device_key="kessel"))
+            sw.append(FroelingHoldingSwitch(coordinator, data, "automatisch_zuenden", 40136, device_key="kessel"))
 
         # --- Heizkreis 01 ---
         if data.get("hk01", False):
             # 48029 Freigabe Heizkreis 01 (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, translations, data, "hk1_freigabe", 48029, device_key="hk01"))
+            sw.append(FroelingHoldingSwitch(coordinator, data, "hk1_freigabe", 48029, device_key="hk01"))
 
         # --- Heizkreis 02 ---
         if data.get("hk02", False):
             # 48030 Freigabe Heizkreis 02 (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, translations, data, "hk2_freigabe", 48030, device_key="hk02"))
+            sw.append(FroelingHoldingSwitch(coordinator, data, "hk2_freigabe", 48030, device_key="hk02"))
 
         # --- Austragung ---
         if data.get("austragung", False):
             # 40265 Automatische Pelletsaustragung deaktivieren (R/W, 0/1)
-            sw.append(FroelingHoldingSwitch(coordinator, translations, data, "pelletsaustragung_deaktivieren", 40265, device_key="austragung"))
+            sw.append(FroelingHoldingSwitch(coordinator, data, "pelletsaustragung_deaktivieren", 40265, device_key="austragung"))
 
         return sw
 
@@ -54,24 +52,22 @@ class _BaseSwitch(CoordinatorEntity[FroelingCoordinator], SwitchEntity):
     """Schalter auf einem Holding-Register. Wert aus dem Coordinator."""
 
     _attr_should_poll = False
+    # Der Anzeigename beschreibt nur die Entität; Home Assistant
+    # stellt den Gerätenamen voran.
+    _attr_has_entity_name = True
 
-    def __init__(self, coordinator, translations, data, entity_id: str,
+    def __init__(self, coordinator, data, entity_id: str,
                  register: int, device_key="controller"):
         super().__init__(coordinator)
-        self._translations = translations
         self._device_name = data["name"]
         self._entity_id = entity_id
         self.entity_id = objekt_id("switch", self._device_name, self._entity_id)
+        self._attr_translation_key = _tr_key(self._entity_id)
         self._register = register
         self._device_key = device_key
         # Gilt nach einem Schaltvorgang, bis der Coordinator neu gelesen hat.
         self._optimistisch: bool | None = None
 
-        key = _tr_key(self._entity_id)
-        self._attr_name = self._translations.get(
-            f"component.{DOMAIN}.entity.switch.{key}.name",
-            self._entity_id.replace("_", " ")
-        )
 
     @property
     def unique_id(self):
