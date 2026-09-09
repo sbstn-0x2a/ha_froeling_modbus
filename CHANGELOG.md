@@ -84,6 +84,12 @@ Wer umstellen möchte, benennt die Entitäten über
   Beim Wechsel der `state_class` beginnt der Recorder für die betroffenen
   Sensoren eine neue Statistikreihe. Die bisher gesammelten Mittelwerte
   bleiben liegen und werden nicht in Summen umgerechnet.
+* **Energie-Dashboard.** Tagesertrag, Gesamtertrag und die vom Kessel
+  erzeugte Wärmemenge tragen jetzt `device_class: energy`. Zusammen mit der
+  Total-`state_class` erfüllen sie damit die Bedingungen des
+  Energie-Dashboards und lassen sich dort direkt auswählen — vorher ging das
+  nur über eine Hilfsentität. Ob die Anlage die Register füllt, hängt vom
+  angeschlossenen Wärmemengenzähler ab.
 * **Karteileichen.** Wird ein Anlagenteil in den Optionen abgewählt,
   verschwinden seine Entitäten jetzt auch aus der Registry.
 

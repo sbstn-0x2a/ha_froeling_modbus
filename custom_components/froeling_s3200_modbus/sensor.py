@@ -94,9 +94,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                            state_class=SensorStateClass.TOTAL_INCREASING),
             FroelingSensor(coordinator, data, "stunden_im_scheitholzbetrieb", 30077, "h", 1, 0, device_key="controller",
                            state_class=SensorStateClass.TOTAL_INCREASING),
-            FroelingSensor(coordinator, data, "tagesertrag", 30085, "kWh", 1, 0, device_key="controller",
+            FroelingSensor(coordinator, data, "tagesertrag", 30085, "kWh", 1, 0, device_class="energy", device_key="controller",
                            state_class=SensorStateClass.TOTAL_INCREASING),
-            FroelingSensor(coordinator, data, "gesamtertrag", 30086, "kWh", 1, 0, device_key="controller",
+            FroelingSensor(coordinator, data, "gesamtertrag", 30086, "kWh", 1, 0, device_class="energy", device_key="controller",
                            state_class=SensorStateClass.TOTAL_INCREASING),
             FroelingSensor(coordinator, data, "betriebsstunden_saugturbine", 30098, "h", 1, 0, device_key="controller",
                            state_class=SensorStateClass.TOTAL_INCREASING),
@@ -139,7 +139,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 FroelingSensor(coordinator, data, "kessel_verbleibende_heizstunden_bis_asche_entleeren", 30087, "h", 1, 0, device_key="kessel"),
                 FroelingSensor(coordinator, data, "kessel_feuerraumtemperatur", 30089, "°C", 1, 0, device_class="temperature", device_key="kessel"),
                 FroelingSensor(coordinator, data, "kessel_saugzug_ansteuerung_alt", 30105, "%", 1, 0, device_key="kessel"),
-                FroelingSensor(coordinator, data, "kessel_waermemenge_vom_kessel", 30171, "MWh", 10, 1, device_key="kessel",
+                FroelingSensor(coordinator, data, "kessel_waermemenge_vom_kessel", 30171, "MWh", 10, 1, device_class="energy", device_key="kessel",
                                state_class=SensorStateClass.TOTAL_INCREASING),
 
                 # Holding 4xxxx -> eigene Klasse
