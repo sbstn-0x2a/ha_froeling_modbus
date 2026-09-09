@@ -522,9 +522,6 @@
       "efilter_feuerungsbetriebsstunden_fuer_bereitschaft_e_filter": {
         "name": "Firing hours for e-filter readiness"
       },
-      "controller_temperatur_in_der_stb_huelse": {
-        "name": "Temperature in the STB sleeve"
-      },
       "puffer01_puffertemperatur_fuehler_2": {
         "name": "Buffer temperature sensor 2"
       },
@@ -534,9 +531,6 @@
       "kessel_zustandslaufzeit_maximal": {
         "name": "State runtime, maximum"
       },
-      "kessel_minimale_abgastemperatur_40005": {
-        "name": "Minimum flue gas temperature"
-      },
       "kessel_maximale_abgastemperatur": {
         "name": "Maximum flue gas temperature"
       },
@@ -545,18 +539,6 @@
       },
       "kessel_anfahranhebung_der_abgastemperatur": {
         "name": "Flue gas temperature start-up boost"
-      },
-      "austragung_saugzug_min_im_scheitholzbetrieb": {
-        "name": "Induced draught min. in log wood mode"
-      },
-      "austragung_saugzug_max": {
-        "name": "Induced draught max."
-      },
-      "kessel_minimaler_einschub_40031": {
-        "name": "Minimum feed"
-      },
-      "kessel_einschub_regler_max_40032": {
-        "name": "Feed controller max."
       },
       "kessel_einflussfaktor_fuer_o2_regler": {
         "name": "O2 controller influence factor"
@@ -570,29 +552,14 @@
       "kessel_100_kesselleistung_ab_einer_abgastemperatur_von": {
         "name": "100 % boiler output from flue gas temperature"
       },
-      "austragung_minimale_drehzahl_des_saugzuges_im_scheitholzbetrieb": {
-        "name": "Minimum induced draught speed in log wood mode"
-      },
       "kessel_einschubzeit_ohne_zuendung": {
         "name": "Feed time without ignition"
       },
       "kessel_abgas_abgas_differenz_fuer_startvorgang": {
         "name": "Flue gas difference for start-up"
       },
-      "austragung_saugzug_beim_anheizen": {
-        "name": "Induced draught during heating up"
-      },
-      "austragung_saugzug_beim_vorwaermen": {
-        "name": "Induced draught during preheating"
-      },
       "kessel_einschub_beim_zuenden": {
         "name": "Feed during ignition"
-      },
-      "austragung_saugzug_beim_abstellen": {
-        "name": "Induced draught during shutdown"
-      },
-      "austragung_saugzug_beim_zuenden": {
-        "name": "Induced draught during ignition"
       },
       "austragung_nachfuellen_des_zyklons_ab": {
         "name": "Refill cyclone from"
@@ -603,20 +570,8 @@
       "kessel_minimale_sekundaerluft_im_heizen": {
         "name": "Minimum secondary air while heating"
       },
-      "austragung_minimale_abgastemperatur_im_pelletsbetrieb": {
-        "name": "Minimum flue gas temperature in pellet mode"
-      },
-      "austragung_sollwert_des_restsauerstoffgehaltes_im_pelletsbetrieb": {
-        "name": "Residual oxygen setpoint in pellet mode"
-      },
-      "controller_temperatur_in_der_stb_huelse_ab_der_alle_pumpen_laufen": {
-        "name": "STB sleeve temperature from which all pumps run"
-      },
       "kessel_die_aufheizzeit_der_lambdasonde_betraegt": {
         "name": "Lambda probe heat-up time"
-      },
-      "controller_notabschoepfung_ab_stb_fuehlertemperatur_starten": {
-        "name": "Emergency skimming from STB sensor temperature"
       },
       "kessel_o2_regler_freigabe_im_heizen_nach": {
         "name": "O2 controller release while heating after"
@@ -627,20 +582,8 @@
       "kessel_gewuenschter_arbeitspunkt_der_abgastemperatur": {
         "name": "Desired flue gas temperature operating point"
       },
-      "kessel_wos_einschalten_alle_40233": {
-        "name": "Switch WOS on every"
-      },
-      "austragung_saugzug_max_im_scheitholzbetrieb": {
-        "name": "Induced draught max. in log wood mode"
-      },
       "kessel_dauer_des_vorheizens": {
         "name": "Preheating duration"
-      },
-      "controller_nach_wie_viel_stunden_heizen_abreinigen_40249": {
-        "name": "Heating hours until cleaning"
-      },
-      "austragung_sauger_nachlauf_40251": {
-        "name": "Suction turbine run-on"
       },
       "kessel_sekundaerluft_bei_tuer_offen_im_heizen": {
         "name": "Secondary air with door open while heating"
@@ -669,12 +612,6 @@
       "kessel_maximaler_unterdruck_im_feuerraum_beim_vorbereiten": {
         "name": "Maximum negative pressure while preparing"
       },
-      "austragung_saugzug_min_im_pelletsbetrieb": {
-        "name": "Induced draught min. in pellet mode"
-      },
-      "austragung_minimale_drehzahl_des_saugzuges_im_pelletsbetrieb": {
-        "name": "Minimum induced draught speed in pellet mode"
-      },
       "boiler01_boiler_solltemp_bei_legionellenaufheizung_fuer_alle_boiler_g": {
         "name": "DHW setpoint during legionella heating (all tanks)"
       },
@@ -686,12 +623,6 @@
       },
       "kessel_restsauerstoff_ueber_welchem_die_lambdasonde_ausschalten_dar": {
         "name": "Residual oxygen above which the lambda probe may switch off"
-      },
-      "kessel_oeffnung_der_sekundaerluft_bei_0_ansteuerung_fuer_scheitholz_40477": {
-        "name": "Secondary air opening at 0 % for log wood"
-      },
-      "kessel_oeffnung_der_sekundaerluft_bei_100_ansteuerung_40478": {
-        "name": "Secondary air opening at 100 %"
       },
       "kessel_korrekturwert_fuer_den_aussenfuehler": {
         "name": "Outdoor sensor correction"
@@ -716,6 +647,75 @@
       },
       "efilter_pelletkessel_restsauerstoffgrenze_leerlauferkennung_bei_erho": {
         "name": "Pellet boiler - residual oxygen limit for idle detection"
+      },
+      "kessel_temperatur_in_der_stb_huelse": {
+        "name": "Temperature in the STB sleeve"
+      },
+      "kessel_minimale_abgastemperatur": {
+        "name": "Minimum flue gas temperature"
+      },
+      "kessel_saugzug_min_im_scheitholzbetrieb": {
+        "name": "Induced draught min. in log wood mode"
+      },
+      "kessel_saugzug_max": {
+        "name": "Induced draught max."
+      },
+      "kessel_minimaler_einschub": {
+        "name": "Minimum feed"
+      },
+      "kessel_einschub_regler_max": {
+        "name": "Feed controller max."
+      },
+      "kessel_minimale_drehzahl_des_saugzuges_im_scheitholzbetrieb": {
+        "name": "Minimum induced draught speed in log wood mode"
+      },
+      "kessel_saugzug_beim_anheizen": {
+        "name": "Induced draught during heating up"
+      },
+      "kessel_saugzug_beim_vorwaermen": {
+        "name": "Induced draught during preheating"
+      },
+      "kessel_saugzug_beim_abstellen": {
+        "name": "Induced draught during shutdown"
+      },
+      "kessel_saugzug_beim_zuenden": {
+        "name": "Induced draught during ignition"
+      },
+      "kessel_minimale_abgastemperatur_im_pelletsbetrieb": {
+        "name": "Minimum flue gas temperature in pellet mode"
+      },
+      "kessel_sollwert_des_restsauerstoffgehaltes_im_pelletsbetrieb": {
+        "name": "Residual oxygen setpoint in pellet mode"
+      },
+      "kessel_temperatur_in_der_stb_huelse_ab_der_alle_pumpen_laufen": {
+        "name": "STB sleeve temperature from which all pumps run"
+      },
+      "kessel_notabschoepfung_ab_stb_fuehlertemperatur_starten": {
+        "name": "Emergency skimming from STB sensor temperature"
+      },
+      "kessel_wos_einschalten_alle": {
+        "name": "Switch WOS on every"
+      },
+      "kessel_saugzug_max_im_scheitholzbetrieb": {
+        "name": "Induced draught max. in log wood mode"
+      },
+      "kessel_nach_wie_viel_stunden_heizen_abreinigen": {
+        "name": "Heating hours until cleaning"
+      },
+      "austragung_sauger_nachlauf": {
+        "name": "Suction turbine run-on"
+      },
+      "kessel_saugzug_min_im_pelletsbetrieb": {
+        "name": "Induced draught min. in pellet mode"
+      },
+      "kessel_minimale_drehzahl_des_saugzuges_im_pelletsbetrieb": {
+        "name": "Minimum induced draught speed in pellet mode"
+      },
+      "kessel_oeffnung_der_sekundaerluft_bei_0_ansteuerung_fuer_scheitholz": {
+        "name": "Secondary air opening at 0 % for log wood"
+      },
+      "kessel_oeffnung_der_sekundaerluft_bei_100_ansteuerung": {
+        "name": "Secondary air opening at 100 %"
       }
     },
     "number": {
@@ -953,9 +953,6 @@
       },
       "pelletsbefuellung_2_startzeit": {
         "name": "Start Time 2nd Pellet Filling"
-      },
-      "nach_scheitholzbetrieb_pufferladung_verzoegern_um": {
-        "name": "After Log Operation: Delay Pellet Buffer Charging by"
       },
       "verzoegerung_pufferladung_nach_scheitholzbetrieb": {
         "name": "After log wood operation: delay buffer charging with pellets by"
