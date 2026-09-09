@@ -63,6 +63,12 @@ Wer umstellen möchte, benennt die Entitäten über
   Executor, und Home Assistant protokollierte sie als unerwarteten Fehler mit
   vollem Traceback. Die Lücke steckte in allen fünf Zugriffsfunktionen; sie
   laufen jetzt über eine gemeinsame Fassung.
+* **Schreibvorgänge kollidieren nicht mehr mit dem Lesedurchlauf.**
+  `ModbusTcpClient` ist nicht threadsicher, und alle Zugriffe laufen über den
+  Executor. Wurde während eines Abrufs ein Wert gesetzt, gingen zwei Anfragen
+  gleichzeitig auf denselben Socket und die Antworten kamen vermischt zurück —
+  ein Wert konnte am falschen Register landen. Der Coordinator serialisiert
+  die Zugriffe jetzt je Vorgang.
 * Deinstallationsanleitung in beiden READMEs.
 * Die Testsuite liegt im Repository (83 Tests, ohne Anlage und ohne
   Home-Assistant-Installation lauffähig).

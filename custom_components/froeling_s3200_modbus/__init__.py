@@ -71,7 +71,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             unique_id=eindeutige_kennung(data["host"], data.get("port", 502), data["unit_id"]),
         )
 
-    # Gemeinsamer Modbus-Client + Lock für diese Entry-ID (einmalig verbinden)
+    # Ein Client je Config-Entry, einmalig verbunden. Serialisiert wird im
+    # Coordinator (siehe FroelingCoordinator._modbus) -- pymodbus ist nicht
+    # threadsicher, und alle Zugriffe laufen ueber den Executor.
     client = ModbusTcpClient(
         data["host"],
         port=data.get("port", 502),

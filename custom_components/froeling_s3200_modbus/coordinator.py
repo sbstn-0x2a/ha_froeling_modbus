@@ -24,6 +24,7 @@ Verbindung wirklich weg.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import timedelta
@@ -110,6 +111,29 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         self._unit_id = unit_id
         #: Fehlversuche in Folge je Block, Schlüssel ist die Startadresse.
         self._blockfehler: dict[int, int] = {}
+        #: Serialisiert den Zugriff auf den Client. Siehe _modbus().
+        self._zugriff = asyncio.Lock()
+
+    async def _modbus(self, funktion, *args):
+        """Ein Modbus-Vorgang, gegen gleichzeitige Nutzung abgesichert.
+
+        ``ModbusTcpClient`` aus pymodbus ist nicht threadsicher, und alle
+        Zugriffe laufen ueber ``async_add_executor_job``, also ueber mehrere
+        Threads. Der Lesedurchlauf des Coordinators und ein Schreibvorgang aus
+        einer Entitaet koennen deshalb gleichzeitig auf demselben Socket
+        landen: Zwei Anfragen gehen raus, die Antworten kommen vermischt
+        zurueck, und ein Wert landet am falschen Register. Genau dieses Bild
+        gab es beim Einzelabruf schon einmal -- ein Register meldete einen
+        Wert, der zu einem anderen gehoerte.
+
+        Gesperrt wird je Vorgang, nicht ueber den ganzen Durchlauf: Ein
+        Schreibvorgang darf sich zwischen zwei Bloecke schieben, er muss nur
+        nicht *in* einen hinein.
+        """
+        async with self._zugriff:
+            return await self.hass.async_add_executor_job(
+                funktion, self._client, self._unit_id, *args
+            )
 
     async def _async_update_data(self) -> dict[int, int]:
         vorher = self.data or {}
@@ -133,9 +157,7 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
             (HOLDING_BASE, HOLDING_BLOCKS, read_holding_sync),
         ):
             for start, anzahl in bloecke:
-                res, err = await self.hass.async_add_executor_job(
-                    lese, self._client, self._unit_id, start - basis, anzahl
-                )
+                res, err = await self._modbus(lese, start - basis, anzahl)
                 if err or res is None or not hasattr(res, "registers"):
                     uebernehmen(start, anzahl,
                                 f"Block ab {start} ({anzahl} Register): {err}")
@@ -152,9 +174,7 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
             (DISCRETE_BASE, DISCRETE_BLOCKS, read_discrete_sync),
         ):
             for start, anzahl in bloecke:
-                res, err = await self.hass.async_add_executor_job(
-                    lese, self._client, self._unit_id, start - basis, anzahl
-                )
+                res, err = await self._modbus(lese, start - basis, anzahl)
                 if err or res is None or not hasattr(res, "bits"):
                     uebernehmen(start, anzahl,
                                 f"Bitblock ab {start} ({anzahl} Bits): {err}")
@@ -200,12 +220,8 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         nicht bis zum naechsten regulaeren Durchlauf alt aussieht. Rueckgabe
         ist die Fehlermeldung oder None.
         """
-        _, err = await self.hass.async_add_executor_job(
-            write_register_sync,
-            self._client,
-            self._unit_id,
-            register - HOLDING_BASE,
-            rohwert,
+        _, err = await self._modbus(
+            write_register_sync, register - HOLDING_BASE, rohwert
         )
         if err:
             _LOGGER.error("Register %s nicht beschreibbar: %s", register, err)
