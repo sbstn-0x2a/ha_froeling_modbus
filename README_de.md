@@ -66,7 +66,7 @@ nichts geschrieben.
 3. Gib die Verbindungseinstellungen ein:
    - Hostname / IP-Adresse der S3200
    - Port (Standard: 502)
-   - Update-Intervall (Standard: 60 s)  
+   - Update-Intervall (Standard: 30 s, erlaubt 15–3600 s)  
    - Modbus UnitID (2)
 
 ---
@@ -93,6 +93,14 @@ Nur wenn beide Werte identisch sind, können Daten korrekt gelesen und geschrieb
 - COM 2 als Modbus-Schnittstelle aktivieren → **JA**  
 - MODBUS-Protokoll: **RTU (1)**  
 - MODBUS-Protokoll 2014 verwenden → **JA**
+
+> **Zum Schreiben wird das 2014er Protokoll gebraucht.**  
+> Ohne die Einstellung beantwortet die Anlage weiterhin Lesezugriffe: Der
+> Verbindungstest bei der Einrichtung geht durch, und alle Sensoren zeigen
+> Werte. Nur das Schreiben scheitert, mit *Illegal Function* — Zahlen-,
+> Schalter-, Auswahl- und Zeit-Entitäten bleiben stillschweigend auf ihrem
+> alten Wert. Wenn Änderungen aus Home Assistant nie an der Heizung ankommen,
+> zuerst hier nachsehen.
 
 Diese Optionen befinden sich ebenfalls im Menü:  
 `Anlage → Einstellen → Allg. Einst → MODBUS Einstellungen`.

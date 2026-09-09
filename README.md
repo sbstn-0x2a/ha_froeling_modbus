@@ -66,7 +66,7 @@ them. Nothing is written to the boiler during removal.
 3. Enter the connection details:  
    - Hostname / IP address of the S3200  
    - Port (default: 502)  
-   - Update interval (default: 60 s)
+   - Update interval (default: 30 s, allowed 15–3600 s)
    - Modbus UnitID (2)
 
 ---
@@ -93,6 +93,13 @@ Both values must match for data to be read or written correctly.
 - Enable COM 2 as Modbus interface → **YES**  
 - Modbus protocol: **RTU (1)**  
 - Use Modbus Protocol 2014 → **YES**
+
+> **Writing needs the 2014 protocol.**  
+> Without it the boiler still answers read requests: the connection test
+> during setup succeeds and all sensors show values. Only writing fails, with
+> *Illegal Function* — number, switch, select and time entities silently stay
+> at their old value. If changes made in Home Assistant never reach the
+> boiler, check this setting first.
 
 These options are also located in:  
 `System → Settings → General Settings → MODBUS Settings`.
