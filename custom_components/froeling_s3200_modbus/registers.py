@@ -11,11 +11,16 @@ Am Geraet gemessen (08.09.2026, Froeling SP Dual Compact):
     143 Einzelreads : 1645 ms
      18 Blockreads  :  348 ms
 
-Zur Blockgroesse: Modbus erlaubt bis zu 125 Register je Anfrage, der Kessel
-beantwortet ab 30001 aber nur 105 -- darueber kommt Exception 0x03 (Illegal
-Data Value), weil der Registerbereich dort endet. MAX_BLOCK bleibt deshalb
-darunter. Luecken innerhalb eines Blocks sind unproblematisch: Der Kessel
-liefert auch Adressen mit, die die Integration nicht nutzt.
+Zur Blockgroesse: Die Modbus-Dokumentation B1200522 nennt ausdruecklich
+"maximal 122 Werte auf einmal", und Fehlercode 0x03 (Illegal Data Value) heisst
+dort "Anzahl der auf einmal abgefragten Register ist zu hoch". Am Geraet
+gemessen: FC=04 beantwortet 122 und lehnt 123 ab; FC=03 setzt die Grenze nicht
+durch und liefert auch 125. MAX_BLOCK bleibt mit Abstand darunter.
+
+Luecken innerhalb eines Blocks sind unproblematisch und ausdruecklich
+vorgesehen: Laut Dokumentation liefert der Kessel fuer nicht gelistete Register
+innerhalb des gueltigen Bereichs den Wert -1, statt die ganze Anfrage
+abzulehnen.
 """
 
 from __future__ import annotations
@@ -24,7 +29,7 @@ INPUT_BASE = 30001
 HOLDING_BASE = 40001
 DISCRETE_BASE = 10001
 
-#: Groesste Registerzahl je Anfrage.
+#: Groesste Registerzahl je Anfrage. Dokumentiertes Maximum ist 122.
 MAX_BLOCK = 100
 
 #: Groesste Luecke, die noch in denselben Block gezogen wird. Tauscht

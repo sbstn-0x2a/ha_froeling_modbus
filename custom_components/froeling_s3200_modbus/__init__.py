@@ -9,6 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 
+from .const import STANDARD_INTERVALL
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
@@ -87,7 +88,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     # gaebe es dann gar nicht -- Automationen wuerden ins Leere greifen. So
     # entstehen sie immer und melden sich bei Lesefehlern als unavailable.
     coordinator = FroelingCoordinator(
-        hass, entry, client, data["unit_id"], data.get("update_interval", 60)
+        hass, entry, client, data["unit_id"], data.get("update_interval", STANDARD_INTERVALL)
     )
     await coordinator.async_refresh()
     entry.runtime_data = FroelingRuntimeData(coordinator, data)

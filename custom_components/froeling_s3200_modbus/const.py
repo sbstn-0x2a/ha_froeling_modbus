@@ -8,6 +8,20 @@ from pathlib import Path
 
 DOMAIN = "froeling_s3200_modbus"
 
+# Abfrageintervall in Sekunden.
+#
+# Die HA-Regel appropriate-polling verbietet einstellbare Intervalle. Hier wird
+# bewusst abgewichen: Sie zielt auf Cloud-Dienste, waehrend hier ein lokales
+# Geraet befragt wird, das seit der Umstellung auf Blocklesungen in rund 400 ms
+# antwortet. Am Geraet gemessen aendern sich Werte im Abstand von zwei
+# Sekunden; ein Anlauf der Austragschnecke dauerte elf Sekunden und faellt bei
+# 60 s Abfrageintervall leicht ganz zwischen zwei Abfragen.
+#
+# Die Untergrenze verhindert, dass ein Vertipper das Gateway ueberrennt.
+MIN_INTERVALL = 15
+STANDARD_INTERVALL = 30
+MAX_INTERVALL = 3600
+
 _LOGGER = logging.getLogger(__name__)
 _MANIFEST = Path(__file__).parent / "manifest.json"
 

@@ -14,7 +14,7 @@ from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
 from pymodbus.client import ModbusTcpClient
 
-from .const import DOMAIN
+from .const import DOMAIN, MAX_INTERVALL, MIN_INTERVALL, STANDARD_INTERVALL
 from .modbus import read_input_sync
 from .registers import INPUT_BASE, INPUT_REGISTERS
 
@@ -22,6 +22,10 @@ _LOGGER = logging.getLogger(__name__)
 
 #: Zum Probelesen. Das erste bekannte Input-Register der Anlage.
 PROBE_REGISTER = INPUT_REGISTERS[0]
+
+
+#: Eingabepruefung fuer das Abfrageintervall.
+_INTERVALL = vol.All(vol.Coerce(int), vol.Range(min=MIN_INTERVALL, max=MAX_INTERVALL))
 
 
 def _probelesen(host: str, port: int, unit_id: int) -> str | None:
@@ -95,7 +99,8 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Required("host", default=vorher.get("host", "")): str,
             vol.Required("port", default=vorher.get("port", 502)): int,
             vol.Optional("unit_id", default=vorher.get("unit_id", 2)): int,
-            vol.Required("update_interval", default=vorher.get("update_interval", 60)): int,
+            vol.Required("update_interval",
+                         default=vorher.get("update_interval", STANDARD_INTERVALL)): _INTERVALL,
             **_gruppen_schema(lambda n: vorher.get(n, True)),
         })
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
@@ -124,7 +129,8 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
             vol.Optional("host", default=cfg.get("host", "")): str,
             vol.Optional("port", default=cfg.get("port", 502)): int,
             vol.Optional("unit_id", default=cfg.get("unit_id", 2)): int,
-            vol.Optional("update_interval", default=cfg.get("update_interval", 60)): int,
+            vol.Optional("update_interval",
+                         default=cfg.get("update_interval", STANDARD_INTERVALL)): _INTERVALL,
             **_gruppen_schema(lambda n: cfg.get(n, True)),
         })
         return self.async_show_form(step_id="init", data_schema=schema, errors=errors)
