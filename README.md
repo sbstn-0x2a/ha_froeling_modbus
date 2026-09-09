@@ -29,7 +29,7 @@ It allows you to read states and sensor values of your heating system (boiler, h
 1. Make sure [HACS](https://hacs.xyz/) is installed.  
 2. Add this repository as a **Custom Repository**:  
    - HACS → Integrations → Repositories → “+” →  
-     URL: `https://github.com/Toxo666/ha_froeling_modbus`  
+     URL: `https://github.com/sbstn-0x2a/ha_froeling_modbus`  
      Category: `Integration`  
 3. The integration will then appear in HACS and can be installed directly.
 

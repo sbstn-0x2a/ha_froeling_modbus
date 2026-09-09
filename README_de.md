@@ -28,7 +28,7 @@ Damit lassen sich Zustände und Messwerte der Heizanlage (Kessel, Heizkreise, Pu
 1. Stelle sicher, dass [HACS](https://hacs.xyz/) installiert ist.  
 2. Füge dieses Repository als **Custom Repository** hinzu:
    - HACS → Integrationen → Repositories → „+“ →  
-     URL: `https://github.com/Toxo666/ha_froeling_modbus`  
+     URL: `https://github.com/sbstn-0x2a/ha_froeling_modbus`  
      Kategorie: `Integration`  
 3. Danach taucht die Integration in HACS auf und kann installiert werden.  
 
