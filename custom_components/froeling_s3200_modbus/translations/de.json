@@ -3,20 +3,40 @@
     "step": {
       "user": {
         "title": "Fröling S3200 Modbus verbinden",
-        "description": "Verbindungsparameter und Geräteeinstellungen eintragen.",
+        "description": "Verbindungsparameter eintragen. Im nächsten Schritt wird die Anlage einmal komplett gelesen (wenige Sekunden) und schlägt vor, welche Anlagenteile es gibt.",
         "data": {
           "name": "Eindeutiger Name (Standard: Froeling)",
           "host": "Hostname/IP",
           "port": "Port (Standard: 502)",
           "unit_id": "Modbus-Adresse (Unit ID)",
-          "update_interval": "Abfrageintervall in Sekunden (15–3600, Standard 30)",
-          "kessel": "Kessel aktivieren",
-          "boiler01": "Boiler 01 aktivieren",
-          "hk01": "Heizkreis 01 aktivieren",
-          "hk02": "Heizkreis 02 aktivieren",
-          "austragung": "Austragung aktivieren",
-          "puffer01": "Puffer 01 aktivieren",
-          "zirkulationspumpe": "Zirkulationspumpe aktivieren"
+          "update_interval": "Abfrageintervall in Sekunden (15–3600, Standard 30)"
+        }
+      },
+      "anlagenteile": {
+        "title": "Anlagenteile bestätigen",
+        "description": "Erkannt an der Anlage (✔ vorhanden, ? unsicher, ✘ nicht vorhanden):\n\n{belege}\n\nHaken setzen für alles, wofür Entitäten angelegt werden sollen.",
+        "data": {
+          "kessel": "Kessel",
+          "boiler01": "Boiler 01",
+          "hk01": "Heizkreis 01",
+          "hk02": "Heizkreis 02",
+          "austragung": "Austragung",
+          "puffer01": "Puffer 01",
+          "zirkulationspumpe": "Zirkulationspumpe",
+          "weitere": "Weitere Anlagenteile anzeigen, die nicht erkannt wurden"
+        }
+      },
+      "weitere": {
+        "title": "Weitere Anlagenteile",
+        "description": "Diese Teile hat die Erkennung nicht gefunden:\n\n{belege}\n\nNur anhaken, wenn sie tatsächlich vorhanden sind.",
+        "data": {
+          "kessel": "Kessel",
+          "boiler01": "Boiler 01",
+          "hk01": "Heizkreis 01",
+          "hk02": "Heizkreis 02",
+          "austragung": "Austragung",
+          "puffer01": "Puffer 01",
+          "zirkulationspumpe": "Zirkulationspumpe"
         }
       }
     },
@@ -34,19 +54,46 @@
     "step": {
       "init": {
         "title": "Fröling S3200 Modbus – Optionen",
-        "description": "Einstellungen anpassen.",
+        "menu_options": {
+          "verbindung": "Verbindung und Abfrageintervall",
+          "anlagenteile": "Anlagenteile ein- und ausblenden",
+          "neu_einlesen": "Anlage neu einlesen"
+        }
+      },
+      "verbindung": {
+        "title": "Verbindung",
+        "description": "Die Verbindung wird vor dem Speichern geprüft.",
         "data": {
           "host": "Hostname/IP",
           "port": "Port (Standard: 502)",
           "unit_id": "Modbus-Adresse (Unit ID)",
-          "update_interval": "Abfrageintervall in Sekunden (15–3600)",
-          "kessel": "Kessel anzeigen",
-          "boiler01": "Boiler 01 anzeigen",
-          "hk01": "Heizkreis 01 anzeigen",
-          "hk02": "Heizkreis 02 anzeigen",
-          "puffer01": "Puffer 01 anzeigen",
-          "austragung": "Austragung anzeigen",
-          "zirkulationspumpe": "Zirkulationspumpe anzeigen"
+          "update_interval": "Abfrageintervall in Sekunden (15–3600)"
+        }
+      },
+      "anlagenteile": {
+        "title": "Anlagenteile",
+        "description": "Abgewählte Teile werden samt Entitäten entfernt.",
+        "data": {
+          "kessel": "Kessel",
+          "boiler01": "Boiler 01",
+          "hk01": "Heizkreis 01",
+          "hk02": "Heizkreis 02",
+          "austragung": "Austragung",
+          "puffer01": "Puffer 01",
+          "zirkulationspumpe": "Zirkulationspumpe"
+        }
+      },
+      "neu_einlesen": {
+        "title": "Anlage neu eingelesen",
+        "description": "Ergebnis (✔ vorhanden, ? unsicher, ✘ nicht vorhanden):\n\n{belege}\n\nDie Haken sind entsprechend vorbelegt. Nichts wird ohne Bestätigung geändert.",
+        "data": {
+          "kessel": "Kessel",
+          "boiler01": "Boiler 01",
+          "hk01": "Heizkreis 01",
+          "hk02": "Heizkreis 02",
+          "austragung": "Austragung",
+          "puffer01": "Puffer 01",
+          "zirkulationspumpe": "Zirkulationspumpe"
         }
       }
     },
@@ -621,6 +668,12 @@
       "verzoegerung_pufferladung_nach_scheitholzbetrieb": {
         "name": "Nach Scheitholzbetrieb: Pufferladung mit Pellets verzögern um"
       }
+    }
+  },
+  "issues": {
+    "anlage_einlesen": {
+      "title": "Anlage {name} noch nicht eingelesen",
+      "description": "Diese Integration kann seit Version 0.5 erkennen, welche Anlagenteile vorhanden sind. Öffne die Optionen der Integration und wähle „Anlage neu einlesen“. Bis dahin bleibt alles wie bisher."
     }
   }
 }

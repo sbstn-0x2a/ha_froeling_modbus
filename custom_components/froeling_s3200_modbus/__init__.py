@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
 from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import issue_registry as ir
 
 from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
@@ -189,6 +190,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         _LOGGER.info(
             "%d verwaiste Entitaet(en) abgewaehlter Anlagenteile entfernt: %s",
             weg, ", ".join(abgewaehlt),
+        )
+
+    # Bestandsinstallationen wurden nie eingelesen: Hinweis in "Reparaturen",
+    # der in den Options-Flow fuehrt. Es wird nichts automatisch abgewaehlt.
+    kennung = f"anlage_einlesen_{entry.entry_id}"
+    if "erkannt" in data:
+        ir.async_delete_issue(hass, DOMAIN, kennung)
+    else:
+        ir.async_create_issue(
+            hass, DOMAIN, kennung,
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key="anlage_einlesen",
+            translation_placeholders={"name": data["name"]},
         )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

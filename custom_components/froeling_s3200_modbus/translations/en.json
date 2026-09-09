@@ -3,20 +3,40 @@
     "step": {
       "user": {
         "title": "Connect Fröling S3200 Modbus",
-        "description": "Enter connection parameters and device settings.",
+        "description": "Enter the connection parameters. The next step reads the whole controller once (a few seconds) and proposes which plant parts exist.",
         "data": {
           "name": "Unique name (Default: Froeling)",
           "host": "Hostname/IP",
           "port": "Port (Default: 502)",
           "unit_id": "Modbus address (Unit ID)",
-          "update_interval": "Polling interval in seconds (15–3600, default 30)",
-          "kessel": "Boiler enable",
-          "boiler01": "DHW 01 enable",
-          "hk01": "Heating Circuit 01 enable",
-          "hk02": "Heating Circuit 02 enable",
-          "austragung": "Feed System enable",
-          "puffer01": "Buffer 01 enable",
-          "zirkulationspumpe": "Circulation Pump enable"
+          "update_interval": "Polling interval in seconds (15–3600, default 30)"
+        }
+      },
+      "anlagenteile": {
+        "title": "Confirm plant parts",
+        "description": "Detected on the controller (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nTick everything that should get entities.",
+        "data": {
+          "kessel": "Boiler unit",
+          "boiler01": "DHW tank 01",
+          "hk01": "Heating circuit 01",
+          "hk02": "Heating circuit 02",
+          "austragung": "Pellet feed",
+          "puffer01": "Buffer 01",
+          "zirkulationspumpe": "Circulation pump",
+          "weitere": "Show further parts that were not detected"
+        }
+      },
+      "weitere": {
+        "title": "Further plant parts",
+        "description": "Detection did not find these parts:\n\n{belege}\n\nTick them only if they really exist.",
+        "data": {
+          "kessel": "Boiler unit",
+          "boiler01": "DHW tank 01",
+          "hk01": "Heating circuit 01",
+          "hk02": "Heating circuit 02",
+          "austragung": "Pellet feed",
+          "puffer01": "Buffer 01",
+          "zirkulationspumpe": "Circulation pump"
         }
       }
     },
@@ -34,19 +54,46 @@
     "step": {
       "init": {
         "title": "Fröling S3200 Modbus – Options",
-        "description": "Adjust settings.",
+        "menu_options": {
+          "verbindung": "Connection and polling interval",
+          "anlagenteile": "Show or hide plant parts",
+          "neu_einlesen": "Re-scan the plant"
+        }
+      },
+      "verbindung": {
+        "title": "Connection",
+        "description": "The connection is tested before saving.",
         "data": {
           "host": "Hostname/IP",
           "port": "Port (Default: 502)",
           "unit_id": "Modbus address (Unit ID)",
-          "update_interval": "Polling interval in seconds (15–3600)",
-          "kessel": "Show boiler",
-          "boiler01": "Show DHW 01",
-          "hk01": "Show heating circuit 01",
-          "hk02": "Show heating circuit 02",
-          "puffer01": "Show buffer 01",
-          "austragung": "Show Feed System",
-          "zirkulationspumpe": "Show circulation pump"
+          "update_interval": "Polling interval in seconds (15–3600)"
+        }
+      },
+      "anlagenteile": {
+        "title": "Plant parts",
+        "description": "Deselected parts are removed together with their entities.",
+        "data": {
+          "kessel": "Boiler unit",
+          "boiler01": "DHW tank 01",
+          "hk01": "Heating circuit 01",
+          "hk02": "Heating circuit 02",
+          "austragung": "Pellet feed",
+          "puffer01": "Buffer 01",
+          "zirkulationspumpe": "Circulation pump"
+        }
+      },
+      "neu_einlesen": {
+        "title": "Plant re-scanned",
+        "description": "Result (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nThe boxes are pre-filled accordingly. Nothing changes without confirmation.",
+        "data": {
+          "kessel": "Boiler unit",
+          "boiler01": "DHW tank 01",
+          "hk01": "Heating circuit 01",
+          "hk02": "Heating circuit 02",
+          "austragung": "Pellet feed",
+          "puffer01": "Buffer 01",
+          "zirkulationspumpe": "Circulation pump"
         }
       }
     },
@@ -621,6 +668,12 @@
       "verzoegerung_pufferladung_nach_scheitholzbetrieb": {
         "name": "After log wood operation: delay buffer charging with pellets by"
       }
+    }
+  },
+  "issues": {
+    "anlage_einlesen": {
+      "title": "Plant {name} has not been scanned yet",
+      "description": "Since version 0.5 this integration can detect which plant parts exist. Open the integration options and choose \"Re-scan the plant\". Until then everything stays as it is."
     }
   }
 }
