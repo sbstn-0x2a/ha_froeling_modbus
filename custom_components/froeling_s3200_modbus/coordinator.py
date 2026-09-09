@@ -61,6 +61,15 @@ _LOGGER = logging.getLogger(__name__)
 MAX_BLOCKFEHLER = 3
 
 
+def _kurzfassung(fehler: list[str], wenn_leer: str) -> str:
+    """Erste Meldung, Rest gezaehlt -- fuer eine lesbare Protokollzeile."""
+    if not fehler:
+        return wenn_leer
+    if len(fehler) == 1:
+        return fehler[0]
+    return f"{fehler[0]} (und {len(fehler) - 1} weitere Bloecke)"
+
+
 @dataclass(slots=True)
 class FroelingRuntimeData:
     """Was die Plattformen zur Laufzeit brauchen.
@@ -158,13 +167,17 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
 
         if erfolge == 0:
             # Kein einziger Block hat geantwortet -- die Verbindung ist weg.
-            # Erst hier gehen die Entitaeten auf "unavailable".
-            raise UpdateFailed("; ".join(gescheitert) or "keine Antwort von der Anlage")
+            # Erst hier gehen die Entitaeten auf "unavailable". Gemeldet wird
+            # nur der erste Fehler: Faellt die Verbindung aus, scheitern alle
+            # folgenden Bloecke mit demselben "connect", und die Zeile im
+            # Protokoll waere seitenlang.
+            raise UpdateFailed(_kurzfassung(gescheitert, "keine Antwort von der Anlage"))
 
         if gescheitert:
             _LOGGER.warning(
                 "%d von %d Bloecken nicht lesbar, letzte Werte bleiben stehen: %s",
-                len(gescheitert), erfolge + len(gescheitert), "; ".join(gescheitert),
+                len(gescheitert), erfolge + len(gescheitert),
+                _kurzfassung(gescheitert, ""),
             )
         else:
             _LOGGER.debug("%d Werte in %d Anfragen gelesen", len(werte), erfolge)

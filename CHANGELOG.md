@@ -56,6 +56,13 @@ Wer umstellen möchte, benennt die Entitäten über
   erst nach drei Fehlversuchen in Folge melden die betroffenen Entitäten
   `unknown`. Nur wenn kein einziger Block antwortet, gilt die Anlage als
   nicht erreichbar.
+* **Verbindungsfehler stehen als Meldung im Protokoll, nicht als Traceback.**
+  `pymodbus` meldet einen Abbruch als `ConnectionException`, und die erbt von
+  `ModbusException`, nicht von `OSError` — das vorhandene
+  `except BrokenPipeError` fing sie deshalb nicht. Die Ausnahme verliess den
+  Executor, und Home Assistant protokollierte sie als unerwarteten Fehler mit
+  vollem Traceback. Die Lücke steckte in allen fünf Zugriffsfunktionen; sie
+  laufen jetzt über eine gemeinsame Fassung.
 * Deinstallationsanleitung in beiden READMEs.
 * Die Testsuite liegt im Repository (83 Tests, ohne Anlage und ohne
   Home-Assistant-Installation lauffähig).
