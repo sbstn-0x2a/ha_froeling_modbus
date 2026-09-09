@@ -23,7 +23,8 @@
           "austragung": "Austragung",
           "puffer01": "Puffer 01",
           "zirkulationspumpe": "Zirkulationspumpe",
-          "weitere": "Weitere Anlagenteile anzeigen, die nicht erkannt wurden"
+          "weitere": "Weitere Anlagenteile anzeigen, die nicht erkannt wurden",
+          "efilter": "E-Abscheider"
         }
       },
       "weitere": {
@@ -36,7 +37,8 @@
           "hk02": "Heizkreis 02",
           "austragung": "Austragung",
           "puffer01": "Puffer 01",
-          "zirkulationspumpe": "Zirkulationspumpe"
+          "zirkulationspumpe": "Zirkulationspumpe",
+          "efilter": "E-Abscheider"
         }
       }
     },
@@ -80,7 +82,8 @@
           "hk02": "Heizkreis 02",
           "austragung": "Austragung",
           "puffer01": "Puffer 01",
-          "zirkulationspumpe": "Zirkulationspumpe"
+          "zirkulationspumpe": "Zirkulationspumpe",
+          "efilter": "E-Abscheider"
         }
       },
       "neu_einlesen": {
@@ -93,7 +96,8 @@
           "hk02": "Heizkreis 02",
           "austragung": "Austragung",
           "puffer01": "Puffer 01",
-          "zirkulationspumpe": "Zirkulationspumpe"
+          "zirkulationspumpe": "Zirkulationspumpe",
+          "efilter": "E-Abscheider"
         }
       }
     },
@@ -451,6 +455,267 @@
       },
       "dauer_des_ruettelns": {
         "name": "Dauer des Rüttelns"
+      },
+      "meldungen": {
+        "name": "Meldungen"
+      },
+      "kessel_t4_bgr2_position_der_sekundaerluftklappe": {
+        "name": "T4 Bgr2 - Position der Sekundärluftklappe"
+      },
+      "kessel_einschub": {
+        "name": "Einschub"
+      },
+      "kessel_einschubregler": {
+        "name": "Einschubregler"
+      },
+      "kessel_feuerraum_unterdruck": {
+        "name": "Feuerraum-Unterdruck"
+      },
+      "austragung_position_absperrschieber": {
+        "name": "Position Absperrschieber"
+      },
+      "kessel_abschoepf_ausgang": {
+        "name": "Abschöpf Ausgang"
+      },
+      "kessel_lambdasondenspannung_korrigiert": {
+        "name": "Lambdasondenspannung korrigiert"
+      },
+      "kessel_ruecklauf_soll_errechnet": {
+        "name": "Rücklauf Soll errechnet"
+      },
+      "kessel_breitbandsonde_heizstrom": {
+        "name": "Breitbandsonde Heizstrom"
+      },
+      "kessel_breitbandsonde_heizungs_spannung": {
+        "name": "Breitbandsonde Heizungs Spannung"
+      },
+      "kessel_breitbandsonde_nernst_spannung": {
+        "name": "Breitbandsonde Nernst Spannung"
+      },
+      "kessel_breitbandsonde_pump_strom": {
+        "name": "Breitbandsonde Pump Strom"
+      },
+      "kessel_breitbandsonde_innenwiderstand": {
+        "name": "Breitbandsonde Innenwiderstand"
+      },
+      "kessel_leistungsbedarf": {
+        "name": "Leistungsbedarf"
+      },
+      "efilter_e_filter_filterrueckmeldung": {
+        "name": "E-Filter - Filterrückmeldung"
+      },
+      "efilter_e_filter_zustand_filter": {
+        "name": "E-Filter - Zustand Filter"
+      },
+      "kessel_auf_zu_bewegung_des_rostes": {
+        "name": "Auf / Zu Bewegung des Rostes"
+      },
+      "kessel_wos_zustand": {
+        "name": "WOS-Zustand"
+      },
+      "kessel_lambdasondenzustand": {
+        "name": "Lambdasondenzustand"
+      },
+      "efilter_rueckmeldung_hv_modul_1": {
+        "name": "Rückmeldung HV-Modul 1"
+      },
+      "efilter_feuerungsbetriebsstunden_fuer_bereitschaft_e_filter": {
+        "name": "Feuerungsbetriebsstunden für Bereitschaft E-Filter"
+      },
+      "controller_temperatur_in_der_stb_huelse": {
+        "name": "Temperatur in der STB Hülse"
+      },
+      "puffer01_puffertemperatur_fuehler_2": {
+        "name": "Puffertemperatur Fühler 2"
+      },
+      "kessel_zustandslaufzeit_aktuell": {
+        "name": "Zustandslaufzeit aktuell"
+      },
+      "kessel_zustandslaufzeit_maximal": {
+        "name": "Zustandslaufzeit maximal"
+      },
+      "kessel_minimale_abgastemperatur_40005": {
+        "name": "Minimale Abgastemperatur"
+      },
+      "kessel_maximale_abgastemperatur": {
+        "name": "Maximale Abgastemperatur"
+      },
+      "kessel_mindestdifferenz_zwischen_abgas_und_kesseltemperatur_im_heiz": {
+        "name": "Mindestdifferenz zwischen Abgas- und Kesseltemperatur im Heizen"
+      },
+      "kessel_anfahranhebung_der_abgastemperatur": {
+        "name": "Anfahranhebung der Abgastemperatur"
+      },
+      "austragung_saugzug_min_im_scheitholzbetrieb": {
+        "name": "Saugzug Min im Scheitholzbetrieb"
+      },
+      "austragung_saugzug_max": {
+        "name": "Saugzug Max"
+      },
+      "kessel_minimaler_einschub_40031": {
+        "name": "Minimaler Einschub"
+      },
+      "kessel_einschub_regler_max_40032": {
+        "name": "Einschub-Regler Max"
+      },
+      "kessel_einflussfaktor_fuer_o2_regler": {
+        "name": "Einflussfaktor für O2-Regler"
+      },
+      "kessel_kein_einschub_wenn_rest_o2_unter": {
+        "name": "Kein Einschub wenn Rest-O2 unter"
+      },
+      "kessel_kesselleistung_ab_einer_abgastemperatur_von_20_c": {
+        "name": "Kesselleistung ab einer Abgastemperatur von 20°C"
+      },
+      "kessel_100_kesselleistung_ab_einer_abgastemperatur_von": {
+        "name": "100% Kesselleistung ab einer Abgastemperatur von"
+      },
+      "austragung_minimale_drehzahl_des_saugzuges_im_scheitholzbetrieb": {
+        "name": "Minimale Drehzahl des Saugzuges im Scheitholzbetrieb"
+      },
+      "kessel_einschubzeit_ohne_zuendung": {
+        "name": "Einschubzeit ohne Zündung"
+      },
+      "kessel_abgas_abgas_differenz_fuer_startvorgang": {
+        "name": "Abgas - Abgas Differenz für Startvorgang"
+      },
+      "austragung_saugzug_beim_anheizen": {
+        "name": "Saugzug beim Anheizen"
+      },
+      "austragung_saugzug_beim_vorwaermen": {
+        "name": "Saugzug beim Vorwärmen"
+      },
+      "kessel_einschub_beim_zuenden": {
+        "name": "Einschub beim Zünden"
+      },
+      "austragung_saugzug_beim_abstellen": {
+        "name": "Saugzug beim Abstellen"
+      },
+      "austragung_saugzug_beim_zuenden": {
+        "name": "Saugzug beim Zünden"
+      },
+      "austragung_nachfuellen_des_zyklons_ab": {
+        "name": "Nachfüllen des Zyklons ab"
+      },
+      "kessel_heizkreisueberhoehung_bei_gleitendem_betrieb": {
+        "name": "Heizkreisüberhöhung bei gleitendem Betrieb"
+      },
+      "kessel_minimale_sekundaerluft_im_heizen": {
+        "name": "Minimale Sekundärluft im Heizen"
+      },
+      "austragung_minimale_abgastemperatur_im_pelletsbetrieb": {
+        "name": "Minimale Abgastemperatur im Pelletsbetrieb"
+      },
+      "austragung_sollwert_des_restsauerstoffgehaltes_im_pelletsbetrieb": {
+        "name": "Sollwert des Restsauerstoffgehaltes im Pelletsbetrieb"
+      },
+      "controller_temperatur_in_der_stb_huelse_ab_der_alle_pumpen_laufen": {
+        "name": "Temperatur in der STB Hülse, ab der alle Pumpen laufen"
+      },
+      "kessel_die_aufheizzeit_der_lambdasonde_betraegt": {
+        "name": "Die Aufheizzeit der Lambdasonde beträgt"
+      },
+      "controller_notabschoepfung_ab_stb_fuehlertemperatur_starten": {
+        "name": "Notabschöpfung ab STB Fühlertemperatur starten"
+      },
+      "kessel_o2_regler_freigabe_im_heizen_nach": {
+        "name": "O2 Regler Freigabe im Heizen nach:"
+      },
+      "kessel_heizstunden_bis_zur_asche_entleeren_warnung": {
+        "name": "Heizstunden bis zur Asche entleeren Warnung"
+      },
+      "kessel_gewuenschter_arbeitspunkt_der_abgastemperatur": {
+        "name": "Gewünschter Arbeitspunkt der Abgastemperatur"
+      },
+      "kessel_wos_einschalten_alle_40233": {
+        "name": "WOS einschalten alle"
+      },
+      "austragung_saugzug_max_im_scheitholzbetrieb": {
+        "name": "Saugzug Max im Scheitholzbetrieb"
+      },
+      "kessel_dauer_des_vorheizens": {
+        "name": "Dauer des Vorheizens"
+      },
+      "controller_nach_wie_viel_stunden_heizen_abreinigen_40249": {
+        "name": "Nach wie viel Stunden Heizen abreinigen"
+      },
+      "austragung_sauger_nachlauf_40251": {
+        "name": "Sauger-Nachlauf"
+      },
+      "kessel_sekundaerluft_bei_tuer_offen_im_heizen": {
+        "name": "Sekundärluft bei Tür offen im Heizen"
+      },
+      "kessel_temperaturanstieg_am_fuehler_1_binnen_5_min_waehrend_des_anh": {
+        "name": "Temperaturanstieg am Fühler 1 binnen 5 min während des Anheizens"
+      },
+      "kessel_anstieg_der_abgastemperatur_fuer_den_hinweis_tuer_schliessen": {
+        "name": "Anstieg der Abgastemperatur für den Hinweis Tür schließen"
+      },
+      "kessel_sauerstoffgrenze_fuer_den_hinweis_tuer_schliessen": {
+        "name": "Sauerstoffgrenze für den Hinweis Tür schließen"
+      },
+      "kessel_o2_regler_begrenzung_wenn_dieser_nicht_freigegeben_ist": {
+        "name": "O2 Regler Begrenzung wenn dieser nicht freigegeben ist:"
+      },
+      "kessel_minimaler_unterdruck_im_feuerraum_beim_heizen": {
+        "name": "Minimaler Unterdruck im Feuerraum beim Heizen"
+      },
+      "kessel_maximaler_unterdruck_im_feuerraum_beim_heizen": {
+        "name": "Maximaler Unterdruck im Feuerraum beim Heizen"
+      },
+      "kessel_minimaler_unterdruck_im_feuerraum_beim_vorbereiten": {
+        "name": "Minimaler Unterdruck im Feuerraum beim Vorbereiten"
+      },
+      "kessel_maximaler_unterdruck_im_feuerraum_beim_vorbereiten": {
+        "name": "Maximaler Unterdruck im Feuerraum beim Vorbereiten"
+      },
+      "austragung_saugzug_min_im_pelletsbetrieb": {
+        "name": "Saugzug Min im Pelletsbetrieb"
+      },
+      "austragung_minimale_drehzahl_des_saugzuges_im_pelletsbetrieb": {
+        "name": "Minimale Drehzahl des Saugzuges im Pelletsbetrieb"
+      },
+      "boiler01_boiler_solltemp_bei_legionellenaufheizung_fuer_alle_boiler_g": {
+        "name": "Boiler-Solltemp. bei Legionellenaufheizung (für alle Boiler gleich)"
+      },
+      "austragung_zyklon_1_ruetteltaktung": {
+        "name": "Zyklon 1 - Rütteltaktung"
+      },
+      "austragung_zyklon_2_max_laufzeit_der_saugturbine": {
+        "name": "Zyklon 2 - max. Laufzeit der Saugturbine"
+      },
+      "kessel_restsauerstoff_ueber_welchem_die_lambdasonde_ausschalten_dar": {
+        "name": "Restsauerstoff, über welchem die Lambdasonde ausschalten darf"
+      },
+      "kessel_oeffnung_der_sekundaerluft_bei_0_ansteuerung_fuer_scheitholz_40477": {
+        "name": "Öffnung der Sekundärluft bei 0% Ansteuerung für Scheitholz"
+      },
+      "kessel_oeffnung_der_sekundaerluft_bei_100_ansteuerung_40478": {
+        "name": "Öffnung der Sekundärluft bei 100% Ansteuerung"
+      },
+      "kessel_korrekturwert_fuer_den_aussenfuehler": {
+        "name": "Korrekturwert für den Außenfühler"
+      },
+      "boiler01_boilerpumpen_nachlauf_dieser_einsteller_gilt_fuer_alle_boile": {
+        "name": "Boilerpumpen Nachlauf -> (Dieser Einsteller gilt für alle Boiler gleich)"
+      },
+      "puffer01_pufferoben_temp_wenn_das_anfahrentl_ventil_auf_pufferunten": {
+        "name": "Pufferoben Temp wenn das Anfahrentl. Ventil auf Pufferunten"
+      },
+      "efilter_einschaltkriterium_hv_module_abgastemperatur": {
+        "name": "Einschaltkriterium HV-Module - Abgastemperatur"
+      },
+      "kessel_autom_kalibrierung_mindestzeit_im_stillstand": {
+        "name": "Autom. Kalibrierung - Mindestzeit im Stillstand"
+      },
+      "kessel_faktor_fuer_einschubimpuls": {
+        "name": "Faktor für Einschubimpuls"
+      },
+      "puffer01_mindestwert_fuer_nachlegemenge": {
+        "name": "Mindestwert für Nachlegemenge"
+      },
+      "efilter_pelletkessel_restsauerstoffgrenze_leerlauferkennung_bei_erho": {
+        "name": "Pelletkessel - Restsauerstoffgrenze Leerlauferkennung bei erhöhtem Einschub"
       }
     },
     "number": {
@@ -608,6 +873,33 @@
       },
       "nachlegeberechnung_aktiv": {
         "name": "Nachlegeberechnung aktiv"
+      },
+      "controller_stoermeldung": {
+        "name": "Störmeldung"
+      },
+      "controller_stoermeldekontakt": {
+        "name": "Störmeldekontakt"
+      },
+      "kessel_eingang_wos_funktionsrueckmeldung_fuehler_2": {
+        "name": "Eingang WOS Funktionsrückmeldung (Fühler 2)"
+      },
+      "kessel_gleitender_betrieb_aktiv": {
+        "name": "Gleitender Betrieb aktiv"
+      },
+      "austragung_nach_beenden_der_pufferladung_den_zyklon_befuellen": {
+        "name": "Nach beenden der Pufferladung den Zyklon befüllen ?"
+      },
+      "austragung_befuellen_bei_rostreinigung_ueber_heizstunden": {
+        "name": "Befüllen bei Rostreinigung über Heizstunden"
+      },
+      "kessel_aufforderung_tuere_schliessen_aktivieren": {
+        "name": "Aufforderung Türe schließen aktivieren"
+      },
+      "efilter_e_filterfunktion_aktiv": {
+        "name": "E-Filterfunktion aktiv"
+      },
+      "puffer01_heizkreispumpe_0_nach_puffer_oben_freigeben": {
+        "name": "Heizkreispumpe 0 nach Puffer Oben freigeben"
       }
     },
     "select": {
@@ -667,6 +959,18 @@
       },
       "verzoegerung_pufferladung_nach_scheitholzbetrieb": {
         "name": "Nach Scheitholzbetrieb: Pufferladung mit Pellets verzögern um"
+      },
+      "kessel_das_wos_darf_starten_ab": {
+        "name": "Das WOS darf starten ab"
+      },
+      "kessel_das_wos_darf_laufen_bis": {
+        "name": "Das WOS darf laufen bis"
+      },
+      "efilter_e_filter_reinigung_moeglich_ab": {
+        "name": "E-Filter - Reinigung möglich ab"
+      },
+      "efilter_e_filter_reinigung_moeglich_bis": {
+        "name": "E-Filter - Reinigung möglich bis"
       }
     }
   },

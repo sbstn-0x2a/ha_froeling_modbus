@@ -16,6 +16,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import FroelingCoordinator
 from .device import device_info_for, objekt_id, tr_key
+from .entitaeten import tote_register
 from .registertabelle import Register
 
 
@@ -76,16 +77,25 @@ class FroelingRegisterEntity(FroelingEntity):
     """
 
     def __init__(self, coordinator, data, zeile: Register) -> None:
-        schluessel = zeile.alter_schluessel or f"{zeile.instanzkennung}_{zeile.schluessel}"
-        geraet = zeile.altes_geraet or zeile.instanzkennung
-        super().__init__(coordinator, data, schluessel, geraet)
+        geraet = zeile.altes_geraet or zeile.gruppe or "controller"
+        super().__init__(coordinator, data, zeile.entitaetsschluessel, geraet)
         self._zeile = zeile
         self._register = zeile.nummer
+        # Register, die die Erkennung beim Einrichten als wertlos eingestuft
+        # hat (Fühler nicht belegt, Zähler bei 0, ...), werden angelegt, aber
+        # nicht eingeschaltet. Bestehende Registry-Eintraege bleiben, wie sie
+        # sind -- die Vorgabe wirkt nur beim Neuanlegen.
+        self._grund = tote_register(data).get(zeile.nummer)
+        if self._grund:
+            self._attr_entity_registry_enabled_default = False
 
     @property
     def extra_state_attributes(self):
         """Register und Doku-Beschreibung, damit man in HA sieht, was dahintersteckt."""
-        return {"register": self._zeile.nummer, "beschreibung": self._zeile.name_de}
+        attribute = {"register": self._zeile.nummer, "beschreibung": self._zeile.name_de}
+        if self._grund:
+            attribute["hinweis_erkennung"] = self._grund
+        return attribute
 
     def _rohwert_vorzeichen(self) -> int | None:
         """Rohwert als 16-Bit-Zweierkomplement."""

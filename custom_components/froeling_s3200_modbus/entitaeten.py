@@ -1,9 +1,11 @@
-"""Welche Zeilen der Registertabelle zu Entitäten werden.
+"""Welche Zeilen der Registertabelle gelesen werden und Entitäten werden.
 
-Heute: genau die 177 Entitäten der Fassung 0.4.0 (Zeilen mit
-``alter_schluessel``), gefiltert nach den gewählten Anlagenteilen des
-Config-Entry. Die Erkennung beim Einrichten und die zusätzlichen Register
-der Kundenebene setzen später hier an, ohne dass die Plattformen sich ändern.
+Freigegeben sind die 177 Entitäten der 0.4.0 (``alter_schluessel``) und die
+Register der Kundenebene aus der Parameteranalyse vom 09.09.2026
+(``scripts/kundenebene.json``). Gefiltert wird nach den gewählten
+Anlagenteilen des Config-Entry: ``gruppe`` ist der Schlüssel des Hakens
+(``hk02``, ``boiler01``, ``efilter`` …); Zeilen ohne Gruppe -- die Reglerwerte
+und der Fehlerpuffer -- gibt es immer.
 """
 
 from __future__ import annotations
@@ -15,20 +17,28 @@ from .registertabelle import TABELLE, Register
 
 def alle_zeilen() -> tuple[Register, ...]:
     """Jede Zeile, die überhaupt eine Entität werden kann."""
-    return tuple(z for z in TABELLE if z.alter_schluessel is not None)
+    return tuple(z for z in TABELLE if z.freigegeben and z.plattform)
+
+
+def zeilen_zum_lesen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
+    """Alles, was der Coordinator für diesen Entry liest -- auch Zeilen ohne
+    eigene Entität (Fehlerpuffer für den Meldungssensor)."""
+    return tuple(
+        z for z in TABELLE
+        if z.freigegeben and (z.gruppe is None or konfiguration.get(z.gruppe, False))
+    )
 
 
 def zeilen_fuer(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
-    """Zeilen für die gewählten Anlagenteile eines Config-Entry.
-
-    ``alte_gruppe`` ist der Schlüssel des Hakens im Config-Flow (``hk02``,
-    ``boiler01`` …). Zeilen ohne Gruppe -- die Reglerwerte -- gibt es immer.
-    """
-    return tuple(
-        z for z in alle_zeilen()
-        if z.alte_gruppe is None or konfiguration.get(z.alte_gruppe, False)
-    )
+    """Zeilen, die für die gewählten Anlagenteile Entitäten werden."""
+    return tuple(z for z in zeilen_zum_lesen(konfiguration) if z.plattform)
 
 
 def zeilen_der_plattform(konfiguration: dict[str, Any], plattform: str) -> tuple[Register, ...]:
     return tuple(z for z in zeilen_fuer(konfiguration) if z.plattform == plattform)
+
+
+def tote_register(konfiguration: dict[str, Any]) -> dict[int, str]:
+    """Register, die die Erkennung als wertlos eingestuft hat: Nummer -> Grund."""
+    erkannt = konfiguration.get("erkannt") or {}
+    return {int(k): v for k, v in (erkannt.get("tot") or {}).items()}

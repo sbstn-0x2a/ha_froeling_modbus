@@ -43,7 +43,7 @@ _LOGGER = logging.getLogger(__name__)
 PROBE_REGISTER = INPUT_REGISTERS[0]
 
 #: Die Anlagenteile, für die es Entitäten gibt -- Schlüssel im Config-Entry.
-GRUPPEN = ("kessel", "boiler01", "hk01", "hk02", "austragung", "puffer01", "zirkulationspumpe")
+GRUPPEN = ("kessel", "boiler01", "hk01", "hk02", "austragung", "puffer01", "zirkulationspumpe", "efilter")
 
 #: Instanzkennung der Erkennung -> Schlüssel im Config-Entry (sonst gleich).
 INSTANZ_ZU_GRUPPE = {"zirkulation": "zirkulationspumpe"}

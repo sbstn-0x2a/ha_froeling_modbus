@@ -24,6 +24,7 @@ DEVICE_NAME = {
     "puffer01": "Puffer 01",
     "austragung": "Austragung",
     "zirkulationspumpe": "Zirkulationspumpe",
+    "efilter": "E-Abscheider",
 }
 
 #: Baureihe. Steht im Modellfeld aller Geraete, auch der Untergeraete -- sie
@@ -105,6 +106,7 @@ _GRUPPENPRAEFIX = {
     "puffer01": (r"^puffer_?0?1_",),
     "austragung": (r"^austragung_",),
     "zirkulationspumpe": (r"^zirkulationspumpe_",),
+    "efilter": (r"^efilter_",),
 }
 
 

@@ -65,6 +65,23 @@ def bloecke(register, max_luecke: int = MAX_LUECKE, max_block: int = MAX_BLOCK):
 INPUT_BLOCKS = bloecke(INPUT_REGISTERS)
 HOLDING_BLOCKS = bloecke(HOLDING_REGISTERS)
 
+
+def bloecke_fuer(zeilen) -> dict[str, tuple[tuple[int, int], ...]]:
+    """Leseblöcke für genau die Zeilen eines Config-Entry.
+
+    Der Coordinator liest nicht die Vollmenge aller freigegebenen Register,
+    sondern nur, was die gewählten Anlagenteile brauchen.
+    """
+    je_typ: dict[str, list[int]] = {"input": [], "holding": [], "coil": [], "discrete": []}
+    for z in zeilen:
+        je_typ[z.typ].append(z.nummer)
+    return {
+        "input": bloecke(je_typ["input"]),
+        "holding": bloecke(je_typ["holding"]),
+        "coil": bloecke(je_typ["coil"], max_luecke=40),
+        "discrete": bloecke(je_typ["discrete"], max_luecke=1),
+    }
+
 #: Coils (FC=01) werden direkt adressiert, ohne Basisversatz.
 COILS: tuple[int, ...] = tuple(sorted(z.nummer for z in alle_zeilen() if z.typ == "coil"))
 

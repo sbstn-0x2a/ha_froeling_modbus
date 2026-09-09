@@ -23,7 +23,8 @@
           "austragung": "Pellet feed",
           "puffer01": "Buffer 01",
           "zirkulationspumpe": "Circulation pump",
-          "weitere": "Show further parts that were not detected"
+          "weitere": "Show further parts that were not detected",
+          "efilter": "Electrostatic precipitator"
         }
       },
       "weitere": {
@@ -36,7 +37,8 @@
           "hk02": "Heating circuit 02",
           "austragung": "Pellet feed",
           "puffer01": "Buffer 01",
-          "zirkulationspumpe": "Circulation pump"
+          "zirkulationspumpe": "Circulation pump",
+          "efilter": "Electrostatic precipitator"
         }
       }
     },
@@ -80,7 +82,8 @@
           "hk02": "Heating circuit 02",
           "austragung": "Pellet feed",
           "puffer01": "Buffer 01",
-          "zirkulationspumpe": "Circulation pump"
+          "zirkulationspumpe": "Circulation pump",
+          "efilter": "Electrostatic precipitator"
         }
       },
       "neu_einlesen": {
@@ -93,7 +96,8 @@
           "hk02": "Heating circuit 02",
           "austragung": "Pellet feed",
           "puffer01": "Buffer 01",
-          "zirkulationspumpe": "Circulation pump"
+          "zirkulationspumpe": "Circulation pump",
+          "efilter": "Electrostatic precipitator"
         }
       }
     },
@@ -451,6 +455,267 @@
       },
       "dauer_des_ruettelns": {
         "name": "Shaking Duration"
+      },
+      "meldungen": {
+        "name": "Messages"
+      },
+      "kessel_t4_bgr2_position_der_sekundaerluftklappe": {
+        "name": "T4 Bgr2 - secondary air flap position"
+      },
+      "kessel_einschub": {
+        "name": "Feed rate"
+      },
+      "kessel_einschubregler": {
+        "name": "Feed controller"
+      },
+      "kessel_feuerraum_unterdruck": {
+        "name": "Combustion chamber negative pressure"
+      },
+      "austragung_position_absperrschieber": {
+        "name": "Shut-off slide position"
+      },
+      "kessel_abschoepf_ausgang": {
+        "name": "Skimming output"
+      },
+      "kessel_lambdasondenspannung_korrigiert": {
+        "name": "Lambda probe voltage, corrected"
+      },
+      "kessel_ruecklauf_soll_errechnet": {
+        "name": "Calculated return setpoint"
+      },
+      "kessel_breitbandsonde_heizstrom": {
+        "name": "Wideband probe heater current"
+      },
+      "kessel_breitbandsonde_heizungs_spannung": {
+        "name": "Wideband probe heater voltage"
+      },
+      "kessel_breitbandsonde_nernst_spannung": {
+        "name": "Wideband probe Nernst voltage"
+      },
+      "kessel_breitbandsonde_pump_strom": {
+        "name": "Wideband probe pump current"
+      },
+      "kessel_breitbandsonde_innenwiderstand": {
+        "name": "Wideband probe internal resistance"
+      },
+      "kessel_leistungsbedarf": {
+        "name": "Power demand"
+      },
+      "efilter_e_filter_filterrueckmeldung": {
+        "name": "E-filter feedback"
+      },
+      "efilter_e_filter_zustand_filter": {
+        "name": "E-filter state"
+      },
+      "kessel_auf_zu_bewegung_des_rostes": {
+        "name": "Grate open/close movements"
+      },
+      "kessel_wos_zustand": {
+        "name": "WOS state"
+      },
+      "kessel_lambdasondenzustand": {
+        "name": "Lambda probe state"
+      },
+      "efilter_rueckmeldung_hv_modul_1": {
+        "name": "HV module 1 feedback"
+      },
+      "efilter_feuerungsbetriebsstunden_fuer_bereitschaft_e_filter": {
+        "name": "Firing hours for e-filter readiness"
+      },
+      "controller_temperatur_in_der_stb_huelse": {
+        "name": "Temperature in the STB sleeve"
+      },
+      "puffer01_puffertemperatur_fuehler_2": {
+        "name": "Buffer temperature sensor 2"
+      },
+      "kessel_zustandslaufzeit_aktuell": {
+        "name": "State runtime, current"
+      },
+      "kessel_zustandslaufzeit_maximal": {
+        "name": "State runtime, maximum"
+      },
+      "kessel_minimale_abgastemperatur_40005": {
+        "name": "Minimum flue gas temperature"
+      },
+      "kessel_maximale_abgastemperatur": {
+        "name": "Maximum flue gas temperature"
+      },
+      "kessel_mindestdifferenz_zwischen_abgas_und_kesseltemperatur_im_heiz": {
+        "name": "Minimum difference flue gas to boiler temperature while heating"
+      },
+      "kessel_anfahranhebung_der_abgastemperatur": {
+        "name": "Flue gas temperature start-up boost"
+      },
+      "austragung_saugzug_min_im_scheitholzbetrieb": {
+        "name": "Induced draught min. in log wood mode"
+      },
+      "austragung_saugzug_max": {
+        "name": "Induced draught max."
+      },
+      "kessel_minimaler_einschub_40031": {
+        "name": "Minimum feed"
+      },
+      "kessel_einschub_regler_max_40032": {
+        "name": "Feed controller max."
+      },
+      "kessel_einflussfaktor_fuer_o2_regler": {
+        "name": "O2 controller influence factor"
+      },
+      "kessel_kein_einschub_wenn_rest_o2_unter": {
+        "name": "No feed if residual O2 below"
+      },
+      "kessel_kesselleistung_ab_einer_abgastemperatur_von_20_c": {
+        "name": "Boiler output at 20 °C flue gas temperature"
+      },
+      "kessel_100_kesselleistung_ab_einer_abgastemperatur_von": {
+        "name": "100 % boiler output from flue gas temperature"
+      },
+      "austragung_minimale_drehzahl_des_saugzuges_im_scheitholzbetrieb": {
+        "name": "Minimum induced draught speed in log wood mode"
+      },
+      "kessel_einschubzeit_ohne_zuendung": {
+        "name": "Feed time without ignition"
+      },
+      "kessel_abgas_abgas_differenz_fuer_startvorgang": {
+        "name": "Flue gas difference for start-up"
+      },
+      "austragung_saugzug_beim_anheizen": {
+        "name": "Induced draught during heating up"
+      },
+      "austragung_saugzug_beim_vorwaermen": {
+        "name": "Induced draught during preheating"
+      },
+      "kessel_einschub_beim_zuenden": {
+        "name": "Feed during ignition"
+      },
+      "austragung_saugzug_beim_abstellen": {
+        "name": "Induced draught during shutdown"
+      },
+      "austragung_saugzug_beim_zuenden": {
+        "name": "Induced draught during ignition"
+      },
+      "austragung_nachfuellen_des_zyklons_ab": {
+        "name": "Refill cyclone from"
+      },
+      "kessel_heizkreisueberhoehung_bei_gleitendem_betrieb": {
+        "name": "Heating circuit boost in sliding mode"
+      },
+      "kessel_minimale_sekundaerluft_im_heizen": {
+        "name": "Minimum secondary air while heating"
+      },
+      "austragung_minimale_abgastemperatur_im_pelletsbetrieb": {
+        "name": "Minimum flue gas temperature in pellet mode"
+      },
+      "austragung_sollwert_des_restsauerstoffgehaltes_im_pelletsbetrieb": {
+        "name": "Residual oxygen setpoint in pellet mode"
+      },
+      "controller_temperatur_in_der_stb_huelse_ab_der_alle_pumpen_laufen": {
+        "name": "STB sleeve temperature from which all pumps run"
+      },
+      "kessel_die_aufheizzeit_der_lambdasonde_betraegt": {
+        "name": "Lambda probe heat-up time"
+      },
+      "controller_notabschoepfung_ab_stb_fuehlertemperatur_starten": {
+        "name": "Emergency skimming from STB sensor temperature"
+      },
+      "kessel_o2_regler_freigabe_im_heizen_nach": {
+        "name": "O2 controller release while heating after"
+      },
+      "kessel_heizstunden_bis_zur_asche_entleeren_warnung": {
+        "name": "Heating hours until ash-empty warning"
+      },
+      "kessel_gewuenschter_arbeitspunkt_der_abgastemperatur": {
+        "name": "Desired flue gas temperature operating point"
+      },
+      "kessel_wos_einschalten_alle_40233": {
+        "name": "Switch WOS on every"
+      },
+      "austragung_saugzug_max_im_scheitholzbetrieb": {
+        "name": "Induced draught max. in log wood mode"
+      },
+      "kessel_dauer_des_vorheizens": {
+        "name": "Preheating duration"
+      },
+      "controller_nach_wie_viel_stunden_heizen_abreinigen_40249": {
+        "name": "Heating hours until cleaning"
+      },
+      "austragung_sauger_nachlauf_40251": {
+        "name": "Suction turbine run-on"
+      },
+      "kessel_sekundaerluft_bei_tuer_offen_im_heizen": {
+        "name": "Secondary air with door open while heating"
+      },
+      "kessel_temperaturanstieg_am_fuehler_1_binnen_5_min_waehrend_des_anh": {
+        "name": "Temperature rise at sensor 1 within 5 min while heating up"
+      },
+      "kessel_anstieg_der_abgastemperatur_fuer_den_hinweis_tuer_schliessen": {
+        "name": "Flue gas rise for the close-door hint"
+      },
+      "kessel_sauerstoffgrenze_fuer_den_hinweis_tuer_schliessen": {
+        "name": "Oxygen limit for the close-door hint"
+      },
+      "kessel_o2_regler_begrenzung_wenn_dieser_nicht_freigegeben_ist": {
+        "name": "O2 controller limit while not released"
+      },
+      "kessel_minimaler_unterdruck_im_feuerraum_beim_heizen": {
+        "name": "Minimum negative pressure while heating"
+      },
+      "kessel_maximaler_unterdruck_im_feuerraum_beim_heizen": {
+        "name": "Maximum negative pressure while heating"
+      },
+      "kessel_minimaler_unterdruck_im_feuerraum_beim_vorbereiten": {
+        "name": "Minimum negative pressure while preparing"
+      },
+      "kessel_maximaler_unterdruck_im_feuerraum_beim_vorbereiten": {
+        "name": "Maximum negative pressure while preparing"
+      },
+      "austragung_saugzug_min_im_pelletsbetrieb": {
+        "name": "Induced draught min. in pellet mode"
+      },
+      "austragung_minimale_drehzahl_des_saugzuges_im_pelletsbetrieb": {
+        "name": "Minimum induced draught speed in pellet mode"
+      },
+      "boiler01_boiler_solltemp_bei_legionellenaufheizung_fuer_alle_boiler_g": {
+        "name": "DHW setpoint during legionella heating (all tanks)"
+      },
+      "austragung_zyklon_1_ruetteltaktung": {
+        "name": "Cyclone 1 - vibration duty cycle"
+      },
+      "austragung_zyklon_2_max_laufzeit_der_saugturbine": {
+        "name": "Cyclone 2 - max. suction turbine run time"
+      },
+      "kessel_restsauerstoff_ueber_welchem_die_lambdasonde_ausschalten_dar": {
+        "name": "Residual oxygen above which the lambda probe may switch off"
+      },
+      "kessel_oeffnung_der_sekundaerluft_bei_0_ansteuerung_fuer_scheitholz_40477": {
+        "name": "Secondary air opening at 0 % for log wood"
+      },
+      "kessel_oeffnung_der_sekundaerluft_bei_100_ansteuerung_40478": {
+        "name": "Secondary air opening at 100 %"
+      },
+      "kessel_korrekturwert_fuer_den_aussenfuehler": {
+        "name": "Outdoor sensor correction"
+      },
+      "boiler01_boilerpumpen_nachlauf_dieser_einsteller_gilt_fuer_alle_boile": {
+        "name": "DHW pump run-on (all tanks)"
+      },
+      "puffer01_pufferoben_temp_wenn_das_anfahrentl_ventil_auf_pufferunten": {
+        "name": "Buffer top temperature at which the start-up relief valve switches to buffer bottom"
+      },
+      "efilter_einschaltkriterium_hv_module_abgastemperatur": {
+        "name": "HV module switch-on criterion - flue gas temperature"
+      },
+      "kessel_autom_kalibrierung_mindestzeit_im_stillstand": {
+        "name": "Automatic calibration - minimum standstill time"
+      },
+      "kessel_faktor_fuer_einschubimpuls": {
+        "name": "Feed pulse factor"
+      },
+      "puffer01_mindestwert_fuer_nachlegemenge": {
+        "name": "Minimum reload quantity"
+      },
+      "efilter_pelletkessel_restsauerstoffgrenze_leerlauferkennung_bei_erho": {
+        "name": "Pellet boiler - residual oxygen limit for idle detection"
       }
     },
     "number": {
@@ -608,6 +873,33 @@
       },
       "nachlegeberechnung_aktiv": {
         "name": "Refill Calculation Active"
+      },
+      "controller_stoermeldung": {
+        "name": "Fault"
+      },
+      "controller_stoermeldekontakt": {
+        "name": "Fault contact"
+      },
+      "kessel_eingang_wos_funktionsrueckmeldung_fuehler_2": {
+        "name": "WOS function feedback input (sensor 2)"
+      },
+      "kessel_gleitender_betrieb_aktiv": {
+        "name": "Sliding mode active"
+      },
+      "austragung_nach_beenden_der_pufferladung_den_zyklon_befuellen": {
+        "name": "Fill cyclone after buffer charging"
+      },
+      "austragung_befuellen_bei_rostreinigung_ueber_heizstunden": {
+        "name": "Fill during grate cleaning by heating hours"
+      },
+      "kessel_aufforderung_tuere_schliessen_aktivieren": {
+        "name": "Close-door prompt enabled"
+      },
+      "efilter_e_filterfunktion_aktiv": {
+        "name": "E-filter function active"
+      },
+      "puffer01_heizkreispumpe_0_nach_puffer_oben_freigeben": {
+        "name": "Release heating circuit pump 0 after buffer top"
       }
     },
     "select": {
@@ -667,6 +959,18 @@
       },
       "verzoegerung_pufferladung_nach_scheitholzbetrieb": {
         "name": "After log wood operation: delay buffer charging with pellets by"
+      },
+      "kessel_das_wos_darf_starten_ab": {
+        "name": "WOS may start from"
+      },
+      "kessel_das_wos_darf_laufen_bis": {
+        "name": "WOS may run until"
+      },
+      "efilter_e_filter_reinigung_moeglich_ab": {
+        "name": "E-filter cleaning allowed from"
+      },
+      "efilter_e_filter_reinigung_moeglich_bis": {
+        "name": "E-filter cleaning allowed until"
       }
     }
   },

@@ -13,6 +13,7 @@ from homeassistant.helpers import issue_registry as ir
 from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
 from .device import device_info_for
+from .entitaeten import zeilen_zum_lesen
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
     logging.getLogger(name).setLevel(logging.WARNING)
@@ -52,6 +53,7 @@ GRUPPEN = (
     "austragung",
     "puffer01",
     "zirkulationspumpe",
+    "efilter",
 )
 
 
@@ -166,7 +168,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     # gaebe es dann gar nicht -- Automationen wuerden ins Leere greifen. So
     # entstehen sie immer und melden sich bei Lesefehlern als unavailable.
     coordinator = FroelingCoordinator(
-        hass, entry, client, data["unit_id"], data.get("update_interval", STANDARD_INTERVALL)
+        hass, entry, client, data["unit_id"], data.get("update_interval", STANDARD_INTERVALL),
+        zeilen=zeilen_zum_lesen(data),
     )
     await coordinator.async_refresh()
     # Das Reglergeraet zuerst anlegen: Untergeraete haengen sich seit

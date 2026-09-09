@@ -52,6 +52,7 @@ from .registers import (
     HOLDING_BLOCKS,
     INPUT_BASE,
     INPUT_BLOCKS,
+    bloecke_fuer,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -100,6 +101,7 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         client: ModbusTcpClient,
         unit_id: int,
         update_interval: int,
+        zeilen=None,
     ) -> None:
         super().__init__(
             hass,
@@ -110,6 +112,13 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         )
         self._client = client
         self._unit_id = unit_id
+        #: Leseblöcke dieses Entry. Ohne Zeilen (Tests, alte Aufrufer) die
+        #: Vollmenge aller freigegebenen Register.
+        if zeilen is None:
+            self._bloecke = {"input": INPUT_BLOCKS, "holding": HOLDING_BLOCKS,
+                             "coil": COIL_BLOCKS, "discrete": DISCRETE_BLOCKS}
+        else:
+            self._bloecke = bloecke_fuer(zeilen)
         #: Fehlversuche in Folge je Block, Schlüssel ist die Startadresse.
         self._blockfehler: dict[int, int] = {}
         #: Serialisiert den Zugriff auf den Client. Siehe _modbus().
@@ -158,8 +167,8 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
                     werte[nummer] = vorher[nummer]
 
         for basis, bloecke, lese in (
-            (INPUT_BASE, INPUT_BLOCKS, read_input_sync),
-            (HOLDING_BASE, HOLDING_BLOCKS, read_holding_sync),
+            (INPUT_BASE, self._bloecke["input"], read_input_sync),
+            (HOLDING_BASE, self._bloecke["holding"], read_holding_sync),
         ):
             for start, anzahl in bloecke:
                 res, err = await self._modbus(lese, start - basis, anzahl)
@@ -175,8 +184,8 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         # Coils (FC=01) werden direkt adressiert, Discrete Inputs (FC=02)
         # ueber ihre 1xxxx-Nummer. Beide liefern Bits statt Register.
         for basis, bloecke, lese in (
-            (0, COIL_BLOCKS, read_coils_sync),
-            (DISCRETE_BASE, DISCRETE_BLOCKS, read_discrete_sync),
+            (0, self._bloecke["coil"], read_coils_sync),
+            (DISCRETE_BASE, self._bloecke["discrete"], read_discrete_sync),
         ):
             for start, anzahl in bloecke:
                 res, err = await self._modbus(lese, start - basis, anzahl)
