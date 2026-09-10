@@ -202,6 +202,18 @@ def belege_text(befund: erkennung.Befund | None, gruppen=GRUPPEN, bisher: dict |
     return "\n".join(zeilen)
 
 
+def tot_text(befund: erkennung.Befund | None) -> str:
+    """Register ohne brauchbaren Wert, für die Beschreibung des Formulars."""
+    if befund is None or not befund.tot:
+        return "keine"
+    from .registertabelle import NACH_NUMMER
+    zeilen = []
+    for nummer, grund in sorted(befund.tot.items()):
+        z = NACH_NUMMER.get(("input", nummer)) or NACH_NUMMER.get(("holding", nummer))
+        zeilen.append(f"{z.name_de if z else nummer}: {grund}")
+    return "\n".join(zeilen)
+
+
 def _gruppen_schema(gruppen, vorgabe) -> dict:
     return {vol.Optional(name, default=bool(vorgabe(name))): bool for name in gruppen}
 
@@ -218,6 +230,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._verbindung: dict = {}
         self._befund: erkennung.Befund | None = None
         self._gewaehlt: dict[str, bool] = {}
+        self._tote_deaktivieren = True
 
     async def async_step_user(self, user_input=None):
         errors: dict[str, str] = {}
@@ -257,18 +270,22 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         sichtbar = [g for g in GRUPPEN if _sichtbar(self._befund, g)]
         if user_input is not None:
             self._gewaehlt = {g: bool(user_input.get(g, False)) for g in sichtbar}
+            self._tote_deaktivieren = bool(user_input.get("tote_deaktivieren", True))
             uebrige = [g for g in GRUPPEN if g not in sichtbar]
             if user_input.get("weitere") and uebrige:
                 return await self.async_step_weitere()
             return self._anlegen()
 
         schema = {**_gruppen_schema(sichtbar, lambda g: _vorbelegung(self._befund, g))}
+        if self._befund is not None and self._befund.tot:
+            schema[vol.Optional("tote_deaktivieren", default=True)] = bool
         if len(sichtbar) < len(GRUPPEN):
             schema[vol.Optional("weitere", default=False)] = bool
         return self.async_show_form(
             step_id="anlagenteile",
             data_schema=vol.Schema(schema),
-            description_placeholders={"belege": belege_text(self._befund)},
+            description_placeholders={"belege": belege_text(self._befund),
+                                      "tot": tot_text(self._befund)},
         )
 
     async def async_step_weitere(self, user_input=None):
@@ -288,6 +305,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             **self._verbindung,
             **{g: self._gewaehlt.get(g, False) for g in GRUPPEN},
             "erkannt": erkannt_als_dict(self._befund),
+            "tote_deaktivieren": self._tote_deaktivieren,
         }
         return self.async_create_entry(title=self._verbindung["name"], data=data)
 
@@ -358,6 +376,7 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
                     **self.config_entry.options,
                     **{g: bool(user_input.get(g, False)) for g in GRUPPEN},
                     "erkannt": erkannt_als_dict(self._befund),
+                    "tote_deaktivieren": bool(user_input.get("tote_deaktivieren", True)),
                 },
             )
         self._befund = await anlage_einlesen(self.hass, cfg)
@@ -366,12 +385,14 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
                 step_id="neu_einlesen",
                 data_schema=vol.Schema(_gruppen_schema(GRUPPEN, lambda g: cfg.get(g, True))),
                 errors={"base": "cannot_connect"},
-                description_placeholders={"belege": belege_text(None)},
+                description_placeholders={"belege": belege_text(None), "tot": "keine"},
             )
+        schema = _gruppen_schema(GRUPPEN, lambda g: _vorbelegung(self._befund, g, cfg.get(g)))
+        if self._befund.tot:
+            schema[vol.Optional("tote_deaktivieren", default=True)] = bool
         return self.async_show_form(
             step_id="neu_einlesen",
-            data_schema=vol.Schema(
-                _gruppen_schema(GRUPPEN, lambda g: _vorbelegung(self._befund, g, cfg.get(g)))
-            ),
-            description_placeholders={"belege": belege_text(self._befund, bisher=cfg)},
+            data_schema=vol.Schema(schema),
+            description_placeholders={"belege": belege_text(self._befund, bisher=cfg),
+                                      "tot": tot_text(self._befund)},
         )

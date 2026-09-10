@@ -13,7 +13,8 @@ from homeassistant.helpers import issue_registry as ir
 from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
 from .device import device_info_for
-from .entitaeten import zeilen_zum_lesen
+from .entitaeten import tote_register, zeilen_zum_lesen
+from .registertabelle import TABELLE
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
     logging.getLogger(name).setLevel(logging.WARNING)
@@ -123,6 +124,30 @@ def _gruppen_entfernen(hass: HomeAssistant, entry: ConfigEntry, name: str,
     return entfernt
 
 
+def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
+    erkannt = data.get("erkannt") or {}
+    zeit = erkannt.get("zeit")
+    if not zeit or not data.get("tote_deaktivieren", True) or data.get("tot_angewendet") == zeit:
+        return
+    ent_reg = er.async_get(hass)
+    vorhanden = {e.unique_id: e for e in ent_reg.entities.values()
+                 if e.config_entry_id == entry.entry_id}
+    anzahl = 0
+    for nummer in tote_register(data):
+        for zeile in TABELLE:
+            if zeile.nummer != nummer or not zeile.freigegeben or not zeile.plattform:
+                continue
+            eintrag = vorhanden.get(f"{data['name']}_{zeile.entitaetsschluessel}")
+            if eintrag is not None and eintrag.disabled_by is None:
+                ent_reg.async_update_entity(
+                    eintrag.entity_id, disabled_by=er.RegistryEntryDisabler.INTEGRATION
+                )
+                anzahl += 1
+    if anzahl:
+        _LOGGER.info("%d Entitaet(en) ohne brauchbaren Wert deaktiviert", anzahl)
+    hass.config_entries.async_update_entry(entry, data={**entry.data, "tot_angewendet": zeit})
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up the integration from a config entry."""
     # entry.data ist immutable → kopieren und Optionen überlagern
@@ -210,6 +235,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # Register ohne brauchbaren Wert einmal deaktivieren. Bei einer frischen
+    # Einrichtung entstehen sie ohnehin deaktiviert; Home Assistant stellt
+    # aber geloeschte Registry-Eintraege samt altem Zustand wieder her, und
+    # beim Neu-Einlesen existieren sie laengst. Deshalb hier, genau einmal je
+    # Befund (Zeitstempel), und vor dem Update-Listener -- sonst loest das
+    # Schreiben in entry.data einen Reload aus.
+    _tote_anwenden(hass, entry, data)
 
     # ---- Options-Update: deaktivierte Gruppen aufräumen und reloaden ----
     async def _cleanup_disabled_groups_and_reload(

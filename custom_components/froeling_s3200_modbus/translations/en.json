@@ -14,7 +14,7 @@
       },
       "anlagenteile": {
         "title": "Confirm plant parts",
-        "description": "Detected on the controller (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nTick everything that should get entities.",
+        "description": "Detected on the controller (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nTick everything that should get entities.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n{tot}",
         "data": {
           "kessel": "Boiler unit",
           "boiler01": "DHW tank 01",
@@ -24,7 +24,8 @@
           "puffer01": "Buffer 01",
           "zirkulationspumpe": "Circulation pump",
           "weitere": "Show further parts that were not detected",
-          "efilter": "Electrostatic precipitator"
+          "efilter": "Electrostatic precipitator",
+          "tote_deaktivieren": "Create registers without a usable value as disabled"
         }
       },
       "weitere": {
@@ -88,7 +89,7 @@
       },
       "neu_einlesen": {
         "title": "Plant re-scanned",
-        "description": "Result (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nThe boxes are pre-filled accordingly. Nothing changes without confirmation.",
+        "description": "Result (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nThe boxes are pre-filled accordingly. Nothing changes without confirmation.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n{tot}",
         "data": {
           "kessel": "Boiler unit",
           "boiler01": "DHW tank 01",
@@ -97,7 +98,8 @@
           "austragung": "Pellet feed",
           "puffer01": "Buffer 01",
           "zirkulationspumpe": "Circulation pump",
-          "efilter": "Electrostatic precipitator"
+          "efilter": "Electrostatic precipitator",
+          "tote_deaktivieren": "Create registers without a usable value as disabled"
         }
       }
     },

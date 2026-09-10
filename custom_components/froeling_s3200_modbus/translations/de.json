@@ -14,7 +14,7 @@
       },
       "anlagenteile": {
         "title": "Anlagenteile bestätigen",
-        "description": "Erkannt an der Anlage (✔ vorhanden, ? unsicher, ✘ nicht vorhanden):\n\n{belege}\n\nHaken setzen für alles, wofür Entitäten angelegt werden sollen.",
+        "description": "Erkannt an der Anlage (✔ vorhanden, ? unsicher, ✘ nicht vorhanden):\n\n{belege}\n\nHaken setzen für alles, wofür Entitäten angelegt werden sollen.\n\nOhne brauchbaren Wert (werden deaktiviert angelegt, lassen sich in der Entitätenliste einschalten):\n{tot}",
         "data": {
           "kessel": "Kessel",
           "boiler01": "Boiler 01",
@@ -24,7 +24,8 @@
           "puffer01": "Puffer 01",
           "zirkulationspumpe": "Zirkulationspumpe",
           "weitere": "Weitere Anlagenteile anzeigen, die nicht erkannt wurden",
-          "efilter": "E-Abscheider"
+          "efilter": "E-Abscheider",
+          "tote_deaktivieren": "Register ohne brauchbaren Wert deaktiviert anlegen"
         }
       },
       "weitere": {
@@ -88,7 +89,7 @@
       },
       "neu_einlesen": {
         "title": "Anlage neu eingelesen",
-        "description": "Ergebnis (✔ vorhanden, ? unsicher, ✘ nicht vorhanden):\n\n{belege}\n\nDie Haken sind entsprechend vorbelegt. Nichts wird ohne Bestätigung geändert.",
+        "description": "Ergebnis (✔ vorhanden, ? unsicher, ✘ nicht vorhanden):\n\n{belege}\n\nDie Haken sind entsprechend vorbelegt. Nichts wird ohne Bestätigung geändert.\n\nOhne brauchbaren Wert (werden deaktiviert angelegt, lassen sich in der Entitätenliste einschalten):\n{tot}",
         "data": {
           "kessel": "Kessel",
           "boiler01": "Boiler 01",
@@ -97,7 +98,8 @@
           "austragung": "Austragung",
           "puffer01": "Puffer 01",
           "zirkulationspumpe": "Zirkulationspumpe",
-          "efilter": "E-Abscheider"
+          "efilter": "E-Abscheider",
+          "tote_deaktivieren": "Register ohne brauchbaren Wert deaktiviert anlegen"
         }
       }
     },

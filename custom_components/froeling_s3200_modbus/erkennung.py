@@ -260,7 +260,7 @@ def _tote_register(werte, befund: Befund) -> None:
     zaehler_pruefbar = betriebsstunden > MINDEST_BETRIEBSSTUNDEN
     waermemenge = [_wert(werte, n) for n in (30085, 30086, 30171)]
     for z in TABELLE:
-        if z.plattform is None or z.kategorie in ("service", "undokumentiert"):
+        if not z.freigegeben or z.plattform is None:
             continue
         v = _wert(werte, z.nummer)
         if v is None:
