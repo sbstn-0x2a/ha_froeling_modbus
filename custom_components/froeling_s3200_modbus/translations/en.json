@@ -14,7 +14,7 @@
       },
       "anlagenteile": {
         "title": "Confirm plant parts",
-        "description": "Detected on the controller (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nTick everything that should get entities.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n\n{tot}",
+        "description": "Detected on the controller (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nTick everything that should get entities.\n\nWithout a usable value:\n\n{tot}",
         "data": {
           "kessel": "Boiler unit",
           "boiler01": "DHW tank 01",
@@ -25,7 +25,7 @@
           "zirkulationspumpe": "Circulation pump",
           "weitere": "Show further parts that were not detected",
           "efilter": "Electrostatic precipitator",
-          "tote_deaktivieren": "Create registers without a usable value as disabled"
+          "tote": "Registers without a usable value"
         }
       },
       "weitere": {
@@ -89,7 +89,7 @@
       },
       "neu_einlesen": {
         "title": "Plant re-scanned",
-        "description": "Result (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nThe boxes are pre-filled accordingly. Nothing changes without confirmation.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n\n{tot}",
+        "description": "Result (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nThe boxes are pre-filled accordingly. Nothing changes without confirmation.\n\nWithout a usable value:\n\n{tot}",
         "data": {
           "kessel": "Boiler unit",
           "boiler01": "DHW tank 01",
@@ -99,7 +99,7 @@
           "puffer01": "Buffer 01",
           "zirkulationspumpe": "Circulation pump",
           "efilter": "Electrostatic precipitator",
-          "tote_deaktivieren": "Create registers without a usable value as disabled"
+          "tote": "Registers without a usable value"
         }
       }
     },
@@ -977,6 +977,15 @@
     "anlage_einlesen": {
       "title": "Plant {name} has not been scanned yet",
       "description": "Since version 0.5 this integration can detect which plant parts exist. Open the integration options and choose \"Re-scan the plant\". Until then everything stays as it is."
+    }
+  },
+  "selector": {
+    "tote": {
+      "options": {
+        "deaktiviert": "create, but disabled (can be enabled later)",
+        "weglassen": "do not create at all",
+        "normal": "create normally"
+      }
     }
   }
 }

@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig, SelectSelectorMode
 from pymodbus.client import ModbusTcpClient
 
 from . import erkennung
@@ -34,6 +35,7 @@ from .const import (
     eindeutige_kennung,
 )
 from .device import DEVICE_NAME
+from .entitaeten import TOTE_DEAKTIVIERT, TOTE_UMGANG
 from .modbus import read_input_sync
 from .registers import INPUT_BASE, INPUT_REGISTERS
 
@@ -221,6 +223,12 @@ def tot_text(befund: erkennung.Befund | None) -> str:
     return "\n".join(f"- **{grund}:** {', '.join(namen)}" for grund, namen in je_grund.items())
 
 
+#: Auswahl, was mit Registern ohne brauchbaren Wert geschieht.
+_TOTE_AUSWAHL = SelectSelector(SelectSelectorConfig(
+    options=list(TOTE_UMGANG), translation_key="tote", mode=SelectSelectorMode.LIST
+))
+
+
 def _gruppen_schema(gruppen, vorgabe) -> dict:
     return {vol.Optional(name, default=bool(vorgabe(name))): bool for name in gruppen}
 
@@ -237,7 +245,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._verbindung: dict = {}
         self._befund: erkennung.Befund | None = None
         self._gewaehlt: dict[str, bool] = {}
-        self._tote_deaktivieren = True
+        self._tote = TOTE_DEAKTIVIERT
 
     async def async_step_user(self, user_input=None):
         errors: dict[str, str] = {}
@@ -277,7 +285,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         sichtbar = [g for g in GRUPPEN if _sichtbar(self._befund, g)]
         if user_input is not None:
             self._gewaehlt = {g: bool(user_input.get(g, False)) for g in sichtbar}
-            self._tote_deaktivieren = bool(user_input.get("tote_deaktivieren", True))
+            self._tote = user_input.get("tote", TOTE_DEAKTIVIERT)
             uebrige = [g for g in GRUPPEN if g not in sichtbar]
             if user_input.get("weitere") and uebrige:
                 return await self.async_step_weitere()
@@ -285,7 +293,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         schema = {**_gruppen_schema(sichtbar, lambda g: _vorbelegung(self._befund, g))}
         if self._befund is not None and self._befund.tot:
-            schema[vol.Optional("tote_deaktivieren", default=True)] = bool
+            schema[vol.Optional("tote", default=TOTE_DEAKTIVIERT)] = _TOTE_AUSWAHL
         if len(sichtbar) < len(GRUPPEN):
             schema[vol.Optional("weitere", default=False)] = bool
         return self.async_show_form(
@@ -312,7 +320,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             **self._verbindung,
             **{g: self._gewaehlt.get(g, False) for g in GRUPPEN},
             "erkannt": erkannt_als_dict(self._befund),
-            "tote_deaktivieren": self._tote_deaktivieren,
+            "tote": self._tote,
         }
         return self.async_create_entry(title=self._verbindung["name"], data=data)
 
@@ -383,7 +391,7 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
                     **self.config_entry.options,
                     **{g: bool(user_input.get(g, False)) for g in GRUPPEN},
                     "erkannt": erkannt_als_dict(self._befund),
-                    "tote_deaktivieren": bool(user_input.get("tote_deaktivieren", True)),
+                    "tote": user_input.get("tote", TOTE_DEAKTIVIERT),
                 },
             )
         self._befund = await anlage_einlesen(self.hass, cfg)
@@ -396,7 +404,7 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
             )
         schema = _gruppen_schema(GRUPPEN, lambda g: _vorbelegung(self._befund, g, cfg.get(g)))
         if self._befund.tot:
-            schema[vol.Optional("tote_deaktivieren", default=True)] = bool
+            schema[vol.Optional("tote", default=cfg.get("tote", TOTE_DEAKTIVIERT))] = _TOTE_AUSWAHL
         return self.async_show_form(
             step_id="neu_einlesen",
             data_schema=vol.Schema(schema),

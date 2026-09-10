@@ -13,7 +13,7 @@ from homeassistant.helpers import issue_registry as ir
 from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
 from .device import device_info_for
-from .entitaeten import tote_register, zeilen_zum_lesen
+from .entitaeten import TOTE_DEAKTIVIERT, tote_register, tote_umgang, zeilen_zum_lesen
 from .registertabelle import TABELLE
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
@@ -127,7 +127,7 @@ def _gruppen_entfernen(hass: HomeAssistant, entry: ConfigEntry, name: str,
 def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
     erkannt = data.get("erkannt") or {}
     zeit = erkannt.get("zeit")
-    if not zeit or not data.get("tote_deaktivieren", True) or data.get("tot_angewendet") == zeit:
+    if not zeit or tote_umgang(data) != TOTE_DEAKTIVIERT or data.get("tot_angewendet") == zeit:
         return
     ent_reg = er.async_get(hass)
     vorhanden = {e.unique_id: e for e in ent_reg.entities.values()

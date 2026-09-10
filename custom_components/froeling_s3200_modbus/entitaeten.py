@@ -20,12 +20,29 @@ def alle_zeilen() -> tuple[Register, ...]:
     return tuple(z for z in TABELLE if z.freigegeben and z.plattform)
 
 
+#: Umgang mit Registern, die die Erkennung als wertlos eingestuft hat.
+TOTE_DEAKTIVIERT = "deaktiviert"   # anlegen, aber in der Registry ausgeschaltet
+TOTE_WEGLASSEN = "weglassen"       # gar nicht anlegen und nicht lesen
+TOTE_NORMAL = "normal"             # wie jedes andere Register
+TOTE_UMGANG = (TOTE_DEAKTIVIERT, TOTE_WEGLASSEN, TOTE_NORMAL)
+
+
+def tote_umgang(konfiguration: dict[str, Any]) -> str:
+    wert = konfiguration.get("tote")
+    if wert in TOTE_UMGANG:
+        return wert
+    # Fassung vor 0.5: ein Haken "tote_deaktivieren".
+    return TOTE_DEAKTIVIERT if konfiguration.get("tote_deaktivieren", True) else TOTE_NORMAL
+
+
 def zeilen_zum_lesen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
     """Alles, was der Coordinator für diesen Entry liest -- auch Zeilen ohne
     eigene Entität (Fehlerpuffer für den Meldungssensor)."""
+    weg = tote_register(konfiguration) if tote_umgang(konfiguration) == TOTE_WEGLASSEN else {}
     return tuple(
         z for z in TABELLE
         if z.freigegeben and (z.gruppe is None or konfiguration.get(z.gruppe, False))
+        and z.nummer not in weg
     )
 
 

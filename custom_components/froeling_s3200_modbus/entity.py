@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import FroelingCoordinator
 from .device import device_info_for, objekt_id, tr_key
-from .entitaeten import tote_register
+from .entitaeten import TOTE_DEAKTIVIERT, tote_register, tote_umgang
 from .registertabelle import Register
 
 
@@ -86,7 +86,7 @@ class FroelingRegisterEntity(FroelingEntity):
         # nicht eingeschaltet. Bestehende Registry-Eintraege bleiben, wie sie
         # sind -- die Vorgabe wirkt nur beim Neuanlegen.
         self._grund = tote_register(data).get(zeile.nummer)
-        if self._grund:
+        if self._grund and tote_umgang(data) == TOTE_DEAKTIVIERT:
             self._attr_entity_registry_enabled_default = False
 
     @property
