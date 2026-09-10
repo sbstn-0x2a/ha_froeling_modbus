@@ -14,7 +14,7 @@
       },
       "anlagenteile": {
         "title": "Confirm plant parts",
-        "description": "Detected on the controller (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nTick everything that should get entities.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n{tot}",
+        "description": "Detected on the controller (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nTick everything that should get entities.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n\n{tot}",
         "data": {
           "kessel": "Boiler unit",
           "boiler01": "DHW tank 01",
@@ -89,7 +89,7 @@
       },
       "neu_einlesen": {
         "title": "Plant re-scanned",
-        "description": "Result (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nThe boxes are pre-filled accordingly. Nothing changes without confirmation.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n{tot}",
+        "description": "Result (✔ present, ? uncertain, ✘ absent):\n\n{belege}\n\nThe boxes are pre-filled accordingly. Nothing changes without confirmation.\n\nWithout a usable value (created disabled, can be enabled in the entity list):\n\n{tot}",
         "data": {
           "kessel": "Boiler unit",
           "boiler01": "DHW tank 01",

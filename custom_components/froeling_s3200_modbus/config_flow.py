@@ -193,12 +193,16 @@ def belege_text(befund: erkennung.Befund | None, gruppen=GRUPPEN, bisher: dict |
             continue
         name = DEVICE_NAME.get(gruppe, gruppe)
         marke = {erkennung.VORHANDEN: "✔", erkennung.NICHT_VORHANDEN: "✘", erkennung.UNSICHER: "?"}[eintrag.zustand]
-        zeile = f"{marke} {name}: {eintrag.beleg}" if eintrag.beleg else f"{marke} {name}"
+        # Kurz halten: Das Fenster des Dialogs ist schmal, lange Zeilen
+        # brechen unschoen um. Deshalb Aufzaehlung, Beleg ohne Registernamen.
+        beleg = eintrag.beleg.replace("Vorlauf-Isttemperatur ", "").replace("Puffertemperatur ", "")
+        beleg = beleg.replace("Boilertemperatur oben ", "").replace("Raumtemperatur ", "Raum ")
+        zeile = f"- {marke} **{name}** {beleg}".rstrip()
         if bisher and bisher.get(gruppe) and eintrag.zustand == erkennung.NICHT_VORHANDEN:
-            zeile += " — bisher aktiv; Haken entfernen löscht die Entitäten samt Historie"
+            zeile += " (bisher aktiv, Haken entfernen löscht die Entitäten samt Historie)"
         zeilen.append(zeile)
     if befund.fehlende_bloecke:
-        zeilen.append(f"⚠ {len(befund.fehlende_bloecke)} Registerblock/-blöcke ohne Antwort")
+        zeilen.append(f"- ⚠ {len(befund.fehlende_bloecke)} Registerblock/-blöcke ohne Antwort")
     return "\n".join(zeilen)
 
 
@@ -207,11 +211,14 @@ def tot_text(befund: erkennung.Befund | None) -> str:
     if befund is None or not befund.tot:
         return "keine"
     from .registertabelle import NACH_NUMMER
-    zeilen = []
+    # Nur die Namen, nach Grund gebuendelt -- der Grund steht spaeter am
+    # Attribut jeder Entitaet.
+    je_grund: dict[str, list[str]] = {}
     for nummer, grund in sorted(befund.tot.items()):
         z = NACH_NUMMER.get(("input", nummer)) or NACH_NUMMER.get(("holding", nummer))
-        zeilen.append(f"{z.name_de if z else nummer}: {grund}")
-    return "\n".join(zeilen)
+        kurz = grund.split(" (")[0].split(" nach ")[0]
+        je_grund.setdefault(kurz, []).append(z.name_de if z else str(nummer))
+    return "\n".join(f"- **{grund}:** {', '.join(namen)}" for grund, namen in je_grund.items())
 
 
 def _gruppen_schema(gruppen, vorgabe) -> dict:
