@@ -12,13 +12,18 @@ It allows you to read states and sensor values of your heating system (boiler, h
 - Connection to the **Fröling S3200** via Modbus TCP  
 - Reading of sensor values (e.g., temperatures, operating states)  
 - Control of switches (e.g., pumps, heating circuits)  
+- Detects during setup which plant parts exist and creates entities only
+  for those
 - Support for multiple system sections:
   - Boiler  
   - Heating circuit(s)  
   - Buffer tank  
   - Discharge unit  
   - Domestic hot water (DHW)  
-  - Circulation pump  
+  - Circulation pump
+  - Electrostatic precipitator
+- "Messages" sensor with the controller's pending fault texts
+- Long-term statistics for all measurements and counters
 
 ---
 
@@ -35,6 +40,9 @@ solar modules are not covered either.
 
 If your plant differs, please open an issue with the model designation rather
 than relying on the readings.
+
+Not covered yet: heating circuits from 03, DHW tanks from 02 and buffers from
+02 are detected but not created as entities.
 
 ---
 
@@ -84,6 +92,19 @@ them. Nothing is written to the boiler during removal.
    - Port (default: 502)  
    - Update interval (default: 30 s, allowed 15–3600 s)
    - Modbus UnitID (2)
+4. The controller is read once completely (a few seconds).
+5. **Confirm plant parts:** the boxes are pre-filled from the scan, each with
+   its evidence (e.g. "Heating circuit 02: 30.5 °C, mode Automatic"). Parts
+   that were not detected are under "show further parts". Below that you
+   choose what happens to registers without a usable value: create disabled
+   (default), do not create, create normally.
+
+Later via **Options**: change connection and interval, show or hide plant
+parts, or re-scan the plant. Deselecting a part removes its entities together
+with their history; a re-scan therefore never proposes deselecting by itself.
+
+**Existing installations** from 0.4.x keep running unchanged. A notice under
+*Repairs* leads to the options for a re-scan.
 
 ---
 

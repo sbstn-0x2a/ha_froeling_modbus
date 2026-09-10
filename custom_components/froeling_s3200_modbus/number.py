@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.components.number import NumberDeviceClass, NumberEntity
+from homeassistant.components.number import NumberDeviceClass, NumberEntity, NumberMode
 
 from .const import FERNSTEUERUNG_HINWEIS
 from .entitaeten import zeilen_der_plattform
@@ -38,6 +38,9 @@ class RegisterNumber(FroelingRegisterEntity, NumberEntity):
     """
 
     _plattform = "number"
+    #: Eingabefeld statt Schieberegler: Bei Temperaturen und Prozentwerten
+    #: sieht man am Regler den aktuellen Wert nicht.
+    _attr_mode = NumberMode.BOX
 
     def __init__(self, coordinator, data, zeile) -> None:
         super().__init__(coordinator, data, zeile)

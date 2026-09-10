@@ -1,5 +1,67 @@
 # Changelog
 
+## 0.5.0 – 2026-09-10
+
+### ⚠️ Was sich sichtbar ändert
+
+**Die Einrichtung liest die Anlage einmal komplett.** Nach der
+Verbindungsprüfung fragt die Integration alle Register ab (rund 60 Anfragen,
+wenige Sekunden) und schlägt vor, welche Anlagenteile es gibt: Heizkreise,
+Boiler, Puffer, E-Abscheider, Zirkulationspumpe. Jeder Vorschlag trägt einen
+Beleg (etwa „Heizkreis 02: 30,5 °C, Betriebsart Automatik“), du bestätigst.
+Nicht erkannte Teile stehen unter „weitere Anlagenteile“. Es gibt kein
+Modbus-Register für das Anlagenart-Menü des Bediengeräts; die Erkennung bleibt
+ein Vorschlag.
+
+**Register ohne brauchbaren Wert** (Fühler nicht belegt, Zähler bei 0 nach
+Hunderten Betriebsstunden, fehlender Wärmemengenzähler) werden erkannt. Bei
+der Einrichtung wählst du: deaktiviert anlegen (Vorgabe, später einschaltbar),
+gar nicht anlegen, oder normal anlegen. Der Grund steht als Attribut
+`hinweis_erkennung` an der Entität.
+
+**Bestehende Installationen ändern sich nicht von selbst.** Ein Hinweis unter
+Reparaturen führt in die Optionen; erst „Anlage neu einlesen“ macht einen
+Vorschlag, und nichts wird ohne Bestätigung abgewählt. Aktive Teile bleiben
+angehakt, auch wenn die Erkennung sie nicht findet – Abwählen löscht Entitäten
+samt Historie.
+
+**Zahlen-Entitäten sind Eingabefelder**, keine Schieberegler mehr: Am Regler
+war der aktuelle Wert nicht zu sehen.
+
+### Neu
+
+* **Registertabelle aus der Modbus-Doku.** Alle 1718 Einträge der B1200522
+  liegen als Daten in `registertabelle.py`, generiert aus
+  `documentation/registerliste_b1200522.json`. Die 177 Entitäten der 0.4.0
+  behalten `unique_id`, `entity_id` und Gerät; ein Test friert das ein.
+* **99 weitere Entitäten der Kundenebene**, an der Anlage gegen das
+  Bediengerät geprüft: Abgas-, Luft- und Lambdawerte, Zündung, WOS,
+  Raumaustragung, Breitbandsonde, Feuerraum-Unterdruck, Zustandslaufzeit,
+  E-Abscheider. Nur-lesbare Parameter erscheinen als Sensoren.
+* **Gerät „E-Abscheider“** als eigener Anlagenteil.
+* **Sensor „Meldungen“**: Anzahl anstehender Meldungen aus dem Fehlerpuffer
+  33001–33020, die Klartexte aus der Doku als Attribut. Grundlage für eine
+  Störmeldung ohne Cloud.
+* **Options-Menü**: Verbindung und Intervall, Anlagenteile ein-/ausblenden,
+  Anlage neu einlesen.
+* Jede Entität trägt die Attribute `register` und `beschreibung` (Doku-Name).
+* Der Coordinator liest nur noch die Register der gewählten Anlagenteile.
+
+### Behoben
+
+* Schrittweite der Zahlen-Entitäten war bei Faktor 2 fälschlich 0.0.
+* Skalierung dreier Register gegen das Display korrigiert (41001, 40066,
+  43070).
+
+### Bekannte Lücken
+
+* **Instanzen jenseits der acht Anlagenteile** (Heizkreis 03 ff., Boiler 02
+  ff., Puffer 02 ff.) erkennt die Integration, legt sie aber noch nicht an.
+  Die Tabelle kennt sie; es fehlt die Auswahl im Dialog.
+* **„Anlage neu einlesen“ entfernt keine einzelnen Entitäten.** Es deaktiviert
+  Register ohne Wert und blendet abgewählte Anlagenteile aus; eine einzelne
+  bestehende Entität wird über die Entitätenliste von Home Assistant entfernt.
+
 ## 0.4.0 – 2026-09-09
 
 ### ⚠️ Was sich sichtbar ändert

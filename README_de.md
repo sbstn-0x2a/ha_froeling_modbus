@@ -12,13 +12,18 @@ Damit lassen sich Zustände und Messwerte der Heizanlage (Kessel, Heizkreise, Pu
 - Verbindung zur **Fröling S3200** über Modbus TCP  
 - Auslesen von Sensorwerten (z. B. Temperaturen, Betriebszustände)  
 - Steuerung von Schaltern (z. B. Pumpen, Heizkreise)  
+- Erkennt beim Einrichten, welche Anlagenteile vorhanden sind, und legt nur
+  dafür Entitäten an
 - Unterstützung mehrerer Gerätebereiche:
   - Kessel
   - Heizkreis(e)
   - Puffer
   - Austragung
   - Warmwasser (DHW)
-  - Zirkulationspumpe  
+  - Zirkulationspumpe
+  - E-Abscheider
+- Sensor „Meldungen“ mit den anstehenden Störungstexten der Anlage
+- Langzeitstatistik für alle Messwerte und Zähler
 
 ---
 
@@ -35,6 +40,9 @@ Solarmodule sind ebenfalls nicht abgedeckt.
 
 Wenn deine Anlage abweicht: bitte ein Issue mit der Typenbezeichnung öffnen,
 statt den angezeigten Werten zu vertrauen.
+
+Noch nicht abgedeckt: Heizkreise ab 03, Boiler ab 02 und Puffer ab 02 werden
+zwar erkannt, aber noch nicht als Entitäten angelegt.
 
 ---
 
@@ -84,6 +92,20 @@ nichts geschrieben.
    - Port (Standard: 502)
    - Update-Intervall (Standard: 30 s, erlaubt 15–3600 s)  
    - Modbus UnitID (2)
+4. Die Anlage wird einmal komplett gelesen (wenige Sekunden).
+5. **Anlagenteile bestätigen:** Die Haken sind aus dem Scan vorbelegt, jeder
+   mit Beleg (etwa „Heizkreis 02: 30,5 °C, Betriebsart Automatik“). Nicht
+   erkannte Teile stehen unter „weitere Anlagenteile anzeigen“. Darunter die
+   Auswahl, was mit Registern ohne brauchbaren Wert geschieht: deaktiviert
+   anlegen (Vorgabe), gar nicht anlegen, normal anlegen.
+
+Später über **Optionen**: Verbindung und Intervall ändern, Anlagenteile ein-
+und ausblenden, oder die Anlage neu einlesen. Abwählen eines Anlagenteils
+entfernt seine Entitäten samt Historie; das Neu-Einlesen schlägt deshalb nie
+von selbst ein Abwählen vor.
+
+**Bestehende Installationen** aus 0.4.x laufen unverändert weiter. Ein Hinweis
+unter *Reparaturen* führt in die Optionen zum Neu-Einlesen.
 
 ---
 
