@@ -128,7 +128,6 @@ class RegisterSelect(FroelingRegisterEntity, SelectEntity):
         if code is None:
             _LOGGER.error("Unbekannte Option %r für %s", option, self._entity_id)
             return
-        if await self.coordinator.schreibe(self._register, code) is not None:
-            return
+        await self._schreiben(code)
         self._optimistisch = code
         self.async_write_ha_state()

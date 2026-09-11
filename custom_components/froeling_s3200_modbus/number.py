@@ -94,8 +94,7 @@ class RegisterNumber(FroelingRegisterEntity, NumberEntity):
         raw = int(round(v * float(self._zeile.faktor)))
         # Negative Werte (Frostschutz -5 °C) als 16-Bit-Zweierkomplement senden;
         # pymodbus packt nur 0..65535.
-        if await self.coordinator.schreibe(self._register, raw & 0xFFFF) is not None:
-            return
+        await self._schreiben(raw & 0xFFFF)
         self._optimistisch = round(raw / float(self._zeile.faktor), self._zeile.dezimalen)
         self.async_write_ha_state()
 

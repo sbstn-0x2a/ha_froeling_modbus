@@ -68,8 +68,7 @@ class RegisterTageszeit(RegisterTageszeitNurLesen):
     """Tageszeit, schreibbar."""
 
     async def async_set_value(self, value: time) -> None:
-        if await self.coordinator.schreibe(self._register, time_to_register(value)) is not None:
-            return
+        await self._schreiben(time_to_register(value))
         self._optimistisch = value
         self.async_write_ha_state()
 
@@ -96,8 +95,7 @@ class RegisterDauer(_Basis):
     async def async_set_value(self, value: time) -> None:
         minuten = value.hour * 60 + value.minute
         roh = max(0, min(240, int(round(minuten / 6.0))))
-        if await self.coordinator.schreibe(self._register, roh) is not None:
-            return
+        await self._schreiben(roh)
         # Auf das 6-Minuten-Raster gerundet zurueckmelden.
         self._optimistisch = self._als_zeit(roh)
         self.async_write_ha_state()

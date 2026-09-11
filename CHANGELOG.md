@@ -73,6 +73,9 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 * **Options-Menü**: Verbindung und Intervall, Anlagenteile ein-/ausblenden,
   Anlage neu einlesen.
 * Jede Entität trägt die Attribute `register` und `beschreibung` (Doku-Name).
+* Ein von der Anlage abgewiesener Schreibzugriff (Wert außerhalb des
+  Bereichs, Protokoll 2014 aus, Mindestschaltdauer) erscheint in Home
+  Assistant als Fehler des Dienstaufrufs mit Klartext, statt nur im Protokoll.
 * Der Coordinator liest nur noch die Register der gewählten Anlagenteile.
 
 ### Behoben

@@ -56,8 +56,7 @@ class RegisterSwitch(FroelingRegisterEntity, SwitchEntity):
         await self._schalten(False)
 
     async def _schalten(self, ein: bool):
-        if await self.coordinator.schreibe(self._register, 1 if ein else 0) is not None:
-            return
+        await self._schreiben(1 if ein else 0)
         self._optimistisch = ein
         self.async_write_ha_state()
 

@@ -11,12 +11,14 @@ das: Coordinator in ``coordinator.py``, Basis-Entität in ``entity.py``.
 
 from __future__ import annotations
 
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import FroelingCoordinator
 from .device import device_info_for, objekt_id, tr_key
 from .entitaeten import TOTE_DEAKTIVIERT, tote_register, tote_umgang
+from .modbus import VERWORFEN
 from .registertabelle import Register
 
 
@@ -96,6 +98,28 @@ class FroelingRegisterEntity(FroelingEntity):
         if self._grund:
             attribute["hinweis_erkennung"] = self._grund
         return attribute
+
+    async def _schreiben(self, rohwert: int) -> None:
+        """Schreibt das eigene Register und macht einen Fehler in HA sichtbar.
+
+        Vorher stand ein abgewiesener Schreibzugriff nur im Protokoll, und die
+        Entitaet sprang still auf den alten Wert zurueck. Jetzt scheitert der
+        Dienstaufruf mit Text -- etwa wenn die Anlage einen Wert ausserhalb
+        ihres Bereichs mit Fehler 04 ablehnt.
+        """
+        err = await self.coordinator.schreibe(self._register, rohwert)
+        if err is None:
+            return
+        if err == VERWORFEN:
+            grund = "von der Regelung verworfen (Mindestschaltdauer 10 min der Fernsteuerung)"
+        elif str(err).startswith("error("):
+            grund = ("von der Anlage abgewiesen: Wert ausserhalb des zulaessigen "
+                     "Bereichs oder MODBUS-Protokoll 2014 nicht aktiv")
+        elif str(err).startswith("echo:"):
+            grund = f"Anlage hat einen anderen Wert bestaetigt ({err})"
+        else:
+            grund = f"keine Verbindung ({err})"
+        raise HomeAssistantError(f"Register {self._register} ({self._zeile.name_de}): {grund}")
 
     def _frisch_gelesen(self) -> bool:
         """Wurde das eigene Register im letzten Durchlauf wirklich gelesen?"""
