@@ -13,7 +13,7 @@ from homeassistant.helpers import issue_registry as ir
 from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
 from .device import device_info_for
-from .entitaeten import TOTE_DEAKTIVIERT, tote_register, tote_umgang, zeilen_zum_lesen
+from .entitaeten import TOTE_DEAKTIVIERT, tote_register, tote_umgang, zeilen_fuer, zeilen_zum_lesen
 from .registertabelle import TABELLE
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
@@ -122,6 +122,27 @@ def _gruppen_entfernen(hass: HomeAssistant, entry: ConfigEntry, name: str,
             _LOGGER.debug("Geraet %s liess sich nicht entfernen", device.id)
 
     return entfernt
+
+
+def _verwaiste_entfernen(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> int:
+    """Registry-Eintraege dieses Entry, fuer die keine Entitaet mehr entsteht.
+
+    Entstehen z. B., wenn Register nach dem Neu-Einlesen auf "gar nicht
+    anlegen" stehen oder sich eine Kennung beim Update geaendert hat. Ohne
+    Aufraeumen bleiben sie dauerhaft als "nicht verfuegbar" stehen -- der
+    Nutzer sah in der Testinstanz 254 statt 242 Entitaeten.
+    """
+    erwartet = {f"{data['name']}_{z.entitaetsschluessel}" for z in zeilen_fuer(data)}
+    erwartet.add(f"{data['name']}_meldungen")
+    ent_reg = er.async_get(hass)
+    weg = [e for e in ent_reg.entities.values()
+           if e.config_entry_id == entry.entry_id and e.unique_id not in erwartet]
+    for e in weg:
+        ent_reg.async_remove(e.entity_id)
+    if weg:
+        _LOGGER.info("%d verwaiste Entitaet(en) entfernt: %s", len(weg),
+                     ", ".join(e.entity_id for e in weg[:5]))
+    return len(weg)
 
 
 def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
@@ -243,6 +264,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     # Befund (Zeitstempel), und vor dem Update-Listener -- sonst loest das
     # Schreiben in entry.data einen Reload aus.
     _tote_anwenden(hass, entry, data)
+    _verwaiste_entfernen(hass, entry, data)
 
     # ---- Options-Update: deaktivierte Gruppen aufräumen und reloaden ----
     async def _cleanup_disabled_groups_and_reload(
