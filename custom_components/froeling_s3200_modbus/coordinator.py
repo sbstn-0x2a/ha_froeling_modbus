@@ -243,8 +243,17 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         return self.data.get(register)
 
     def client_schliessen(self) -> None:
-        """Schliesst die Modbus-Verbindung. Wird beim Entladen aufgerufen."""
+        """Schliesst die Modbus-Verbindung (blockierend, ohne Sperre)."""
         self._client.close()
+
+    async def async_schliessen(self) -> None:
+        """Schliesst die Verbindung, sobald kein Lese- oder Schreibvorgang
+        mehr laeuft. Vorher konnte das Entladen mitten in einen Durchlauf
+        fallen; der naechste Block verband dann neu, und die Sitzung blieb
+        nach dem Entladen offen."""
+        await self.async_shutdown()
+        async with self._zugriff:
+            await self.hass.async_add_executor_job(self._client.close)
 
     async def schreibe(self, register: int, rohwert: int) -> str | None:
         """Schreibt ein Holding-Register (FC=06).

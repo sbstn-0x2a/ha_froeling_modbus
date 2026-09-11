@@ -120,10 +120,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     # Dublettenpruefung im Config-Flow nicht. Bewusst hier oben, bevor der
     # Update-Listener haengt -- sonst loeste die Aenderung einen Reload aus.
     if entry.unique_id is None:
-        hass.config_entries.async_update_entry(
-            entry,
-            unique_id=eindeutige_kennung(data["host"], data.get("port", 502), data["unit_id"]),  # data = Eintrag + Optionen
-        )
+        kennung = eindeutige_kennung(data["host"], data.get("port", 502), data["unit_id"])
+        andere = hass.config_entries.async_entry_for_domain_unique_id(DOMAIN, kennung)
+        if andere is None:
+            hass.config_entries.async_update_entry(entry, unique_id=kennung)
+        else:
+            # Zwei Alt-Eintraege fuer dieselbe Anlage: Vor 0.4.0 war das
+            # moeglich. Der zweite bleibt ohne Kennung, statt eine doppelte
+            # zu bekommen -- HA lehnt das ab.
+            _LOGGER.warning(
+                "Eintrag %s nutzt dieselbe Anlage wie %s (%s); bitte einen der beiden entfernen",
+                entry.title, andere.title, kennung,
+            )
 
     # Ein Client je Config-Entry, einmalig verbunden. Serialisiert wird im
     # Coordinator (siehe FroelingCoordinator._modbus) -- pymodbus ist nicht
@@ -208,7 +216,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     laufzeit: FroelingRuntimeData | None = getattr(entry, "runtime_data", None)
     if laufzeit is not None:
         try:
-            laufzeit.coordinator.client_schliessen()
+            await laufzeit.coordinator.async_schliessen()
         except Exception:  # noqa: BLE001 - beim Entladen nie hart scheitern
             _LOGGER.debug("Modbus-Verbindung liess sich nicht schliessen", exc_info=True)
 

@@ -99,6 +99,11 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 * Ein geänderter Host in den Optionen aktualisiert die Kennung des Eintrags;
   Intervall und Anlagenteile lassen sich auch ohne erreichbare Anlage
   speichern.
+* Beim Entladen wartet die Integration, bis der laufende Lesedurchlauf
+  fertig ist, bevor sie die Verbindung schließt; vorher konnte eine Sitzung
+  am Gateway offen bleiben.
+* Zwei Alt-Einträge derselben Anlage bekommen beim Update keine doppelte
+  Kennung mehr; der zweite bleibt ohne und wird im Protokoll gemeldet.
 
 ### Bekannte Lücken
 
