@@ -86,9 +86,9 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 * **Instanzen jenseits der acht Anlagenteile** (Heizkreis 03 ff., Boiler 02
   ff., Puffer 02 ff.) erkennt die Integration, legt sie aber noch nicht an.
   Die Tabelle kennt sie; es fehlt die Auswahl im Dialog.
-* **„Anlage neu einlesen“ entfernt keine einzelnen Entitäten.** Es deaktiviert
-  Register ohne Wert und blendet abgewählte Anlagenteile aus; eine einzelne
-  bestehende Entität wird über die Entitätenliste von Home Assistant entfernt.
+* **Einzelne unerwünschte Entitäten** (die weder wertlos noch Teil eines
+  abgewählten Anlagenteils sind) entfernt man über die Entitätenliste von
+  Home Assistant; der Options-Flow bietet dafür keine Auswahl je Register.
 
 ## 0.4.0 – 2026-09-09
 
