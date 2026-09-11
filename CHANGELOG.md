@@ -80,9 +80,11 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 * Schrittweite der Zahlen-Entitäten war bei Faktor 2 fälschlich 0.0.
 * Skalierung dreier Register gegen das Display korrigiert (41001, 40066,
   43070).
-* Negative Sollwerte (Frostschutz −5 °C) ließen sich nicht schreiben: Der
-  Rohwert ging ohne Zweierkomplement an pymodbus, der Schreibzugriff schlug
-  fehl und riss die Verbindung mit.
+* Negative Sollwerte (Außentemperatur-Schwellen unter 0 °C) ließen sich nicht
+  schreiben: Der Rohwert ging ohne Zweierkomplement an pymodbus, der
+  Schreibzugriff schlug fehl und riss die Verbindung mit.
+* Die Frostschutztemperatur der Heizkreise erlaubte −30 bzw. −10 °C als
+  Untergrenze; laut Doku sind 5 bis 10 °C zulässig.
 * Zähler über 32767 (Betriebsstunden, kWh) wurden negativ angezeigt, mit
   Rückfall in der Langzeitstatistik.
 * War Boiler 01 abgewählt, löschte jeder Start die Zirkulationssensoren und
