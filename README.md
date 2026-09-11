@@ -215,14 +215,16 @@ German translations are also available via `de.json`.
 
 ## 📚 Manufacturer documentation
 
-The integration follows Fröling's Modbus description **B1200522** ("ModBus
-Lambdatronic 3200", edition 05/2019). That document and the boiler manuals
-(operating manual B1500624, installation manual M1821425, touch control unit
-B1460922) are available for download from Fröling; they are not part of this
-repository.
+The Fröling manuals and the Modbus register list live in the
+[`documentation/`](documentation/) folder of this repository.
 
-The attribute `register` of every entity shows which register it reads,
-and `beschreibung` carries the name from the Modbus list.
+They are deliberately kept **outside** `custom_components/`, so HACS does not
+copy roughly 33 MB of PDFs into every Home Assistant configuration directory.
+The integration does not read these files at runtime — they are reference
+material only.
+
+`documentation/Modbus_Register.txt` lists the registers used by this
+integration together with their entity type.
 
 ---
 

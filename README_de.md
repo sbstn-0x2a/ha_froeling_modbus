@@ -205,14 +205,16 @@ Nachschreiben ist als optionale Funktion geplant.
 
 ## 📚 Herstellerdokumentation
 
-Die Integration folgt der Fröling-Modbus-Beschreibung **B1200522** („ModBus
-Lambdatronic 3200“, Ausgabe 05/2019). Diese und die Handbücher zum Kessel
-(Bedienungsanleitung B1500624, Montageanleitung M1821425, Touch-Bediengerät
-B1460922) gibt es bei Fröling zum Download; sie sind nicht Teil dieses
-Repositorys.
+Die Fröling-Handbücher und die Modbus-Registerliste liegen im Ordner
+[`documentation/`](documentation/) dieses Repositorys.
 
-Welches Register hinter einer Entität liegt, zeigt das Attribut `register`
-der Entität, dazu `beschreibung` mit dem Namen aus der Modbus-Liste.
+Sie liegen bewusst **außerhalb** von `custom_components/`, damit HACS nicht rund
+33 MB PDFs in jedes Home-Assistant-Konfigurationsverzeichnis kopiert. Die
+Integration liest diese Dateien zur Laufzeit nicht — sie sind reines
+Nachschlagematerial.
+
+`documentation/Modbus_Register.txt` listet die von dieser Integration genutzten
+Register samt Entitätstyp auf.
 
 ---
 
