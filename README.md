@@ -34,17 +34,11 @@ It allows you to read states and sensor values of your heating system (boiler, h
 Developed and tested against a **Fröling SP Dual Compact with Lambdatronic
 S3200**, connected over Modbus TCP through an RS485 gateway.
 
-The register map is fixed to that layout. Other models use different
-addresses — the P5 / Lambdatronic P3200 for instance shifts them by an offset
-of 1000, and the S3100 differs as well. Such a device will connect, but the
-values will belong to the wrong quantities. More than two heating circuits and
-solar modules are not covered either.
+The register map is fixed to that layout. Other models use different addresses — the P5 / Lambdatronic P3200 for instance shifts them by an offset of 1000, and the S3100 differs as well. Such a device will connect, but the values will belong to the wrong quantities. More than two heating circuits and solar modules are not covered either.
 
-If your plant differs, please open an issue with the model designation rather
-than relying on the readings.
+If your plant differs, please open an issue with the model designation rather than relying on the readings.
 
-Not covered yet: heating circuits from 03, DHW tanks from 02 and buffers from
-02 are detected but not created as entities.
+Not covered yet: heating circuits from 03, DHW tanks from 02 and buffers from 02 are detected but not created as entities.
 
 ---
 
@@ -72,17 +66,14 @@ Not covered yet: heating circuits from 03, DHW tanks from 02 and buffers from
 
 ## 🗑️ Removal
 
-1. Go to **Settings → Devices & Services**, open **Froeling S3200 Modbus**,
-   then use the three-dot menu on the entry and choose **Delete**.
+1. Go to **Settings → Devices & Services**, open **Froeling S3200 Modbus**, then use the three-dot menu on the entry and choose **Delete**.
    This removes the config entry together with all its devices and entities.
-2. If the integration was installed through HACS: **HACS → Integrations →
-   Froeling S3200 Modbus → three-dot menu → Remove**.
+2. If the integration was installed through HACS: **HACS → Integrations → Froeling S3200 Modbus → three-dot menu → Remove**.
 3. For a manual installation, delete the folder
    `config/custom_components/froeling_s3200_modbus`.
 4. Restart Home Assistant.
 
-Recorded history and long-term statistics are kept until the recorder purges
-them. Nothing is written to the boiler during removal.
+Recorded history and long-term statistics are kept until the recorder purges them. Nothing is written to the boiler during removal.
 
 ## ⚙️ Configuration
 
@@ -95,46 +86,21 @@ them. Nothing is written to the boiler during removal.
    - Update interval (default: 30 s, allowed 15–3600 s)
    - Modbus UnitID (2)
 4. The controller is read once completely (a few seconds).
-5. **Confirm plant parts:** the boxes are pre-filled from the scan, each with
-   its evidence (e.g. "Heating circuit 02: 30.5 °C, mode Automatic"). Parts
-   that were not detected are under "show further parts". Below that you
-   choose what happens to registers without a usable value: create disabled
-   (default), do not create, create normally.
+5. **Confirm plant parts:** the boxes are pre-filled from the scan, each with its evidence (e.g. "Heating circuit 02: 30.5 °C, mode Automatic"). Parts that were not detected are under "show further parts". Below that you choose what happens to registers without a usable value: create disabled (default), do not create, create normally.
 
-Later via **Options**: change connection and interval, show or hide plant
-parts, or re-scan the plant. Deselecting a part removes its entities together
-with their history; a re-scan therefore never proposes deselecting by itself.
+Later via **Options**: change connection and interval, show or hide plant parts, or re-scan the plant. Deselecting a part removes its entities together with their history; a re-scan therefore never proposes deselecting by itself.
 
 ---
 
 ## 🔄 Upgrading from 0.3.x or 0.4.0
 
-An upgrade leaves existing entities alone: every entity keeps its
-`entity_id`, history and statistics. In addition, the new customer-level
-entities and the "Messages" sensor are created for the plant parts already
-selected, with `entity_id`s following the new scheme
-(`sensor.froeling_kessel_…`). Both schemes then coexist; the integration
-deliberately does not rename existing entities because automations, scripts
-and dashboards would not follow. If you want to migrate, rename entities in
-Home Assistant; history and statistics follow automatically.
+An upgrade leaves existing entities alone: every entity keeps its `entity_id`, history and statistics. In addition, the new customer-level entities and the "Messages" sensor are created for the plant parts already selected, with `entity_id`s following the new scheme (`sensor.froeling_kessel_…`). Both schemes then coexist; the integration deliberately does not rename existing entities because automations, scripts and dashboards would not follow. If you want to migrate, rename entities in Home Assistant; history and statistics follow automatically.
 
-The electrostatic precipitator and the detection of registers without a
-usable value only arrive with **Options → Re-scan the plant**. A notice under
-*Repairs* reminds you. There you also choose whether such registers are
-created disabled (history kept), removed (history lost) or left as they are.
+The electrostatic precipitator and the detection of registers without a usable value only arrive with **Options → Re-scan the plant**. A notice under *Repairs* reminds you. There you also choose whether such registers are created disabled (history kept), removed (history lost) or left as they are.
 
-Re-scanning pays off again later: it judges afresh every time. If a
-previously useless register now delivers values, e.g. a counter that has
-started counting, its entity is re-enabled or created again; conversely, a
-register newly found useless is disabled. Entities you disabled yourself are
-left alone. Counters only count as useless after 24 operating hours of the
-plant, so a freshly commissioned plant is not judged prematurely.
+Re-scanning pays off again later: it judges afresh every time. If a previously useless register now delivers values, e.g. a counter that has started counting, its entity is re-enabled or created again; conversely, a register newly found useless is disabled. Entities you disabled yourself are left alone. Counters only count as useless after 24 operating hours of the plant, so a freshly commissioned plant is not judged prematurely.
 
-**Plant name:** the name given during setup is part of every entity's
-`unique_id` and therefore cannot be changed afterwards; a different name would
-be a new plant without history to Home Assistant. To change the label, rename
-the controller device under *Settings → Devices*; all entity display names
-follow immediately, history and statistics are kept.
+**Plant name:** the name given during setup is part of every entity's `unique_id` and therefore cannot be changed afterwards; a different name would be a new plant without history to Home Assistant. To change the label, rename the controller device under *Settings → Devices*; all entity display names follow immediately, history and statistics are kept.
 
 ---
 
@@ -148,9 +114,7 @@ The **Unit ID** is set directly on the heating controller:
 System → Settings → General Settings → MODBUS Settings → MODBUS Address
 ```
 
-You can choose any value between **1 and 247**.  
-Use the same value in the integration’s **“Unit ID”** (or **“Unit Number”**) field.  
-Both values must match for data to be read or written correctly.
+You can choose any value between **1 and 247**. Use the same value in the integration’s **“Unit ID”** (or **“Unit Number”**) field. Both values must match for data to be read or written correctly.
 
 > **Important:**  
 > If the addresses do not match, no data will be received and no commands will be executed.  
@@ -162,11 +126,7 @@ Both values must match for data to be read or written correctly.
 - Use Modbus Protocol 2014 → **YES**
 
 > **Writing needs the 2014 protocol.**  
-> Without it the boiler still answers read requests: the connection test
-> during setup succeeds and all sensors show values. Only writing fails, with
-> *Illegal Function* — number, switch, select and time entities silently stay
-> at their old value. If changes made in Home Assistant never reach the
-> boiler, check this setting first.
+> Without it the boiler still answers read requests: the connection test during setup succeeds and all sensors show values. Only writing fails, with *Illegal Function* — number, switch, select and time entities silently stay at their old value. If changes made in Home Assistant never reach the boiler, check this setting first.
 
 These options are also located in:  
 `System → Settings → General Settings → MODBUS Settings`.
@@ -175,30 +135,15 @@ These options are also located in:
 
 ## 🔁 Boiler remote control (registers 48001–48046)
 
-Besides the ordinary parameters the controller offers an **external setpoint
-mode**: flow setpoint and enable flag per heating circuit plus the DHW
-setpoint (registers 48001–48046). It behaves unlike anything else in this
-integration, so the related entities ("Enable (remote control)", "Flow
-setpoint (remote control)", "Setpoint (remote control)") are **disabled by
-default**.
+Besides the ordinary parameters the controller offers an **external setpointmode**: flow setpoint and enable flag per heating circuit plus the DHW setpoint (registers 48001–48046). It behaves unlike anything else in this integration, so the related entities ("Enable (remote control)", "Flow setpoint (remote control)", "Setpoint (remote control)") are **disabled by default**.
 
 Measured on the device (SP Dual Compact, 2026-09-09):
 
-* **A single write** to any of these registers activates the external
-  setpoints **for all heating circuits and DHW tanks at once**, using whatever
-  the other registers currently hold. Writing only the DHW setpoint also puts
-  the heating circuits onto their remote values.
-* If **more than two minutes** pass without another write, the controller
-  falls back to its own regulation. The entity in Home Assistant keeps showing
-  the written value anyway.
-* Toggling again **within ten minutes** is rejected by the controller (the
-  integration now reports that as an error) but still keeps the external mode
-  alive for another two minutes.
+* **A single write** to any of these registers activates the external setpoints **for all heating circuits and DHW tanks at once**, using whatever the other registers currently hold. Writing only the DHW setpoint also puts the heating circuits onto their remote values.
+* If **more than two minutes** pass without another write, the controller falls back to its own regulation. The entity in Home Assistant keeps showing the written value anyway.
+* Toggling again **within ten minutes** is rejected by the controller (the integration now reports that as an error) but still keeps the external mode alive for another two minutes.
 
-For everyday needs (setback a circuit, change the DHW setpoint) the
-**operating mode** and the ordinary parameters are the right tools; they act
-permanently. A proper implementation with cyclic rewriting is planned as an
-optional feature.
+For everyday needs (setback a circuit, change the DHW setpoint) the **operating mode** and the ordinary parameters are the right tools; they act permanently. A proper implementation with cyclic rewriting is planned as an optional feature.
 
 ## 🌐 Translations
 
@@ -217,22 +162,14 @@ German translations are also available via `de.json`.
 
 ## 📚 Manufacturer documentation
 
-The Fröling manuals and the Modbus register list live in the
-[`documentation/`](documentation/) folder of this repository.
-
-They are deliberately kept **outside** `custom_components/`, so HACS does not
-copy roughly 33 MB of PDFs into every Home Assistant configuration directory.
-The integration does not read these files at runtime — they are reference
-material only.
-
-`documentation/Modbus_Register.txt` lists the registers used by this
-integration together with their entity type.
+The Fröling manuals and the Modbus register list live in the [`documentation/`](documentation/) folder of this repository. They are deliberately kept **outside** `custom_components/`, so HACS does not copy roughly 33 MB of PDFs into every Home Assistant configuration directory. The integration does not read these files at runtime — they are reference material only.
+`documentation/Modbus_Register.txt` lists the registers used by this integration together with their entity type.
 
 ---
 
 ## 🖼️ Screenshots
 
-<img width="2010" height="1344" alt="2025-10-03_14-57-08" src="https://github.com/user-attachments/assets/ebbb796a-b0e1-4b06-b8c6-bd18caea4a31" />
+<img width="500" height="618" alt="image" src="https://github.com/user-attachments/assets/6ffe643d-9679-4c69-90a0-10cdbadef477" />
 
 ---
 
