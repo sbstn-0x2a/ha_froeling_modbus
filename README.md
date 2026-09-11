@@ -2,6 +2,8 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz/docs/faq/custom_repositories)
 
+🇬🇧 English | 🇩🇪 [Deutsch](README_de.md)
+
 A **Home Assistant custom integration** for connecting a **Fröling Lambdatronic S3200** controller via **Modbus TCP**.  
 It allows you to read states and sensor values of your heating system (boiler, heating circuits, buffer tank, discharge unit, etc.) directly in Home Assistant.
 
