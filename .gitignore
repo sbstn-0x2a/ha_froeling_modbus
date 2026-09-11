@@ -16,3 +16,9 @@ ENV/
 
 # pytest
 .pytest_cache/
+
+# Entwicklungsmaterial, nicht Teil der Integration
+scripts/
+tests/
+documentation/
+requirements-dev.txt
