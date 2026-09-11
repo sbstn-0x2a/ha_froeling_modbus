@@ -930,8 +930,8 @@
       "brennstoffauswahl": {
         "name": "Brennstoffauswahl",
         "state": {
-          "softwood": "weiches Holz",
-          "hardwood": "hartes Holz"
+          "softwood": "Scheitholz trocken (< 15 % Wassergehalt)",
+          "hardwood": "Scheitholz feucht (> 15 % Wassergehalt)"
         }
       }
     },

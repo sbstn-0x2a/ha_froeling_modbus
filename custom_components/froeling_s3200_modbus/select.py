@@ -32,9 +32,13 @@ DEFAULT_LABELS = {
         "eco_permanent": "Dauerabsenken",
         "party": "Partybetrieb",
     },
+    # Laut Bedienungsanleitung B1460922 (SP 3200): 0 = Scheitholz trocken
+    # (Wassergehalt < 15 %), 1 = Scheitholz feucht. Am Geraet gegengeprueft:
+    # Register 0, Display "Scheitholz trocken". Die Schluessel bleiben, damit
+    # bestehende Automationen weiterlaufen.
     "fuel": {
-        "softwood": "weiches Holz",
-        "hardwood": "hartes Holz",
+        "softwood": "Scheitholz trocken",
+        "hardwood": "Scheitholz feucht",
     },
 }
 

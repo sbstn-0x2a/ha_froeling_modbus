@@ -930,8 +930,8 @@
       "brennstoffauswahl": {
         "name": "Fuel Selection",
         "state": {
-          "softwood": "Softwood",
-          "hardwood": "Hardwood"
+          "softwood": "Log wood, dry (< 15 % moisture)",
+          "hardwood": "Log wood, moist (> 15 % moisture)"
         }
       }
     },

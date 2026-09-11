@@ -104,6 +104,9 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 * War Boiler 01 abgewählt, löschte jeder Start die Zirkulationssensoren und
   40601 mit, die an dessen Gerät hängen, und legte sie neu an; Umbenennungen
   und Bereiche gingen dabei verloren.
+* Die Brennstoffauswahl hieß „weiches Holz / hartes Holz“; laut Handbuch und
+  Bediengerät sind es „Scheitholz trocken / Scheitholz feucht“ (Wassergehalt
+  unter/über 15 %). Die internen Schlüssel bleiben, Automationen laufen weiter.
 * Ein Register, das die Anlage nicht führt (0xFFFF), zeigte an Zahlen-
   Entitäten −0,5 °C statt keinen Wert.
 * Nach einem Schreibvorgang konnte ein einmal ausgesetzter Leseblock den
