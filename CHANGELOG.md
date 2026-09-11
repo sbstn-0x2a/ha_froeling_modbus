@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.0 – 2026-09-10
+## 0.5.0 – 2026-09-11
 
 ### ⚠️ Was sich sichtbar ändert
 
