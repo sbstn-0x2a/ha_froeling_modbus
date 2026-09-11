@@ -80,6 +80,25 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 * Schrittweite der Zahlen-Entitäten war bei Faktor 2 fälschlich 0.0.
 * Skalierung dreier Register gegen das Display korrigiert (41001, 40066,
   43070).
+* Negative Sollwerte (Frostschutz −5 °C) ließen sich nicht schreiben: Der
+  Rohwert ging ohne Zweierkomplement an pymodbus, der Schreibzugriff schlug
+  fehl und riss die Verbindung mit.
+* Zähler über 32767 (Betriebsstunden, kWh) wurden negativ angezeigt, mit
+  Rückfall in der Langzeitstatistik.
+* War Boiler 01 abgewählt, löschte jeder Start die Zirkulationssensoren und
+  40601 mit, die an dessen Gerät hängen, und legte sie neu an; Umbenennungen
+  und Bereiche gingen dabei verloren.
+* Ein Register, das die Anlage nicht führt (0xFFFF), zeigte an Zahlen-
+  Entitäten −0,5 °C statt keinen Wert.
+* Nach einem Schreibvorgang konnte ein einmal ausgesetzter Leseblock den
+  neuen Wert mit dem alten überschreiben.
+* Der Verbindungsaufbau beim Start lief blockierend in der Ereignisschleife.
+* Bei nicht erreichbarer Anlage lief jeder Block einzeln in den
+  Verbindungs-Timeout (24 × 3 s); jetzt bricht der Durchlauf nach dem ersten
+  ab.
+* Ein geänderter Host in den Optionen aktualisiert die Kennung des Eintrags;
+  Intervall und Anlagenteile lassen sich auch ohne erreichbare Anlage
+  speichern.
 
 ### Bekannte Lücken
 

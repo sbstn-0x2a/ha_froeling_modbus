@@ -110,7 +110,8 @@ class RegisterSelect(FroelingRegisterEntity, SelectEntity):
         return self._label_for_key(schluessel) if schluessel else f"Wert {roh}"
 
     def _handle_coordinator_update(self) -> None:
-        self._optimistisch = None
+        if self._frisch_gelesen():
+            self._optimistisch = None
         super()._handle_coordinator_update()
 
     async def async_select_option(self, option: str):

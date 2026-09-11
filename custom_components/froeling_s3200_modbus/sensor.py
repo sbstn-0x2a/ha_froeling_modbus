@@ -69,7 +69,12 @@ class RegisterZahlSensor(_Basis):
 
     @property
     def state(self):
-        roh = self._rohwert_vorzeichen()
+        if self._zeile.zustandsklasse == "total_increasing":
+            # Zaehler laufen nie negativ; ab 32768 (Betriebsstunden, kWh)
+            # waere das Zweierkomplement ein Rueckfall in den Minusbereich.
+            roh = self.coordinator.rohwert(self._register)
+        else:
+            roh = self._rohwert_vorzeichen()
         if roh is None:
             return None
         wert = roh / (self._zeile.faktor or 1)

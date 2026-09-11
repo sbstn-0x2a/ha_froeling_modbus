@@ -55,7 +55,9 @@ class RegisterNumber(FroelingRegisterEntity, NumberEntity):
         if self._optimistisch is not None:
             return self._optimistisch
         roh = self._rohwert_vorzeichen()
-        if roh is None:
+        if roh is None or roh == -1:
+            # 0xFFFF: Register auf dieser Anlage nicht vorhanden -> kein Wert,
+            # statt -0,5 °C unterhalb des erlaubten Bereichs.
             return None
         return round(roh / float(self._zeile.faktor or 1), self._zeile.dezimalen)
 
@@ -80,14 +82,19 @@ class RegisterNumber(FroelingRegisterEntity, NumberEntity):
         return int(step) if step.is_integer() else round(step, 3)
 
     def _handle_coordinator_update(self) -> None:
-        # Frische Registerwerte loesen die optimistische Anzeige ab.
-        self._optimistisch = None
+        # Nur ein frisch gelesenes Register loest die optimistische Anzeige
+        # ab -- ein ausgesetzter Block darf den geschriebenen Wert nicht
+        # mit dem alten ueberschreiben.
+        if self._frisch_gelesen():
+            self._optimistisch = None
         super()._handle_coordinator_update()
 
     async def async_set_native_value(self, value):
         v = float(min(max(value, self.native_min_value), self.native_max_value))
         raw = int(round(v * float(self._zeile.faktor)))
-        if await self.coordinator.schreibe(self._register, raw) is not None:
+        # Negative Werte (Frostschutz -5 °C) als 16-Bit-Zweierkomplement senden;
+        # pymodbus packt nur 0..65535.
+        if await self.coordinator.schreibe(self._register, raw & 0xFFFF) is not None:
             return
         self._optimistisch = round(raw / float(self._zeile.faktor), self._zeile.dezimalen)
         self.async_write_ha_state()

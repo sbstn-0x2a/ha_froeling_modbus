@@ -48,7 +48,8 @@ class _Basis(FroelingRegisterEntity, TimeEntity):
         self._optimistisch: time | None = None
 
     def _handle_coordinator_update(self) -> None:
-        self._optimistisch = None
+        if self._frisch_gelesen():
+            self._optimistisch = None
         super()._handle_coordinator_update()
 
 

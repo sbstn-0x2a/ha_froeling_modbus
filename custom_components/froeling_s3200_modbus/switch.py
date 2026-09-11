@@ -45,7 +45,8 @@ class RegisterSwitch(FroelingRegisterEntity, SwitchEntity):
         return None if roh is None else bool(roh)
 
     def _handle_coordinator_update(self) -> None:
-        self._optimistisch = None
+        if self._frisch_gelesen():
+            self._optimistisch = None
         super()._handle_coordinator_update()
 
     async def async_turn_on(self, **kwargs):

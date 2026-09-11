@@ -97,6 +97,10 @@ class FroelingRegisterEntity(FroelingEntity):
             attribute["hinweis_erkennung"] = self._grund
         return attribute
 
+    def _frisch_gelesen(self) -> bool:
+        """Wurde das eigene Register im letzten Durchlauf wirklich gelesen?"""
+        return self._register in self.coordinator.frisch
+
     def _rohwert_vorzeichen(self) -> int | None:
         """Rohwert als 16-Bit-Zweierkomplement."""
         roh = self.coordinator.rohwert(self._register)

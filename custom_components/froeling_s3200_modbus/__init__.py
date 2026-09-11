@@ -22,30 +22,7 @@ for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.fr
 DOMAIN = "froeling_s3200_modbus"
 _LOGGER = logging.getLogger(__name__)
 
-#: Gruppen, deren Entitaeten unter einem fremden Geraet haengen.
-#:
-#: Das Aufraeumen beim Abwaehlen einer Gruppe laeuft ueber deren Geraet: alle
-#: Entitaeten daran werden entfernt. Die Zirkulationspumpe hat aber bewusst
-#: kein eigenes Geraet, ihre Sensoren sitzen unter Boiler 01. Ohne diese Liste
-#: bleiben sie beim Abwaehlen als unavailable in der Registry stehen.
-GRUPPEN_OHNE_EIGENES_GERAET: dict[str, tuple[tuple[str, str], ...]] = {
-    "zirkulationspumpe": (
-        # Kein eigenes Geraet, die drei sitzen unter Boiler 01.
-        ("sensor", "ruecklauftemperatur_an_der_zirkulations_leitung"),
-        ("sensor", "stoemungsschalter_an_der_brauchwasser_leitung"),
-        ("sensor", "drehzahl_der_zirkulations_pumpe"),
-    ),
-    "kessel": (
-        # Inhaltlich bewusst woanders einsortiert: die Nachlegeberechnung
-        # gehoert zum Puffer, die Ruecklauftemperatur der Zirkulationsleitung
-        # zum Boiler.
-        ("binary_sensor", "nachlegeberechnung_aktiv"),
-        ("number", "bei_welcher_rl_temperatur_an_der_zirkulationsleitung_soll_die_pumpe_ausschalten"),
-    ),
-}
-
-
-#: Die sieben Anlagenteile, die sich ein- und ausblenden lassen.
+#: Die Anlagenteile, die sich ein- und ausblenden lassen.
 GRUPPEN = (
     "kessel",
     "boiler01",
@@ -71,59 +48,6 @@ async def async_setup(hass: HomeAssistant, config: dict):
     return True
 
 
-def _gruppen_entfernen(hass: HomeAssistant, entry: ConfigEntry, name: str,
-                       gruppen) -> int:
-    """Entfernt Geraete und Entitaeten abgewaehlter Anlagenteile.
-
-    Laeuft ueber das Geraet der Gruppe: alles, was daran haengt, verschwindet.
-    Entitaeten ohne eigenes Gruppengeraet stehen in
-    GRUPPEN_OHNE_EIGENES_GERAET und werden vorher einzeln entfernt.
-
-    Gesucht wird ausschliesslich unter den Geraeten des eigenen Config-Entry.
-    ``dev_reg.async_get_device`` waere kuerzer, sucht aber ueber alle Eintraege
-    hinweg -- und Identifier sind seit HA 2026.9 nicht mehr eindeutig. Bei
-    Mehrdeutigkeit raet die Registry ("falling back to the first match"), und
-    hier wird geloescht: Ein falscher Treffer wuerde die Entitaeten einer
-    fremden Anlage mitnehmen. Der Aufruf ist ausserdem als veraltet markiert
-    und verschwindet in HA 2027.8.
-
-    Rueckgabe ist die Zahl der entfernten Entitaeten.
-    """
-    ent_reg = er.async_get(hass)
-    dev_reg = dr.async_get(hass)
-    entfernt = 0
-
-    eigene = {
-        kennung: geraet
-        for geraet in dr.async_entries_for_config_entry(dev_reg, entry.entry_id)
-        for kennung in geraet.identifiers
-    }
-
-    for gruppe in gruppen:
-        for entity_domain, schluessel in GRUPPEN_OHNE_EIGENES_GERAET.get(gruppe, ()):
-            entity_id = ent_reg.async_get_entity_id(
-                entity_domain, DOMAIN, f"{name}_{schluessel}"
-            )
-            if entity_id:
-                ent_reg.async_remove(entity_id)
-                entfernt += 1
-
-        device = eigene.get((DOMAIN, f"{name}:{gruppe}"))
-        if not device:
-            continue
-
-        for ent in list(ent_reg.entities.values()):
-            if ent.config_entry_id == entry.entry_id and ent.device_id == device.id:
-                ent_reg.async_remove(ent.entity_id)
-                entfernt += 1
-        try:
-            dev_reg.async_remove_device(device.id)
-        except Exception:  # noqa: BLE001
-            _LOGGER.debug("Geraet %s liess sich nicht entfernen", device.id)
-
-    return entfernt
-
-
 def _verwaiste_entfernen(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> int:
     """Registry-Eintraege dieses Entry, fuer die keine Entitaet mehr entsteht.
 
@@ -142,6 +66,17 @@ def _verwaiste_entfernen(hass: HomeAssistant, entry: ConfigEntry, data: dict) ->
     if weg:
         _LOGGER.info("%d verwaiste Entitaet(en) entfernt: %s", len(weg),
                      ", ".join(e.entity_id for e in weg[:5]))
+    # Geraete abgewaehlter Anlagenteile: alles, woran keine Entitaet mehr
+    # haengt, ausser dem Regler. Vorher lief das ueber das Geraet der Gruppe
+    # und riss Entitaeten anderer Gruppen mit, die dort bewusst einsortiert
+    # sind (40601 und die Zirkulationspumpe unter Boiler 01) -- bei jedem
+    # Neustart, samt Nutzeranpassungen.
+    dev_reg = dr.async_get(hass)
+    for geraet in dr.async_entries_for_config_entry(dev_reg, entry.entry_id):
+        if (DOMAIN, f"{data['name']}:controller") in geraet.identifiers:
+            continue
+        if not er.async_entries_for_device(ent_reg, geraet.id, include_disabled_entities=True):
+            dev_reg.async_remove_device(geraet.id)
     return len(weg)
 
 
@@ -169,6 +104,10 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
     hass.config_entries.async_update_entry(entry, data={**entry.data, "tot_angewendet": zeit})
 
 
+async def _neu_laden(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    await hass.config_entries.async_reload(entry.entry_id)
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up the integration from a config entry."""
     # entry.data ist immutable → kopieren und Optionen überlagern
@@ -183,7 +122,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if entry.unique_id is None:
         hass.config_entries.async_update_entry(
             entry,
-            unique_id=eindeutige_kennung(data["host"], data.get("port", 502), data["unit_id"]),
+            unique_id=eindeutige_kennung(data["host"], data.get("port", 502), data["unit_id"]),  # data = Eintrag + Optionen
         )
 
     # Ein Client je Config-Entry, einmalig verbunden. Serialisiert wird im
@@ -195,10 +134,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         timeout=3,
         retries=2,
     )
-    try:
-        client.connect()
-    except Exception:
-        pass
+    # Kein client.connect() hier: Das waere ein blockierender Socket-Aufbau im
+    # Event-Loop. Die Lesefunktionen verbinden im Executor bei Bedarf selbst.
 
     _LOGGER.debug(
         "Froeling Modbus initialisiert (pymodbus=%s, host=%s, port=%s, unit_id=%s)",
@@ -230,17 +167,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     entry.runtime_data = FroelingRuntimeData(coordinator, data)
 
-    # Reste abgewaehlter Anlagenteile entfernen. Bisher passierte das nur beim
-    # Aendern der Optionen -- wer eine Gruppe vor diesem Update abgewaehlt
-    # hatte, behielt deren Entitaeten dauerhaft als "unavailable" in der
-    # Registry.
-    abgewaehlt = [g for g in GRUPPEN if not data.get(g, False)]
-    if abgewaehlt and (weg := _gruppen_entfernen(hass, entry, data["name"], abgewaehlt)):
-        _LOGGER.info(
-            "%d verwaiste Entitaet(en) abgewaehlter Anlagenteile entfernt: %s",
-            weg, ", ".join(abgewaehlt),
-        )
-
     # Bestandsinstallationen wurden nie eingelesen: Hinweis in "Reparaturen",
     # der in den Options-Flow fuehrt. Es wird nichts automatisch abgewaehlt.
     kennung = f"anlage_einlesen_{entry.entry_id}"
@@ -266,28 +192,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     _tote_anwenden(hass, entry, data)
     _verwaiste_entfernen(hass, entry, data)
 
-    # ---- Options-Update: deaktivierte Gruppen aufräumen und reloaden ----
-    async def _cleanup_disabled_groups_and_reload(
-        hass: HomeAssistant, updated_entry: ConfigEntry
-    ):
-        laufzeit = getattr(updated_entry, "runtime_data", None)
-        old_cfg = laufzeit.konfiguration if laufzeit else {}
-        new_cfg = {**updated_entry.data, **updated_entry.options}
-
-        name = new_cfg.get("name", old_cfg.get("name", "Froeling"))
-        ent_reg = er.async_get(hass)
-        dev_reg = dr.async_get(hass)
-
-        neu_abgewaehlt = [
-            g for g in GRUPPEN
-            if old_cfg.get(g, False) and not new_cfg.get(g, False)
-        ]
-        _gruppen_entfernen(hass, updated_entry, name, neu_abgewaehlt)
-
-        await hass.config_entries.async_reload(updated_entry.entry_id)
-
-    entry.async_on_unload(entry.add_update_listener(_cleanup_disabled_groups_and_reload))
-    # --------------------------------------------------------------------
+    # Optionen geaendert -> neu laden. Das Aufraeumen abgewaehlter Teile
+    # erledigt das Setup selbst (_verwaiste_entfernen).
+    entry.async_on_unload(entry.add_update_listener(_neu_laden))
 
     return True
 

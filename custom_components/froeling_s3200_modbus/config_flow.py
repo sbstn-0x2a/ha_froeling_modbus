@@ -353,13 +353,24 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
         cfg = self._cfg
         errors: dict[str, str] = {}
         if user_input is not None:
-            fehler = await pruefe_verbindung(self.hass, {**cfg, **user_input})
+            neu = {**cfg, **user_input}
+            geaendert = any(str(neu.get(k)) != str(cfg.get(k)) for k in ("host", "port", "unit_id"))
+            # Nur eine geaenderte Verbindung wird geprueft: Ein neues Intervall
+            # muss sich auch speichern lassen, wenn die Anlage gerade aus ist.
+            fehler = await pruefe_verbindung(self.hass, neu) if geaendert else None
             if fehler is None:
+                if geaendert:
+                    # Die Kennung des Eintrags folgt der Verbindung, sonst
+                    # liesse sich die neue Adresse ein zweites Mal anlegen.
+                    self.hass.config_entries.async_update_entry(
+                        self.config_entry,
+                        unique_id=eindeutige_kennung(neu["host"], neu.get("port", 502), neu.get("unit_id", 2)),
+                    )
                 return self.async_create_entry(
                     title="", data={**self.config_entry.options, **user_input}
                 )
             errors["base"] = fehler
-            cfg = {**cfg, **user_input}
+            cfg = neu
         schema = vol.Schema({
             vol.Optional("host", default=cfg.get("host", "")): str,
             vol.Optional("port", default=cfg.get("port", 502)): int,

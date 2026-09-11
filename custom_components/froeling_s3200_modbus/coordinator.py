@@ -123,6 +123,10 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
         self._blockfehler: dict[int, int] = {}
         #: Serialisiert den Zugriff auf den Client. Siehe _modbus().
         self._zugriff = asyncio.Lock()
+        #: Register, die im letzten Durchlauf frisch gelesen wurden. Entitaeten
+        #: verwerfen ihren optimistischen Wert nur, wenn ihr Register dabei war
+        #: -- sonst zeigt ein Block, der einmal aussetzt, den alten Wert.
+        self.frisch: set[int] = set()
         #: Registry-id des Reglergeraets. Neuere Fassungen von Home
         #: Assistant haengen Untergeraete darueber ein statt ueber die
         #: Identifier. Wird beim Setup gesetzt.
@@ -152,8 +156,10 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
     async def _async_update_data(self) -> dict[int, int]:
         vorher = self.data or {}
         werte: dict[int, int] = {}
+        frisch: set[int] = set()
         erfolge = 0
         gescheitert: list[str] = []
+        verbindung_weg = False
 
         def uebernehmen(start: int, anzahl: int, fehler: str) -> None:
             """Behält die zuletzt gelesenen Werte eines Blocks -- oder gibt ihn auf."""
@@ -171,8 +177,14 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
             (HOLDING_BASE, self._bloecke["holding"], read_holding_sync),
         ):
             for start, anzahl in bloecke:
+                if verbindung_weg:
+                    # Ohne Verbindung liefe jeder weitere Block in denselben
+                    # Timeout -- 24 Bloecke mal 3 s statt einmal 3 s.
+                    uebernehmen(start, anzahl, f"Block ab {start}: connect")
+                    continue
                 res, err = await self._modbus(lese, start - basis, anzahl)
                 if err or res is None or not hasattr(res, "registers"):
+                    verbindung_weg = err == "connect"
                     uebernehmen(start, anzahl,
                                 f"Block ab {start} ({anzahl} Register): {err}")
                     continue
@@ -180,6 +192,7 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
                 self._blockfehler.pop(start, None)
                 for versatz, rohwert in enumerate(res.registers):
                     werte[start + versatz] = rohwert
+                    frisch.add(start + versatz)
 
         # Coils (FC=01) werden direkt adressiert, Discrete Inputs (FC=02)
         # ueber ihre 1xxxx-Nummer. Beide liefern Bits statt Register.
@@ -188,8 +201,12 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
             (DISCRETE_BASE, self._bloecke["discrete"], read_discrete_sync),
         ):
             for start, anzahl in bloecke:
+                if verbindung_weg:
+                    uebernehmen(start, anzahl, f"Bitblock ab {start}: connect")
+                    continue
                 res, err = await self._modbus(lese, start - basis, anzahl)
                 if err or res is None or not hasattr(res, "bits"):
+                    verbindung_weg = err == "connect"
                     uebernehmen(start, anzahl,
                                 f"Bitblock ab {start} ({anzahl} Bits): {err}")
                     continue
@@ -198,7 +215,9 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
                 # bits ist auf ganze Bytes aufgefuellt, deshalb abschneiden.
                 for versatz, bit in enumerate(res.bits[:anzahl]):
                     werte[start + versatz] = int(bit)
+                    frisch.add(start + versatz)
 
+        self.frisch = frisch
         if erfolge == 0:
             # Kein einziger Block hat geantwortet -- die Verbindung ist weg.
             # Erst hier gehen die Entitaeten auf "unavailable". Gemeldet wird
