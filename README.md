@@ -128,6 +128,12 @@ register newly found useless is disabled. Entities you disabled yourself are
 left alone. Counters only count as useless after 24 operating hours of the
 plant, so a freshly commissioned plant is not judged prematurely.
 
+**Plant name:** the name given during setup is part of every entity's
+`unique_id` and therefore cannot be changed afterwards; a different name would
+be a new plant without history to Home Assistant. To change the label, rename
+the controller device under *Settings → Devices*; all entity display names
+follow immediately, history and statistics are kept.
+
 ---
 
 ## ⚙️ Modbus Address / Unit ID Settings

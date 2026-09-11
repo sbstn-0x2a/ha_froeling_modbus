@@ -131,6 +131,13 @@ deaktiviert. Was du selbst deaktiviert hast, bleibt unberührt. Zähler gelten
 erst ab 24 Betriebsstunden der Anlage als wertlos, damit eine frisch in
 Betrieb genommene Anlage nicht vorschnell eingestuft wird.
 
+**Anlagenname:** Der bei der Einrichtung vergebene Name steckt in der
+`unique_id` jeder Entität und lässt sich deshalb nachträglich nicht ändern;
+ein anderer Name wäre für Home Assistant eine neue Anlage ohne Historie. Wer
+eine andere Beschriftung will, benennt das Reglergerät unter *Einstellungen →
+Geräte* um; die Anzeigenamen aller Entitäten folgen sofort, Historie und
+Statistik bleiben.
+
 ---
 
 ## ⚙️ Modbus-Adresse / Unit-ID einstellen
