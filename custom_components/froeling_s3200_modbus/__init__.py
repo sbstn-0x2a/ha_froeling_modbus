@@ -88,19 +88,24 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
     ent_reg = er.async_get(hass)
     vorhanden = {e.unique_id: e for e in ent_reg.entities.values()
                  if e.config_entry_id == entry.entry_id}
-    anzahl = 0
-    for nummer in tote_register(data):
-        for zeile in TABELLE:
-            if zeile.nummer != nummer or not zeile.freigegeben or not zeile.plattform:
-                continue
-            eintrag = vorhanden.get(f"{data['name']}_{zeile.entitaetsschluessel}")
-            if eintrag is not None and eintrag.disabled_by is None:
-                ent_reg.async_update_entity(
-                    eintrag.entity_id, disabled_by=er.RegistryEntryDisabler.INTEGRATION
-                )
-                anzahl += 1
-    if anzahl:
-        _LOGGER.info("%d Entitaet(en) ohne brauchbaren Wert deaktiviert", anzahl)
+    tot = tote_register(data)
+    aus = an = 0
+    for zeile in zeilen_fuer(data):
+        eintrag = vorhanden.get(f"{data['name']}_{zeile.entitaetsschluessel}")
+        if eintrag is None or zeile.kategorie == "fernsteuerung":
+            continue   # Fernsteuerregister sind aus eigenem Grund deaktiviert
+        if zeile.nummer in tot and eintrag.disabled_by is None:
+            ent_reg.async_update_entity(
+                eintrag.entity_id, disabled_by=er.RegistryEntryDisabler.INTEGRATION
+            )
+            aus += 1
+        elif zeile.nummer not in tot and eintrag.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
+            # Frueher wertlos, jetzt nicht mehr (ein Zaehler hat begonnen zu
+            # zaehlen): wieder einschalten. Vom Nutzer Deaktiviertes bleibt aus.
+            ent_reg.async_update_entity(eintrag.entity_id, disabled_by=None)
+            an += 1
+    if aus or an:
+        _LOGGER.info("Befund angewendet: %d Entitaet(en) deaktiviert, %d wieder aktiviert", aus, an)
     hass.config_entries.async_update_entry(entry, data={**entry.data, "tot_angewendet": zeit})
 
 

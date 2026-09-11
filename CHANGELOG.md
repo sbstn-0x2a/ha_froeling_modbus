@@ -47,6 +47,11 @@ Beim Update passiert automatisch:
 * Nichts wird deaktiviert oder entfernt: Es liegt noch kein Befund vor.
 * Unter *Reparaturen* erscheint „Anlage noch nicht eingelesen“.
 
+Ein späteres Neu-Einlesen wirkt in beide Richtungen: Liefert ein vorher
+wertloses Register inzwischen Werte (ein Zähler hat begonnen zu zählen),
+wird seine Entität wieder aktiviert bzw. bei „gar nicht anlegen“ neu
+angelegt. Vom Nutzer selbst deaktivierte Entitäten bleiben aus.
+
 Erst **Optionen → Anlage neu einlesen** bringt den Rest: E-Abscheider als
 Vorschlag, und die Register ohne brauchbaren Wert nach deiner Auswahl
 deaktiviert (Historie bleibt), entfernt (Historie geht) oder belassen. Aktive
