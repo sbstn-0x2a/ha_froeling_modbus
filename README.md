@@ -103,8 +103,23 @@ Later via **Options**: change connection and interval, show or hide plant
 parts, or re-scan the plant. Deselecting a part removes its entities together
 with their history; a re-scan therefore never proposes deselecting by itself.
 
-**Existing installations** from 0.4.x keep running unchanged. A notice under
-*Repairs* leads to the options for a re-scan.
+---
+
+## 🔄 Upgrading from 0.3.x or 0.4.0
+
+An upgrade leaves existing entities alone: every entity keeps its
+`entity_id`, history and statistics. In addition, the new customer-level
+entities and the "Messages" sensor are created for the plant parts already
+selected, with `entity_id`s following the new scheme
+(`sensor.froeling_kessel_…`). Both schemes then coexist; the integration
+deliberately does not rename existing entities because automations, scripts
+and dashboards would not follow. If you want to migrate, rename entities in
+Home Assistant; history and statistics follow automatically.
+
+The electrostatic precipitator and the detection of registers without a
+usable value only arrive with **Options → Re-scan the plant**. A notice under
+*Repairs* reminds you. There you also choose whether such registers are
+created disabled (history kept), removed (history lost) or left as they are.
 
 ---
 

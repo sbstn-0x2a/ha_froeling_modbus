@@ -104,8 +104,24 @@ und ausblenden, oder die Anlage neu einlesen. Abwählen eines Anlagenteils
 entfernt seine Entitäten samt Historie; das Neu-Einlesen schlägt deshalb nie
 von selbst ein Abwählen vor.
 
-**Bestehende Installationen** aus 0.4.x laufen unverändert weiter. Ein Hinweis
-unter *Reparaturen* führt in die Optionen zum Neu-Einlesen.
+---
+
+## 🔄 Update von 0.3.x oder 0.4.0
+
+Ein Update ändert am Bestand nichts: Alle bisherigen Entitäten behalten ihre
+`entity_id`, Historie und Statistik. Zusätzlich entstehen für die schon
+gewählten Anlagenteile die neuen Entitäten der Kundenebene und der Sensor
+„Meldungen“, mit `entity_id` nach dem neuen Schema (`sensor.froeling_kessel_…`).
+Beide Schemata stehen danach nebeneinander; eine Umbenennung des Bestands
+nimmt die Integration bewusst nicht vor, weil Automationen, Skripte und
+Dashboards nicht mitziehen würden. Wer umstellen möchte, benennt einzelne
+Entitäten in Home Assistant um; Historie und Statistik folgen dabei
+automatisch.
+
+Der E-Abscheider und die Erkennung wertloser Register kommen erst mit
+**Optionen → Anlage neu einlesen**. Ein Hinweis unter *Reparaturen* erinnert
+daran. Dort wählst du auch, ob Register ohne brauchbaren Wert deaktiviert
+(Historie bleibt), entfernt (Historie geht) oder belassen werden.
 
 ---
 

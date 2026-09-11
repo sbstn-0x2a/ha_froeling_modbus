@@ -28,6 +28,34 @@ samt Historie.
 **Zahlen-Entitäten sind Eingabefelder**, keine Schieberegler mehr: Am Regler
 war der aktuelle Wert nicht zu sehen.
 
+### Update von 0.3.x oder 0.4.0
+
+Beim Update passiert automatisch:
+
+* Alle bisherigen Entitäten bleiben mit **unveränderter `unique_id` und
+  `entity_id`**; Historie, Statistik und Dashboards laufen weiter (Test
+  `test_update_von_0_3_6_behaelt_alle_entitaeten`).
+* Kommt von 0.3.x: Die Anzeigenamen bekommen den Gerätenamen vorangestellt
+  („Kessel Kesseltemperatur“), siehe 0.4.0.
+* Für die bereits gewählten Anlagenteile entstehen die neuen Entitäten der
+  Kundenebene **zusätzlich**, mit `entity_id` nach dem neuen Schema
+  (`sensor.froeling_kessel_…`). Bestand und Neues tragen also zwei Schemata
+  nebeneinander; eine Umstellung des Bestands gibt es bewusst nicht, weil
+  Automationen und Dashboards nicht mitziehen würden.
+* Der Sensor „Meldungen“ kommt dazu. Der E-Abscheider entsteht noch nicht,
+  weil der alte Eintrag den Haken nicht kennt.
+* Nichts wird deaktiviert oder entfernt: Es liegt noch kein Befund vor.
+* Unter *Reparaturen* erscheint „Anlage noch nicht eingelesen“.
+
+Erst **Optionen → Anlage neu einlesen** bringt den Rest: E-Abscheider als
+Vorschlag, und die Register ohne brauchbaren Wert nach deiner Auswahl
+deaktiviert (Historie bleibt), entfernt (Historie geht) oder belassen. Aktive
+Anlagenteile bleiben angehakt, auch wenn die Erkennung sie nicht findet; das
+Abwählen ist dein Klick und löscht die Entitäten samt Historie.
+
+Die fünf Fernsteuer-Entitäten bleiben beim Update aktiv, weil ihre Einträge
+schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
+
 ### Neu
 
 * **Registertabelle aus der Modbus-Doku.** Alle 1718 Einträge der B1200522
