@@ -86,8 +86,11 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 * Negative Sollwerte (Außentemperatur-Schwellen unter 0 °C) ließen sich nicht
   schreiben: Der Rohwert ging ohne Zweierkomplement an pymodbus, der
   Schreibzugriff schlug fehl und riss die Verbindung mit.
-* Die Frostschutztemperatur der Heizkreise erlaubte −30 bzw. −10 °C als
-  Untergrenze; laut Doku sind 5 bis 10 °C zulässig.
+* Einstellbereiche der Heizkreis- und Pufferparameter am Gerät nachgemessen:
+  Frostschutz −10 bis 20 °C, Außentemperatur-Schwellen −20 bis 50 °C,
+  Puffer-Temperaturdifferenz 2 bis 80 °C. Die Doku führt diese Grenzen als
+  Realwerte, verliert aber die Minuszeichen; die alten Bereiche −30 und 0 bis
+  120 waren zu weit.
 * Zähler über 32767 (Betriebsstunden, kWh) wurden negativ angezeigt, mit
   Rückfall in der Langzeitstatistik.
 * War Boiler 01 abgewählt, löschte jeder Start die Zirkulationssensoren und
