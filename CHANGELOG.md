@@ -80,7 +80,9 @@ schon existieren; nur Neuinstallationen bekommen sie deaktiviert.
 
 ### Behoben
 
-* Schrittweite der Zahlen-Entitäten war bei Faktor 2 fälschlich 0.0.
+* Schrittweite der Zahlen-Entitäten war bei Faktor 2 fälschlich 0.0; jetzt
+  folgt sie den Dezimalstellen der Doku (Temperaturen ganzzahlig wie am
+  Bediengerät, Pelletlager in 0,1 t).
 * Skalierung dreier Register gegen das Display korrigiert (41001, 40066,
   43070).
 * Negative Sollwerte (Außentemperatur-Schwellen unter 0 °C) ließen sich nicht

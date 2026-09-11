@@ -75,11 +75,13 @@ class RegisterNumber(FroelingRegisterEntity, NumberEntity):
 
     @property
     def native_step(self):
-        # Vorher wurde auf ``dezimalen`` gerundet -- bei Faktor 2 und null
-        # Dezimalen ergab das den Schritt 0.0. Der Schritt ist die Auflösung
-        # des Registers, unabhängig von der Anzeige.
-        step = 1.0 / float(self._zeile.faktor or 1)
-        return int(step) if step.is_integer() else round(step, 3)
+        # Der Schritt folgt den Dezimalstellen der Doku, nicht der
+        # Registerauflösung: Bei Faktor 2 könnte das Register halbe Grad
+        # speichern, das Bediengerät zeigt aber ganze -- also Schritt 1.
+        # Beim Pelletlager (Faktor 10, eine Dezimale) bleibt es bei 0,1.
+        if self._zeile.dezimalen <= 0:
+            return 1
+        return round(10 ** -self._zeile.dezimalen, self._zeile.dezimalen)
 
     def _handle_coordinator_update(self) -> None:
         # Nur ein frisch gelesenes Register loest die optimistische Anzeige
