@@ -123,6 +123,14 @@ Der E-Abscheider und die Erkennung wertloser Register kommen erst mit
 daran. Dort wählst du auch, ob Register ohne brauchbaren Wert deaktiviert
 (Historie bleibt), entfernt (Historie geht) oder belassen werden.
 
+Das Neu-Einlesen lohnt sich später erneut: Es bewertet jedes Mal frisch.
+Liefert ein vorher wertloses Register inzwischen Werte, etwa ein Zähler, der
+zu zählen begonnen hat, wird seine Entität wieder aktiviert beziehungsweise
+neu angelegt; umgekehrt wird ein neu als wertlos erkanntes Register
+deaktiviert. Was du selbst deaktiviert hast, bleibt unberührt. Zähler gelten
+erst ab 24 Betriebsstunden der Anlage als wertlos, damit eine frisch in
+Betrieb genommene Anlage nicht vorschnell eingestuft wird.
+
 ---
 
 ## ⚙️ Modbus-Adresse / Unit-ID einstellen

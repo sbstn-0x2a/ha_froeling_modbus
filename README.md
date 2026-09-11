@@ -121,6 +121,13 @@ usable value only arrive with **Options → Re-scan the plant**. A notice under
 *Repairs* reminds you. There you also choose whether such registers are
 created disabled (history kept), removed (history lost) or left as they are.
 
+Re-scanning pays off again later: it judges afresh every time. If a
+previously useless register now delivers values, e.g. a counter that has
+started counting, its entity is re-enabled or created again; conversely, a
+register newly found useless is disabled. Entities you disabled yourself are
+left alone. Counters only count as useless after 24 operating hours of the
+plant, so a freshly commissioned plant is not judged prematurely.
+
 ---
 
 ## ⚙️ Modbus Address / Unit ID Settings

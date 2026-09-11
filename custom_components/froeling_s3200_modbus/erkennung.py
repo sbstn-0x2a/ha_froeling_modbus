@@ -36,8 +36,11 @@ UNSICHER = "unsicher"
 
 #: Rohwerte, die bei Faktor 2 einen nicht belegten Fühlereingang bedeuten.
 FEHLERWERTE = {254, -98}
-#: Ab so vielen Betriebsstunden gilt ein Zähler mit 0 als nicht belegt.
-MINDEST_BETRIEBSSTUNDEN = 100
+#: Ab so vielen Betriebsstunden gilt ein Zähler mit 0 als nicht belegt. Ein
+#: Tag reicht: Danach haben Saugturbine, Rüttler und WOS sicher gelaufen.
+#: Zu früh eingestuft ist harmlos, das nächste Einlesen holt den Zähler
+#: zurück, sobald er zählt.
+MINDEST_BETRIEBSSTUNDEN = 24
 #: Fühler- und Pumpenzuordnungen ab dieser Nummer zeigen auf ein
 #: Erweiterungsmodul, das es nicht gibt (Kernmodul: 1-16).
 IO_PLATZHALTER_AB = 17

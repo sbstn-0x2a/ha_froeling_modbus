@@ -50,7 +50,8 @@ Beim Update passiert automatisch:
 Ein späteres Neu-Einlesen wirkt in beide Richtungen: Liefert ein vorher
 wertloses Register inzwischen Werte (ein Zähler hat begonnen zu zählen),
 wird seine Entität wieder aktiviert bzw. bei „gar nicht anlegen“ neu
-angelegt. Vom Nutzer selbst deaktivierte Entitäten bleiben aus.
+angelegt. Vom Nutzer selbst deaktivierte Entitäten bleiben aus. Zähler gelten erst ab 24
+Betriebsstunden als wertlos.
 
 Erst **Optionen → Anlage neu einlesen** bringt den Rest: E-Abscheider als
 Vorschlag, und die Register ohne brauchbaren Wert nach deiner Auswahl
