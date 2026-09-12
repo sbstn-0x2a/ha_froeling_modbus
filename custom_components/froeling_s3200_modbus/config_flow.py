@@ -1,6 +1,7 @@
 """Einrichtung über die Oberfläche.
 
-Drei Schritte: Verbindung prüfen, Anlage einlesen, Anlagenteile bestätigen.
+Vier Schritte: Verbindung prüfen, Anlage einlesen, Anlagenteile bestätigen,
+Kesselfernsteuerung ein- oder ausschalten.
 
 Die Verbindungsprüfung stand zuerst: Ohne sie nimmt der Dialog jede Eingabe
 an, und ein Zahlendreher im Port führt zu einer scheinbar sauber
@@ -233,6 +234,12 @@ def _gruppen_schema(gruppen, vorgabe) -> dict:
     return {vol.Optional(name, default=bool(vorgabe(name))): bool for name in gruppen}
 
 
+def _fernsteuerung_schema(vorgabe: bool) -> vol.Schema:
+    """Ein Haken. Vorgabe aus: Die Fernsteuerung schreibt an die Anlage und
+    uebernimmt alle Heizkreise und Boiler -- das schaltet man bewusst ein."""
+    return vol.Schema({vol.Optional("fernsteuerung", default=bool(vorgabe)): bool})
+
+
 # --------------------------------------------------------------------------
 # Config-Flow
 # --------------------------------------------------------------------------
@@ -246,6 +253,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._befund: erkennung.Befund | None = None
         self._gewaehlt: dict[str, bool] = {}
         self._tote = TOTE_DEAKTIVIERT
+        self._fernsteuerung = False
 
     async def async_step_user(self, user_input=None):
         errors: dict[str, str] = {}
@@ -289,7 +297,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             uebrige = [g for g in GRUPPEN if g not in sichtbar]
             if user_input.get("weitere") and uebrige:
                 return await self.async_step_weitere()
-            return self._anlegen()
+            return await self.async_step_fernsteuerung()
 
         schema = {**_gruppen_schema(sichtbar, lambda g: _vorbelegung(self._befund, g))}
         if self._befund is not None and self._befund.tot:
@@ -308,11 +316,25 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         uebrige = [g for g in GRUPPEN if g not in self._gewaehlt]
         if user_input is not None:
             self._gewaehlt.update({g: bool(user_input.get(g, False)) for g in uebrige})
-            return self._anlegen()
+            return await self.async_step_fernsteuerung()
         return self.async_show_form(
             step_id="weitere",
             data_schema=vol.Schema(_gruppen_schema(uebrige, lambda g: False)),
             description_placeholders={"belege": belege_text(self._befund, uebrige)},
+        )
+
+    async def async_step_fernsteuerung(self, user_input=None):
+        """Kesselfernsteuerung ein- oder ausschalten -- letzter Schritt.
+
+        Eigener Schritt mit Erklaerung, weil die Fernsteuerung anders wirkt
+        als ein Anlagenteil: Sie schreibt an die Anlage und uebernimmt bei
+        Regelung "Home Assistant" die Sollwerte aller Heizkreise und Boiler.
+        """
+        if user_input is not None:
+            self._fernsteuerung = bool(user_input.get("fernsteuerung", False))
+            return self._anlegen()
+        return self.async_show_form(
+            step_id="fernsteuerung", data_schema=_fernsteuerung_schema(False)
         )
 
     def _anlegen(self):
@@ -321,6 +343,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             **{g: self._gewaehlt.get(g, False) for g in GRUPPEN},
             "erkannt": erkannt_als_dict(self._befund),
             "tote": self._tote,
+            "fernsteuerung": self._fernsteuerung,
         }
         return self.async_create_entry(title=self._verbindung["name"], data=data)
 
@@ -335,7 +358,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 # --------------------------------------------------------------------------
 
 class FroelingOptionsFlow(config_entries.OptionsFlow):
-    """Nachträgliche Konfiguration: Verbindung, Anlagenteile, neu einlesen."""
+    """Nachträgliche Konfiguration: Verbindung, Anlagenteile, Fernsteuerung, neu einlesen."""
 
     def __init__(self) -> None:
         self._befund: erkennung.Befund | None = None
@@ -346,7 +369,21 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         return self.async_show_menu(
-            step_id="init", menu_options=["verbindung", "anlagenteile", "neu_einlesen"]
+            step_id="init", menu_options=["verbindung", "anlagenteile", "fernsteuerung", "neu_einlesen"]
+        )
+
+    async def async_step_fernsteuerung(self, user_input=None):
+        """Kesselfernsteuerung ein- oder ausschalten. Speichern laedt neu;
+        ausschalten entfernt die Fernsteuer-Entitaeten samt Historie."""
+        if user_input is not None:
+            return self.async_create_entry(
+                title="",
+                data={**self.config_entry.options,
+                      "fernsteuerung": bool(user_input.get("fernsteuerung", False))},
+            )
+        return self.async_show_form(
+            step_id="fernsteuerung",
+            data_schema=_fernsteuerung_schema(self._cfg.get("fernsteuerung", False)),
         )
 
     async def async_step_verbindung(self, user_input=None):

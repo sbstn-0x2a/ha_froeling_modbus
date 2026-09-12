@@ -79,7 +79,14 @@ class FroelingRegisterEntity(FroelingEntity):
     """
 
     def __init__(self, coordinator, data, zeile: Register) -> None:
-        geraet = zeile.altes_geraet or zeile.gruppe or "controller"
+        if zeile.kategorie == "fernsteuerung":
+            # Alle Fernsteuer-Entitaeten am Geraet "Fernsteuerung", nicht am
+            # Heizkreis: Die unique_id bleibt exakt, Home Assistant haengt
+            # einen bestehenden Registry-Eintrag beim naechsten Start selbst
+            # an das neue Geraet.
+            geraet = "fernsteuerung"
+        else:
+            geraet = zeile.altes_geraet or zeile.gruppe or "controller"
         super().__init__(coordinator, data, zeile.entitaetsschluessel, geraet)
         self._zeile = zeile
         self._register = zeile.nummer

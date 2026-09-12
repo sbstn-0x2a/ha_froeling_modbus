@@ -100,11 +100,14 @@ nichts geschrieben.
    erkannte Teile stehen unter „weitere Anlagenteile anzeigen“. Darunter die
    Auswahl, was mit Registern ohne brauchbaren Wert geschieht: deaktiviert
    anlegen (Vorgabe), gar nicht anlegen, normal anlegen.
+6. **Fernsteuerung:** Haken, Vorgabe aus. Eingeschaltet entsteht das Gerät
+   „Fernsteuerung“ mit dem Select „Regelung“ und den Vorgabewerten aller
+   Heizkreise und Boiler, siehe Abschnitt Kesselfernsteuerung.
 
 Später über **Optionen**: Verbindung und Intervall ändern, Anlagenteile ein-
-und ausblenden, oder die Anlage neu einlesen. Abwählen eines Anlagenteils
-entfernt seine Entitäten samt Historie; das Neu-Einlesen schlägt deshalb nie
-von selbst ein Abwählen vor.
+und ausblenden, Fernsteuerung ein- oder ausschalten, oder die Anlage neu
+einlesen. Abwählen eines Anlagenteils entfernt seine Entitäten samt
+Historie; das Neu-Einlesen schlägt deshalb nie von selbst ein Abwählen vor.
 
 ---
 
@@ -181,29 +184,141 @@ Diese Optionen befinden sich ebenfalls im Menü:
 ## 🔁 Kesselfernsteuerung (Register 48001–48046)
 
 Die Anlage kennt neben den normalen Parametern eine **Sollwertvorgabe von
-außen**: Vorlauf-Solltemperatur und Freigabe je Heizkreis sowie die
-Boiler-Solltemperatur (Register 48001–48046). Sie verhält sich anders als
-alles andere in dieser Integration, deshalb sind die zugehörigen Entitäten
-(„Freigabe (Fernsteuerung)“, „Vorlauf-Soll (Fernsteuerung)“, „Solltemperatur
-(Fernsteuerung)“) **standardmäßig deaktiviert**.
+außen** (Doku B1200522 Kap. 2.6): Vorlauf-Solltemperatur und Freigabe je
+Heizkreis, Solltemperatur je Boiler. Seit 0.6.0 setzt die Integration sie
+samt dem nötigen Heartbeat um, als eigener Anlagenteil „Fernsteuerung“,
+Vorgabe aus.
 
-Was am Gerät gemessen wurde (SP Dual Compact, 09.09.2026):
+Sie ist für eine übergeordnete Regelung gedacht: Boilerladung nach Bedarf
+statt nach Uhr, ein Raumthermostat in Home Assistant, das den Vorlauf
+gradgenau vorgibt. Wer nur einen Heizkreis absenken oder die
+Boilertemperatur dauerhaft ändern will, bleibt bei der **Betriebsart** und
+den normalen Parametern; die wirken dauerhaft und ohne Heartbeat.
 
-* **Ein einziger Schreibzugriff** auf eines dieser Register schaltet die
-  Vorgabe **für alle vorhandenen Heizkreise und Boiler gleichzeitig** ein, mit
-  dem aktuellen Inhalt der übrigen Register. Wer nur die Boiler-Solltemperatur
-  schreibt, schaltet damit auch die Heizkreise auf ihre Fernsteuer-Werte.
-* Bleibt danach **mehr als zwei Minuten** jeder weitere Schreibzugriff aus,
-  regelt die Anlage wieder selbst. Die Entität in Home Assistant zeigt den
-  geschriebenen Wert trotzdem weiter an.
-* Ein Schaltwechsel **innerhalb von zehn Minuten** wird von der Anlage
-  verworfen (die Integration meldet das seit dieser Version als Fehler), hält
-  die Vorgabe aber trotzdem für weitere zwei Minuten am Leben.
+### Was die Anlage tut
 
-Für die üblichen Wünsche (Heizkreis absenken, Boiler-Solltemperatur ändern)
-sind die **Betriebsart** und die normalen Parameter das richtige Werkzeug;
-sie wirken dauerhaft. Eine echte Umsetzung der Fernsteuerung mit zyklischem
-Nachschreiben ist als optionale Funktion geplant.
+Am Gerät gemessen (SP Dual Compact, 09.09.2026):
+
+| Verhalten der Anlage | Folge |
+|---|---|
+| Ein einziger Schreibzugriff auf eines der Register schaltet die Vorgabe **für alle vorhandenen Heizkreise und Boiler** ein, wirksam nach einer Sekunde. | Es gibt kein „nur den Boiler“: Die übrigen Register wirken mit ihrem Inhalt mit. |
+| Ohne weiteren Schreibzugriff fällt die Anlage nach **zwei Minuten** in ihre eigene Regelung zurück (gemessen 54 bis 129 s). | Wer die Vorgabe halten will, muss zyklisch schreiben. Die Integration tut das alle 60 s. |
+| Einen **Schaltwechsel** (Freigabe an/aus, Boiler-Soll 0 ↔ größer 0) nimmt die Anlage frühestens **zehn Minuten** nach dem letzten an. Sonst antwortet sie mit 0xFFFF, verwirft den Wert und hält die Vorgabe trotzdem am Leben. | Ein Ausschalten innerhalb der Sperre gibt es nicht. Reine Wertänderungen (56 → 58 °C) gehen jederzeit. |
+| Freigabe 1 mit Soll 0: Heizkurve der Anlage, aber **ohne Außentemperatur-Heizgrenze**. Soll größer 0: direkt die Vorlauf-Solltemperatur. Freigabe 0: Heizkreis aus, Frostschutz und Sicherheitspumpenlauf bleiben. | Mit Soll 0 heizt ein Heizkreis auch im Sommer nach Heizkurve. |
+| Boiler-Soll 0: Ladung aus. Größer 0: Ladung bis zu diesem Wert, Start bei `Boiler-Soll − (Gewünschte Boilertemperatur − Nachladen, wenn Boilertemperatur unter)`. | Ein Boiler-Soll über der aktuellen Boilertemperatur startet eine Ladung, wie das „Extraladen“ der Cloud. |
+| Die Betriebsart (48047 ff.) ist davon unabhängig und dauerhaft. | Das Select „Betriebsart“ bleibt wie bisher. |
+
+### So wird sie benutzt
+
+1. **Einschalten:** Haken „Fernsteuerung“ im gleichnamigen Schritt der
+   Einrichtung oder später unter **Optionen → Fernsteuerung**. Damit
+   entsteht unter dem Regler das Gerät **„Fernsteuerung“**, in dem alles zu
+   diesem Thema liegt: das Select „Regelung“, der Binärsensor „Fernsteuerung
+   aktiv“ und je vorhandenem Heizkreis „Heizkreis 0n Vorlauf-Soll“ und
+   „Heizkreis 0n Freigabe“, je Boiler „Boiler 0n Solltemperatur“. Ohne
+   Einlesen der Anlage zählen nur die angehakten Anlagenteile als
+   vorhanden.
+2. Select **„Regelung“** auf **„Home Assistant“** stellen. Die Integration
+   schreibt sofort einen kompletten Satz und danach alle 60 s. Bei
+   **„Kessel“** (Vorgabe) schreibt sie nichts.
+3. **Vorgabewerte** im Gerät „Fernsteuerung“ setzen. Bei Regelung Home
+   Assistant geht jede Änderung sofort raus, Schaltwechsel nach der
+   Zehn-Minuten-Regel. Bei Regelung Kessel wird sie nur gemerkt und mit dem
+   nächsten Einschalten gesendet.
+4. Der Binärsensor **„Fernsteuerung aktiv“** zeigt, ob die Vorgabe wirkt:
+   an, wenn Regelung Home Assistant ist und der letzte erfolgreiche Satz
+   jünger als zwei Minuten war. Bleibt der Erfolg aus, geht er aus und das
+   Protokoll warnt.
+5. Zurück auf **„Kessel“**: Die Integration hört auf zu schreiben, die Anlage
+   übernimmt nach spätestens zwei Minuten selbst. Es wird nie „Freigabe 0“
+   nachgeschoben.
+
+**Bei Regelung Home Assistant übernimmt Home Assistant die Sollwerte aller
+Heizkreise und Boiler**, nicht nur die, die du gesetzt hast. Für jede
+Instanz ohne Vorgabe geht ein neutraler Wert mit: Heizkreis Freigabe an und
+Soll 0 (Heizkurve ohne Heizgrenze), Boiler der Wert von „Gewünschte
+Boilertemperatur“ (41632). Das Attribut `neutral` an der Entität zeigt, dass
+keine Vorgabe gesetzt ist, `register_wert` den zuletzt von der Anlage
+angenommenen Wert.
+
+**Ausgeschaltet** gibt es keine Fernsteuer-Entitäten, keinen Heartbeat, und
+die Register 48001–48046 werden nicht gelesen. Die Betriebsart der
+Heizkreise bleibt unberührt. Die fünf Entitäten aus 0.4.0/0.5.0 („…
+(Fernsteuerung)“ unter Heizkreis 01/02 und Boiler 01) liegen jetzt im Gerät
+„Fernsteuerung“ mit neuem Namen; `unique_id`, `entity_id` und Historie
+bleiben.
+
+### Auflagen
+
+* **Zehn Minuten** zwischen zwei Schaltwechseln. Bis dahin sendet die
+  Integration den alten Zustand und führt den neuen im Attribut
+  `ausstehend` des Selects; ein trotzdem verworfener Zugriff zählt in
+  `verworfen`.
+* **Zwei Minuten** ohne erfolgreichen Satz, und die Anlage regelt selbst.
+  Home Assistant merkt das am Binärsensor und am Attribut
+  `fenster_ueberschritten`.
+* **Nach einem Neustart** von Home Assistant steht die Regelung immer auf
+  Kessel. Die Vorgabewerte bleiben erhalten; eine Automation muss die
+  Regelung selbst wieder einschalten.
+* **Die Betriebsart bleibt unabhängig.** Ob ein Heizkreis mit Betriebsart
+  „Aus“ und Freigabe 1 läuft, ist am Gerät nicht getestet, ebenso wenig, ob
+  ein Boiler-Soll im Anlagenzustand „Brauchwasser“ den Kessel startet.
+
+### Beispiel: Brauchwasserladung nach Bedarf
+
+Lädt den Boiler auf 65 °C, sobald die Temperatur oben unter 47 °C fällt,
+und gibt die Regelung an den Kessel zurück, wenn 65 °C erreicht sind. Die
+Ladung startet, sobald die Boilertemperatur unter `65 − (Gewünschte
+Boilertemperatur − Nachladen, wenn Boilertemperatur unter)` liegt; bei den
+Werkswerten ist das deutlich über 47 °C.
+
+Die `entity_id`s folgen dem Schema neuer Installationen mit dem Anlagennamen
+`froeling`; neue Fernsteuer-Entitäten heißen
+`number.froeling_fernsteuerung_<schlüssel>`. Die fünf Entitäten aus
+0.4.0/0.5.0 behalten ihre bisherige ID, in einer Bestandsinstallation also
+etwa `number.froeling_boiler01_solltemperatur_modbus` oder, aus 0.3.x,
+`number.boiler_1_solltemperatur_modbus`.
+
+```yaml
+automation:
+  - alias: "Boiler laden, wenn kalt"
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.froeling_boiler01_temperatur_oben
+        below: 47
+    actions:
+      - action: number.set_value
+        target:
+          entity_id: number.froeling_boiler01_solltemperatur_modbus
+        data:
+          value: 65
+      - action: select.select_option
+        target:
+          entity_id: select.froeling_fernsteuerung_regelung
+        data:
+          option: home_assistant
+
+  - alias: "Boiler geladen, Regelung zurück an den Kessel"
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.froeling_boiler01_temperatur_oben
+        above: 64.5
+    conditions:
+      - condition: state
+        entity_id: select.froeling_fernsteuerung_regelung
+        state: home_assistant
+    actions:
+      - action: select.select_option
+        target:
+          entity_id: select.froeling_fernsteuerung_regelung
+        data:
+          option: kessel
+```
+
+Solange die Regelung auf Home Assistant steht, laufen die Heizkreise mit
+ihren Vorgabewerten, ohne gesetzte Vorgabe also nach Heizkurve ohne
+Heizgrenze. Wer das im Sommer nicht will, setzt „Heizkreis 0n Freigabe“
+vorher aus.
 
 ## 📚 Herstellerdokumentation
 

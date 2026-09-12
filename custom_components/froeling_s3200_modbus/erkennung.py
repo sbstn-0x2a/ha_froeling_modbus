@@ -263,7 +263,9 @@ def _tote_register(werte, befund: Befund) -> None:
     zaehler_pruefbar = betriebsstunden > MINDEST_BETRIEBSSTUNDEN
     waermemenge = [_wert(werte, n) for n in (30085, 30086, 30171)]
     for z in TABELLE:
-        if not z.freigegeben or z.plattform is None:
+        if not z.freigegeben or z.plattform is None or z.kategorie == "fernsteuerung":
+            # Fernsteuerregister sind Vorgabewerte, keine Messwerte: Ihr
+            # Inhalt sagt nichts ueber die Anlage (wie in _parametersatz).
             continue
         v = _wert(werte, z.nummer)
         if v is None:

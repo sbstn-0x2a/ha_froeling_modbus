@@ -41,6 +41,13 @@
           "zirkulationspumpe": "Circulation pump",
           "efilter": "Electrostatic precipitator"
         }
+      },
+      "fernsteuerung": {
+        "title": "Boiler remote control",
+        "description": "With the boiler remote control (registers 48001–48046) Home Assistant can take over the setpoints of **all existing heating circuits and DHW tanks**. Switched on, a device \"Remote control\" appears with the select \"Control\" (Boiler controller / Home Assistant), the binary sensor \"Remote control active\" and setpoint entities per heating circuit and DHW tank.\n\nIt only takes effect once \"Control\" is set to **Home Assistant**. Home Assistant then sends all setpoints every minute; without a write the controller falls back to its own regulation after two minutes. A switching change (enable, DHW setpoint 0/above 0) waits up to ten minutes. After a restart the control is always at the boiler. Values you did not set are sent neutral (heating curve without heating limit, desired DHW temperature). A DHW setpoint above the tank temperature starts a charge – the replacement for the cloud's \"extra charge\".\n\nSwitched off, the integration neither reads nor writes these registers.",
+        "data": {
+          "fernsteuerung": "Enable boiler remote control"
+        }
       }
     },
     "error": {
@@ -60,7 +67,8 @@
         "menu_options": {
           "verbindung": "Connection and polling interval",
           "anlagenteile": "Show or hide plant parts",
-          "neu_einlesen": "Re-scan the plant"
+          "neu_einlesen": "Re-scan the plant",
+          "fernsteuerung": "Boiler remote control"
         }
       },
       "verbindung": {
@@ -100,6 +108,13 @@
           "zirkulationspumpe": "Circulation pump",
           "efilter": "Electrostatic precipitator",
           "tote": "Registers without a usable value"
+        }
+      },
+      "fernsteuerung": {
+        "title": "Boiler remote control",
+        "description": "With the boiler remote control (registers 48001–48046) Home Assistant can take over the setpoints of **all existing heating circuits and DHW tanks**. Switched on, a device \"Remote control\" appears with the select \"Control\" (Boiler controller / Home Assistant), the binary sensor \"Remote control active\" and setpoint entities per heating circuit and DHW tank.\n\nIt only takes effect once \"Control\" is set to **Home Assistant**. Home Assistant then sends all setpoints every minute; without a write the controller falls back to its own regulation after two minutes. A switching change (enable, DHW setpoint 0/above 0) waits up to ten minutes. After a restart the control is always at the boiler. Values you did not set are sent neutral (heating curve without heating limit, desired DHW temperature). A DHW setpoint above the tank temperature starts a charge – the replacement for the cloud's \"extra charge\".\n\nSwitched off, the integration neither reads nor writes these registers.\n\nSaving reloads the integration. Switching off removes the remote-control entities including their history.",
+        "data": {
+          "fernsteuerung": "Enable boiler remote control"
         }
       }
     },
@@ -785,13 +800,13 @@
         "name": "Pellet Storage – Remaining Stock"
       },
       "hk1_vorlauf_soll_modbus": {
-        "name": "Flow setpoint (remote control)"
+        "name": "Heating circuit 01 flow setpoint"
       },
       "hk2_vorlauf_soll_modbus": {
-        "name": "Flow setpoint (remote control)"
+        "name": "Heating circuit 02 flow setpoint"
       },
       "boiler_1_solltemperatur_modbus": {
-        "name": "Setpoint (remote control)"
+        "name": "DHW tank 01 setpoint"
       },
       "puffer_1_delta_t_kessel_vs_grenzschicht": {
         "name": "ΔT Boiler vs. Stratification Layer"
@@ -810,6 +825,75 @@
       },
       "pelletlager_mindestbestand": {
         "name": "Pellet Storage – Minimum Stock"
+      },
+      "hk03_vorlauf_solltemperatur_hk_3": {
+        "name": "Heating circuit 03 flow setpoint"
+      },
+      "hk04_vorlauf_solltemperatur_hk_4": {
+        "name": "Heating circuit 04 flow setpoint"
+      },
+      "hk05_vorlauf_solltemperatur_hk_5": {
+        "name": "Heating circuit 05 flow setpoint"
+      },
+      "hk06_vorlauf_solltemperatur_hk_6": {
+        "name": "Heating circuit 06 flow setpoint"
+      },
+      "hk07_vorlauf_solltemperatur_hk_7": {
+        "name": "Heating circuit 07 flow setpoint"
+      },
+      "hk08_vorlauf_solltemperatur_hk_8": {
+        "name": "Heating circuit 08 flow setpoint"
+      },
+      "hk09_vorlauf_solltemperatur_hk_9": {
+        "name": "Heating circuit 09 flow setpoint"
+      },
+      "hk10_vorlauf_solltemperatur_hk_10": {
+        "name": "Heating circuit 10 flow setpoint"
+      },
+      "hk11_vorlauf_solltemperatur_hk_11": {
+        "name": "Heating circuit 11 flow setpoint"
+      },
+      "hk12_vorlauf_solltemperatur_hk_12": {
+        "name": "Heating circuit 12 flow setpoint"
+      },
+      "hk13_vorlauf_solltemperatur_hk_13": {
+        "name": "Heating circuit 13 flow setpoint"
+      },
+      "hk14_vorlauf_solltemperatur_hk_14": {
+        "name": "Heating circuit 14 flow setpoint"
+      },
+      "hk15_vorlauf_solltemperatur_hk_15": {
+        "name": "Heating circuit 15 flow setpoint"
+      },
+      "hk16_vorlauf_solltemperatur_hk_16": {
+        "name": "Heating circuit 16 flow setpoint"
+      },
+      "hk17_vorlauf_solltemperatur_hk_17": {
+        "name": "Heating circuit 17 flow setpoint"
+      },
+      "hk18_vorlauf_solltemperatur_hk_18": {
+        "name": "Heating circuit 18 flow setpoint"
+      },
+      "boiler02_boiler_solltemperatur_boiler_2": {
+        "name": "DHW tank 02 setpoint"
+      },
+      "boiler03_boiler_solltemperatur_boiler_3": {
+        "name": "DHW tank 03 setpoint"
+      },
+      "boiler04_boiler_solltemperatur_boiler_4": {
+        "name": "DHW tank 04 setpoint"
+      },
+      "boiler05_boiler_solltemperatur_boiler_5": {
+        "name": "DHW tank 05 setpoint"
+      },
+      "boiler06_boiler_solltemperatur_boiler_6": {
+        "name": "DHW tank 06 setpoint"
+      },
+      "boiler07_boiler_solltemperatur_boiler_7": {
+        "name": "DHW tank 07 setpoint"
+      },
+      "boiler08_boiler_solltemperatur_boiler_8": {
+        "name": "DHW tank 08 setpoint"
       }
     },
     "binary_sensor": {
@@ -902,6 +986,9 @@
       },
       "puffer01_heizkreispumpe_0_nach_puffer_oben_freigeben": {
         "name": "Release heating circuit pump 0 after buffer top"
+      },
+      "fernsteuerung_aktiv": {
+        "name": "Remote control active"
       }
     },
     "select": {
@@ -933,6 +1020,13 @@
           "softwood": "Log wood, dry (< 15 % moisture)",
           "hardwood": "Log wood, moist (> 15 % moisture)"
         }
+      },
+      "fernsteuerung_regelung": {
+        "name": "Control",
+        "state": {
+          "kessel": "Boiler controller",
+          "home_assistant": "Home Assistant"
+        }
       }
     },
     "switch": {
@@ -943,10 +1037,58 @@
         "name": "Automatic Log Ignition"
       },
       "hk1_freigabe": {
-        "name": "Enable (remote control)"
+        "name": "Heating circuit 01 enable"
       },
       "hk2_freigabe": {
-        "name": "Enable (remote control)"
+        "name": "Heating circuit 02 enable"
+      },
+      "hk03_freigabe_hk_3": {
+        "name": "Heating circuit 03 enable"
+      },
+      "hk04_freigabe_hk_4": {
+        "name": "Heating circuit 04 enable"
+      },
+      "hk05_freigabe_hk_5": {
+        "name": "Heating circuit 05 enable"
+      },
+      "hk06_freigabe_hk_6": {
+        "name": "Heating circuit 06 enable"
+      },
+      "hk07_freigabe_hk_7": {
+        "name": "Heating circuit 07 enable"
+      },
+      "hk08_freigabe_hk_8": {
+        "name": "Heating circuit 08 enable"
+      },
+      "hk09_freigabe_hk_9": {
+        "name": "Heating circuit 09 enable"
+      },
+      "hk10_freigabe_hk_10": {
+        "name": "Heating circuit 10 enable"
+      },
+      "hk11_freigabe_hk_11": {
+        "name": "Heating circuit 11 enable"
+      },
+      "hk12_freigabe_hk_12": {
+        "name": "Heating circuit 12 enable"
+      },
+      "hk13_freigabe_hk_13": {
+        "name": "Heating circuit 13 enable"
+      },
+      "hk14_freigabe_hk_14": {
+        "name": "Heating circuit 14 enable"
+      },
+      "hk15_freigabe_hk_15": {
+        "name": "Heating circuit 15 enable"
+      },
+      "hk16_freigabe_hk_16": {
+        "name": "Heating circuit 16 enable"
+      },
+      "hk17_freigabe_hk_17": {
+        "name": "Heating circuit 17 enable"
+      },
+      "hk18_freigabe_hk_18": {
+        "name": "Heating circuit 18 enable"
       }
     },
     "time": {

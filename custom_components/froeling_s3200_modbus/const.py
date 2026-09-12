@@ -22,15 +22,18 @@ MIN_INTERVALL = 15
 STANDARD_INTERVALL = 30
 MAX_INTERVALL = 3600
 
-#: Attribut der Entitaeten auf den Fernsteuerregistern 48001-48046. Sie sind
-#: standardmaessig deaktiviert; wer sie einschaltet, soll wissen, was sie tun.
-#: Verhalten laut B1200522 Kap. 2.6, am Geraet am 09.09.2026 bestaetigt.
+#: Attribut der Vorgabe-Entitaeten auf den Fernsteuerregistern 48001-48046.
+#: Sie schreiben seit 0.6.0 nichts mehr selbst: Die Werte sind Vorgaben fuer
+#: den Heartbeat in fernsteuerung.py und wirken nur, solange die Auswahl
+#: "Regelung" auf "Home Assistant" steht. Verhalten der Anlage laut B1200522
+#: Kap. 2.6, am Geraet am 09.09.2026 bestaetigt.
 FERNSTEUERUNG_HINWEIS = (
-    "Kesselfernsteuerung: Jeder Schreibzugriff auf ein Register 48001-48046 "
-    "schaltet die Sollwertvorgabe für alle Heizkreise und Boiler ein. Ohne "
-    "weiteren Schreibzugriff fällt die Anlage nach zwei Minuten in ihre "
-    "eigene Regelung zurück; der hier gezeigte Wert bleibt trotzdem stehen. "
-    "Ein Wechsel innerhalb von zehn Minuten wird verworfen."
+    "Kesselfernsteuerung: Vorgabewert, nur wirksam bei Regelung „Home "
+    "Assistant“. Dann sendet Home Assistant alle Register 48001-48046 der "
+    "vorhandenen Heizkreise und Boiler jede Minute; ohne Schreibzugriff fällt "
+    "die Anlage nach zwei Minuten in ihre eigene Regelung zurück. Ein "
+    "Schaltwechsel (Freigabe, Boiler-Soll 0/>0) innerhalb von zehn Minuten "
+    "wird von der Anlage verworfen und wartet bis zum Ablauf der Sperre."
 )
 
 _LOGGER = logging.getLogger(__name__)

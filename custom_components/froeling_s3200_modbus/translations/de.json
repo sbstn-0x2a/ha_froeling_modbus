@@ -41,6 +41,13 @@
           "zirkulationspumpe": "Zirkulationspumpe",
           "efilter": "E-Abscheider"
         }
+      },
+      "fernsteuerung": {
+        "title": "Kesselfernsteuerung",
+        "description": "Mit der Kesselfernsteuerung (Register 48001–48046) kann Home Assistant die Sollwerte **aller vorhandenen Heizkreise und Boiler** übernehmen. Eingeschaltet entstehen dafür ein Gerät „Fernsteuerung“ mit der Auswahl „Regelung“ (Kessel / Home Assistant), dem Binärsensor „Fernsteuerung aktiv“ und je Heizkreis und Boiler Vorgabe-Entitäten.\n\nWirksam wird das erst, wenn „Regelung“ auf **Home Assistant** steht. Dann sendet Home Assistant jede Minute alle Sollwerte; ohne Schreibzugriff fällt die Anlage nach zwei Minuten in ihre eigene Regelung zurück. Ein Schaltwechsel (Freigabe, Boiler-Soll 0/größer 0) wartet bis zu zehn Minuten. Nach einem Neustart steht die Regelung immer auf Kessel. Nicht gesetzte Werte gehen neutral mit (Heizkurve ohne Heizgrenze, gewünschte Boilertemperatur). Ein Boiler-Soll über der Boilertemperatur startet eine Ladung – der Ersatz für das „Extraladen“ der Cloud.\n\nAusgeschaltet liest und schreibt die Integration diese Register nicht.",
+        "data": {
+          "fernsteuerung": "Kesselfernsteuerung einschalten"
+        }
       }
     },
     "error": {
@@ -60,7 +67,8 @@
         "menu_options": {
           "verbindung": "Verbindung und Abfrageintervall",
           "anlagenteile": "Anlagenteile ein- und ausblenden",
-          "neu_einlesen": "Anlage neu einlesen"
+          "neu_einlesen": "Anlage neu einlesen",
+          "fernsteuerung": "Kesselfernsteuerung"
         }
       },
       "verbindung": {
@@ -100,6 +108,13 @@
           "zirkulationspumpe": "Zirkulationspumpe",
           "efilter": "E-Abscheider",
           "tote": "Register ohne brauchbaren Wert"
+        }
+      },
+      "fernsteuerung": {
+        "title": "Kesselfernsteuerung",
+        "description": "Mit der Kesselfernsteuerung (Register 48001–48046) kann Home Assistant die Sollwerte **aller vorhandenen Heizkreise und Boiler** übernehmen. Eingeschaltet entstehen dafür ein Gerät „Fernsteuerung“ mit der Auswahl „Regelung“ (Kessel / Home Assistant), dem Binärsensor „Fernsteuerung aktiv“ und je Heizkreis und Boiler Vorgabe-Entitäten.\n\nWirksam wird das erst, wenn „Regelung“ auf **Home Assistant** steht. Dann sendet Home Assistant jede Minute alle Sollwerte; ohne Schreibzugriff fällt die Anlage nach zwei Minuten in ihre eigene Regelung zurück. Ein Schaltwechsel (Freigabe, Boiler-Soll 0/größer 0) wartet bis zu zehn Minuten. Nach einem Neustart steht die Regelung immer auf Kessel. Nicht gesetzte Werte gehen neutral mit (Heizkurve ohne Heizgrenze, gewünschte Boilertemperatur). Ein Boiler-Soll über der Boilertemperatur startet eine Ladung – der Ersatz für das „Extraladen“ der Cloud.\n\nAusgeschaltet liest und schreibt die Integration diese Register nicht.\n\nSpeichern lädt die Integration neu. Ausschalten entfernt die Fernsteuer-Entitäten samt Historie.",
+        "data": {
+          "fernsteuerung": "Kesselfernsteuerung einschalten"
         }
       }
     },
@@ -785,13 +800,13 @@
         "name": "Pelletlager – Restbestand"
       },
       "hk1_vorlauf_soll_modbus": {
-        "name": "Vorlauf-Soll (Fernsteuerung)"
+        "name": "Heizkreis 01 Vorlauf-Soll"
       },
       "hk2_vorlauf_soll_modbus": {
-        "name": "Vorlauf-Soll (Fernsteuerung)"
+        "name": "Heizkreis 02 Vorlauf-Soll"
       },
       "boiler_1_solltemperatur_modbus": {
-        "name": "Solltemperatur (Fernsteuerung)"
+        "name": "Boiler 01 Solltemperatur"
       },
       "puffer_1_delta_t_kessel_vs_grenzschicht": {
         "name": "ΔT Kessel/Grenzschicht"
@@ -810,6 +825,75 @@
       },
       "pelletlager_mindestbestand": {
         "name": "Pelletlager Mindestbestand"
+      },
+      "hk03_vorlauf_solltemperatur_hk_3": {
+        "name": "Heizkreis 03 Vorlauf-Soll"
+      },
+      "hk04_vorlauf_solltemperatur_hk_4": {
+        "name": "Heizkreis 04 Vorlauf-Soll"
+      },
+      "hk05_vorlauf_solltemperatur_hk_5": {
+        "name": "Heizkreis 05 Vorlauf-Soll"
+      },
+      "hk06_vorlauf_solltemperatur_hk_6": {
+        "name": "Heizkreis 06 Vorlauf-Soll"
+      },
+      "hk07_vorlauf_solltemperatur_hk_7": {
+        "name": "Heizkreis 07 Vorlauf-Soll"
+      },
+      "hk08_vorlauf_solltemperatur_hk_8": {
+        "name": "Heizkreis 08 Vorlauf-Soll"
+      },
+      "hk09_vorlauf_solltemperatur_hk_9": {
+        "name": "Heizkreis 09 Vorlauf-Soll"
+      },
+      "hk10_vorlauf_solltemperatur_hk_10": {
+        "name": "Heizkreis 10 Vorlauf-Soll"
+      },
+      "hk11_vorlauf_solltemperatur_hk_11": {
+        "name": "Heizkreis 11 Vorlauf-Soll"
+      },
+      "hk12_vorlauf_solltemperatur_hk_12": {
+        "name": "Heizkreis 12 Vorlauf-Soll"
+      },
+      "hk13_vorlauf_solltemperatur_hk_13": {
+        "name": "Heizkreis 13 Vorlauf-Soll"
+      },
+      "hk14_vorlauf_solltemperatur_hk_14": {
+        "name": "Heizkreis 14 Vorlauf-Soll"
+      },
+      "hk15_vorlauf_solltemperatur_hk_15": {
+        "name": "Heizkreis 15 Vorlauf-Soll"
+      },
+      "hk16_vorlauf_solltemperatur_hk_16": {
+        "name": "Heizkreis 16 Vorlauf-Soll"
+      },
+      "hk17_vorlauf_solltemperatur_hk_17": {
+        "name": "Heizkreis 17 Vorlauf-Soll"
+      },
+      "hk18_vorlauf_solltemperatur_hk_18": {
+        "name": "Heizkreis 18 Vorlauf-Soll"
+      },
+      "boiler02_boiler_solltemperatur_boiler_2": {
+        "name": "Boiler 02 Solltemperatur"
+      },
+      "boiler03_boiler_solltemperatur_boiler_3": {
+        "name": "Boiler 03 Solltemperatur"
+      },
+      "boiler04_boiler_solltemperatur_boiler_4": {
+        "name": "Boiler 04 Solltemperatur"
+      },
+      "boiler05_boiler_solltemperatur_boiler_5": {
+        "name": "Boiler 05 Solltemperatur"
+      },
+      "boiler06_boiler_solltemperatur_boiler_6": {
+        "name": "Boiler 06 Solltemperatur"
+      },
+      "boiler07_boiler_solltemperatur_boiler_7": {
+        "name": "Boiler 07 Solltemperatur"
+      },
+      "boiler08_boiler_solltemperatur_boiler_8": {
+        "name": "Boiler 08 Solltemperatur"
       }
     },
     "binary_sensor": {
@@ -902,6 +986,9 @@
       },
       "puffer01_heizkreispumpe_0_nach_puffer_oben_freigeben": {
         "name": "Heizkreispumpe 0 nach Puffer Oben freigeben"
+      },
+      "fernsteuerung_aktiv": {
+        "name": "Fernsteuerung aktiv"
       }
     },
     "select": {
@@ -933,6 +1020,13 @@
           "softwood": "Scheitholz trocken (< 15 % Wassergehalt)",
           "hardwood": "Scheitholz feucht (> 15 % Wassergehalt)"
         }
+      },
+      "fernsteuerung_regelung": {
+        "name": "Regelung",
+        "state": {
+          "kessel": "Kessel",
+          "home_assistant": "Home Assistant"
+        }
       }
     },
     "switch": {
@@ -943,10 +1037,58 @@
         "name": "Automatische Scheitholzzündung"
       },
       "hk1_freigabe": {
-        "name": "Freigabe (Fernsteuerung)"
+        "name": "Heizkreis 01 Freigabe"
       },
       "hk2_freigabe": {
-        "name": "Freigabe (Fernsteuerung)"
+        "name": "Heizkreis 02 Freigabe"
+      },
+      "hk03_freigabe_hk_3": {
+        "name": "Heizkreis 03 Freigabe"
+      },
+      "hk04_freigabe_hk_4": {
+        "name": "Heizkreis 04 Freigabe"
+      },
+      "hk05_freigabe_hk_5": {
+        "name": "Heizkreis 05 Freigabe"
+      },
+      "hk06_freigabe_hk_6": {
+        "name": "Heizkreis 06 Freigabe"
+      },
+      "hk07_freigabe_hk_7": {
+        "name": "Heizkreis 07 Freigabe"
+      },
+      "hk08_freigabe_hk_8": {
+        "name": "Heizkreis 08 Freigabe"
+      },
+      "hk09_freigabe_hk_9": {
+        "name": "Heizkreis 09 Freigabe"
+      },
+      "hk10_freigabe_hk_10": {
+        "name": "Heizkreis 10 Freigabe"
+      },
+      "hk11_freigabe_hk_11": {
+        "name": "Heizkreis 11 Freigabe"
+      },
+      "hk12_freigabe_hk_12": {
+        "name": "Heizkreis 12 Freigabe"
+      },
+      "hk13_freigabe_hk_13": {
+        "name": "Heizkreis 13 Freigabe"
+      },
+      "hk14_freigabe_hk_14": {
+        "name": "Heizkreis 14 Freigabe"
+      },
+      "hk15_freigabe_hk_15": {
+        "name": "Heizkreis 15 Freigabe"
+      },
+      "hk16_freigabe_hk_16": {
+        "name": "Heizkreis 16 Freigabe"
+      },
+      "hk17_freigabe_hk_17": {
+        "name": "Heizkreis 17 Freigabe"
+      },
+      "hk18_freigabe_hk_18": {
+        "name": "Heizkreis 18 Freigabe"
       }
     },
     "time": {

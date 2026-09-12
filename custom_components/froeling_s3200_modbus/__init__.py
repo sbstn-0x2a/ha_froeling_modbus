@@ -13,7 +13,15 @@ from homeassistant.helpers import issue_registry as ir
 from .const import STANDARD_INTERVALL, eindeutige_kennung
 from .coordinator import FroelingCoordinator, FroelingRuntimeData
 from .device import device_info_for
-from .entitaeten import TOTE_DEAKTIVIERT, tote_register, tote_umgang, zeilen_fuer, zeilen_zum_lesen
+from .entitaeten import (
+    TOTE_DEAKTIVIERT,
+    fernsteuerung_aktiv,
+    tote_register,
+    tote_umgang,
+    zeilen_fuer,
+    zeilen_zum_lesen,
+)
+from .fernsteuerung import Fernsteuerung, satz_zeilen
 from .registertabelle import TABELLE
 
 for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.framer", "pymodbus.logging"):
@@ -58,6 +66,13 @@ def _verwaiste_entfernen(hass: HomeAssistant, entry: ConfigEntry, data: dict) ->
     """
     erwartet = {f"{data['name']}_{z.entitaetsschluessel}" for z in zeilen_fuer(data)}
     erwartet.add(f"{data['name']}_meldungen")
+    if fernsteuerung_aktiv(data) and satz_zeilen(data):
+        # Die beiden Entitaeten der Kesselfernsteuerung haben keine Zeile in
+        # der Registertabelle; sie entstehen, sobald es einen Satz gibt. Ist
+        # die Fernsteuerung aus, verschwinden sie und die Vorgabe-Entitaeten
+        # hier -- gewollt, wie ein abgewaehltes Anlagenteil.
+        erwartet.add(f"{data['name']}_fernsteuerung_regelung")
+        erwartet.add(f"{data['name']}_fernsteuerung_aktiv")
     ent_reg = er.async_get(hass)
     weg = [e for e in ent_reg.entities.values()
            if e.config_entry_id == entry.entry_id and e.unique_id not in erwartet]
@@ -93,7 +108,9 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
     for zeile in zeilen_fuer(data):
         eintrag = vorhanden.get(f"{data['name']}_{zeile.entitaetsschluessel}")
         if eintrag is None or zeile.kategorie == "fernsteuerung":
-            continue   # Fernsteuerregister sind aus eigenem Grund deaktiviert
+            # Fernsteuerregister sind Vorgabewerte in HA, keine Messwerte der
+            # Anlage -- ein Befund "wertlos" sagt ueber sie nichts aus.
+            continue
         if zeile.nummer in tot and eintrag.disabled_by is None:
             ent_reg.async_update_entity(
                 eintrag.entity_id, disabled_by=er.RegistryEntryDisabler.INTEGRATION
@@ -178,7 +195,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     coordinator.regler_id = regler.id
 
-    entry.runtime_data = FroelingRuntimeData(coordinator, data)
+    # Kesselfernsteuerung, nur wenn eingeschaltet: haelt die Vorgaben und den
+    # Heartbeat. Beim Entladen endet der Timer -- danach schreibt nichts mehr,
+    # und die Anlage regelt nach zwei Minuten wieder selbst (B1200522
+    # Kap. 2.6, gemessen 09.09.2026). Abgemeldet wird sie in
+    # async_unload_entry als Erstes -- nicht ueber entry.async_on_unload, das
+    # erst nach dem Schliessen des Clients laeuft.
+    fernsteuerung = Fernsteuerung(hass, coordinator, data) if fernsteuerung_aktiv(data) else None
+
+    entry.runtime_data = FroelingRuntimeData(coordinator, data, fernsteuerung)
 
     # Bestandsinstallationen wurden nie eingelesen: Hinweis in "Reparaturen",
     # der in den Options-Flow fuehrt. Es wird nichts automatisch abgewaehlt.
@@ -214,11 +239,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload the config entry and close the client."""
+    laufzeit: FroelingRuntimeData | None = getattr(entry, "runtime_data", None)
+    # Zuerst den Heartbeat der Fernsteuerung beenden. Liefe er weiter, bis
+    # entry.async_on_unload dran ist, laege das *nach* async_schliessen():
+    # Ein Timer in diesem Fenster oeffnete den Socket neu und schriebe die
+    # Vorgabe noch einmal -- zwei Minuten Fernsteuerung nach dem Entladen.
+    if laufzeit is not None and laufzeit.fernsteuerung is not None:
+        laufzeit.fernsteuerung.abmelden()
+
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if not unload_ok:
         return False
 
-    laufzeit: FroelingRuntimeData | None = getattr(entry, "runtime_data", None)
     if laufzeit is not None:
         try:
             await laufzeit.coordinator.async_schliessen()

@@ -87,8 +87,9 @@ Recorded history and long-term statistics are kept until the recorder purges the
    - Modbus UnitID (2)
 4. The controller is read once completely (a few seconds).
 5. **Confirm plant parts:** the boxes are pre-filled from the scan, each with its evidence (e.g. "Heating circuit 02: 30.5 °C, mode Automatic"). Parts that were not detected are under "show further parts". Below that you choose what happens to registers without a usable value: create disabled (default), do not create, create normally.
+6. **Remote control:** a checkbox, off by default. Switched on, it creates the device "Remote control" with the select "Control" and the setpoints of all heating circuits and DHW tanks, see the section on boiler remote control.
 
-Later via **Options**: change connection and interval, show or hide plant parts, or re-scan the plant. Deselecting a part removes its entities together with their history; a re-scan therefore never proposes deselecting by itself.
+Later via **Options**: change connection and interval, show or hide plant parts, switch remote control on or off, or re-scan the plant. Deselecting a part removes its entities together with their history; a re-scan therefore never proposes deselecting by itself.
 
 ---
 
@@ -135,15 +136,85 @@ These options are also located in:
 
 ## 🔁 Boiler remote control (registers 48001–48046)
 
-Besides the ordinary parameters the controller offers an **external setpointmode**: flow setpoint and enable flag per heating circuit plus the DHW setpoint (registers 48001–48046). It behaves unlike anything else in this integration, so the related entities ("Enable (remote control)", "Flow setpoint (remote control)", "Setpoint (remote control)") are **disabled by default**.
+Besides the ordinary parameters the controller offers an **external setpoint mode** (manual B1200522 chapter 2.6): flow setpoint and enable flag per heating circuit, setpoint per DHW tank. Since 0.6.0 the integration implements it, including the heartbeat it requires, as a separate plant part "Remote control", off by default.
+
+It is meant for a supervisory controller: DHW charging on demand instead of by schedule, or a room thermostat in Home Assistant that sets the flow temperature to the degree. If you only want to set back a circuit or change the DHW temperature permanently, stay with the **operating mode** and the ordinary parameters; they act permanently and need no heartbeat.
+
+### What the controller does
 
 Measured on the device (SP Dual Compact, 2026-09-09):
 
-* **A single write** to any of these registers activates the external setpoints **for all heating circuits and DHW tanks at once**, using whatever the other registers currently hold. Writing only the DHW setpoint also puts the heating circuits onto their remote values.
-* If **more than two minutes** pass without another write, the controller falls back to its own regulation. The entity in Home Assistant keeps showing the written value anyway.
-* Toggling again **within ten minutes** is rejected by the controller (the integration now reports that as an error) but still keeps the external mode alive for another two minutes.
+| Controller behaviour | Consequence |
+|---|---|
+| A single write to any of these registers activates the external setpoints **for all existing heating circuits and DHW tanks**, effective after one second. | There is no "DHW only": the other registers take effect with whatever they hold. |
+| Without another write the controller falls back to its own regulation after **two minutes** (measured 54 to 129 s). | Keeping the setpoints alive means writing cyclically. The integration does so every 60 s. |
+| A **switching change** (enable on/off, DHW setpoint 0 ↔ above 0) is accepted at the earliest **ten minutes** after the previous one. Otherwise the controller answers 0xFFFF, discards the value and still keeps the external mode alive. | There is no switching off within the lock. Plain value changes (56 → 58 °C) are accepted at any time. |
+| Enable 1 with setpoint 0: the controller's heating curve, but **without the outdoor temperature heating limit**. Setpoint above 0: used directly as flow setpoint. Enable 0: circuit off, frost protection and safety pump run remain. | With setpoint 0 a circuit heats by its curve even in summer. |
+| DHW setpoint 0: charging off. Above 0: charging up to this value, starting at `setpoint − (Desired temperature − Recharge when temperature below)`. | A DHW setpoint above the current tank temperature starts a charge, like the cloud's "extra charge". |
+| The operating mode (48047 ff.) is independent of all this and permanent. | The "Operating mode" select stays as it is. |
 
-For everyday needs (setback a circuit, change the DHW setpoint) the **operating mode** and the ordinary parameters are the right tools; they act permanently. A proper implementation with cyclic rewriting is planned as an optional feature.
+### How to use it
+
+1. **Switch it on:** tick "Remote control" in the step of the same name during setup, or later under **Options → Remote control**. This creates the device **"Remote control"** below the controller, which holds everything on this topic: the select "Control", the binary sensor "Remote control active" and, per existing heating circuit, "Heating circuit 0n flow setpoint" and "Heating circuit 0n enable", per DHW tank "DHW 0n setpoint". Without a scan of the plant only the ticked plant parts count as existing.
+2. Set the select **"Control"** to **"Home Assistant"**. The integration writes a complete set immediately and then every 60 s. At **"Boiler controller"** (default) it writes nothing.
+3. Set the **setpoint entities** in the device "Remote control". With control at Home Assistant every change is sent immediately, switching changes subject to the ten-minute rule. With control at the boiler it is only stored and sent when you switch on.
+4. The binary sensor **"Remote control active"** shows whether the setpoints are in effect: on when control is at Home Assistant and the last successful set is younger than two minutes. If success stays away it turns off and the log warns.
+5. Back to **"Boiler controller"**: the integration stops writing and the controller takes over within two minutes. "Enable 0" is never pushed afterwards.
+
+**With control at Home Assistant, Home Assistant takes over the setpoints of all heating circuits and DHW tanks**, not only the ones you set. Every instance without a setpoint gets a neutral value: heating circuit enable on and setpoint 0 (heating curve without heating limit), DHW tank the value of "Desired temperature" (41632). The attribute `neutral` on the entity shows that no setpoint is set, `register_wert` the value the controller last accepted.
+
+**Switched off** there are no remote control entities, no heartbeat, and registers 48001–48046 are not read. The operating mode of the heating circuits is untouched. The five entities from 0.4.0/0.5.0 ("… (remote control)" under heating circuit 01/02 and DHW 01) now live in the device "Remote control" under new names; `unique_id`, `entity_id` and history remain.
+
+### Constraints
+
+* **Ten minutes** between two switching changes. Until then the integration keeps sending the old state and lists the new one in the select's attribute `ausstehend`; a write that is discarded anyway counts in `verworfen`.
+* **Two minutes** without a successful set and the controller regulates on its own. Home Assistant notices this on the binary sensor and on the attribute `fenster_ueberschritten`.
+* **After a restart** of Home Assistant the control is always at the boiler. The setpoints are kept; an automation has to switch control back on itself.
+* **The operating mode stays independent.** Whether a circuit with operating mode "Off" and enable 1 runs has not been tested on the device, nor whether a DHW setpoint starts the boiler in system state "domestic hot water".
+
+### Example: DHW charging on demand
+
+Charges the tank to 65 °C as soon as the top temperature drops below 47 °C and hands control back to the boiler once 65 °C is reached. Charging starts as soon as the tank temperature is below `65 − (Desired temperature − Recharge when temperature below)`; with factory values that is well above 47 °C.
+
+The `entity_id`s follow the scheme of new installations with the plant name `froeling`; new remote control entities are named `number.froeling_fernsteuerung_<key>`. The five entities from 0.4.0/0.5.0 keep their previous ID, in an existing installation for example `number.froeling_boiler01_solltemperatur_modbus` or, from 0.3.x, `number.boiler_1_solltemperatur_modbus`.
+
+```yaml
+automation:
+  - alias: "Charge DHW when cold"
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.froeling_boiler01_temperatur_oben
+        below: 47
+    actions:
+      - action: number.set_value
+        target:
+          entity_id: number.froeling_boiler01_solltemperatur_modbus
+        data:
+          value: 65
+      - action: select.select_option
+        target:
+          entity_id: select.froeling_fernsteuerung_regelung
+        data:
+          option: home_assistant
+
+  - alias: "DHW charged, control back to the boiler"
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.froeling_boiler01_temperatur_oben
+        above: 64.5
+    conditions:
+      - condition: state
+        entity_id: select.froeling_fernsteuerung_regelung
+        state: home_assistant
+    actions:
+      - action: select.select_option
+        target:
+          entity_id: select.froeling_fernsteuerung_regelung
+        data:
+          option: kessel
+```
+
+As long as control is at Home Assistant the heating circuits run with their setpoint entities, i.e. without a setpoint by heating curve without heating limit. If you do not want that in summer, switch "Heating circuit 0n enable" off beforehand.
 
 ## 🌐 Translations
 

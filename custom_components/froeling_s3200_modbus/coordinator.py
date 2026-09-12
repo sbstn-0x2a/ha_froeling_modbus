@@ -26,9 +26,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -55,7 +56,15 @@ from .registers import (
     bloecke_fuer,
 )
 
+if TYPE_CHECKING:
+    from .fernsteuerung import Fernsteuerung
+
 _LOGGER = logging.getLogger(__name__)
+
+#: Pause zwischen den FC06 eines Fernsteuersatzes. Das Waveshare-Gateway
+#: vertraegt keine dicht aufeinander folgenden Anfragen ohne Luft; 50 ms
+#: kosten bei fuenf Registern eine Viertelsekunde je Heartbeat.
+SATZ_ABSTAND_S = 0.05
 
 #: So oft darf ein Block hintereinander ausfallen, bevor seine Werte
 #: verworfen werden und die betroffenen Entitäten "unknown" melden.
@@ -84,6 +93,9 @@ class FroelingRuntimeData:
 
     coordinator: "FroelingCoordinator"
     konfiguration: dict[str, Any]
+    #: Kesselfernsteuerung dieses Entry (Vorgaben, Heartbeat). Optional, damit
+    #: aeltere Aufrufer und Tests den Coordinator weiter ohne sie bauen koennen.
+    fernsteuerung: "Fernsteuerung | None" = None
 
 
 class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
@@ -279,3 +291,44 @@ class FroelingCoordinator(DataUpdateCoordinator[dict[int, int]]):
             return err
         await self.async_request_refresh()
         return None
+
+    async def schreibe_satz(self, paare) -> dict[int, str | None]:
+        """Schreibt mehrere Holding-Register nacheinander (je FC=06) in
+        **einem** Executor-Job unter der Sperre -- fuer den Fernsteuersatz.
+
+        Warum nicht ``schreibe`` je Register: Der erste Schreibzugriff auf
+        48001-48046 aktiviert die Sollwertvorgabe der Anlage mit dem *alten*
+        Inhalt aller uebrigen Register. Laege zwischen zwei Registern ein
+        Leseblock oder ein anderer Schreibvorgang, regelte die Anlage solange
+        mit einem halben Satz. FC16 (mehrere Register auf einmal) kann die
+        Anlage nicht -- Exception 0x90/02, am Geraet 09.09.2026 gemessen.
+
+        Rueckgabe: Register -> Fehlertext oder None (``VERWORFEN`` steht fuer
+        das Echo 0xFFFF). Nach "connect" werden die uebrigen Register nicht
+        mehr versucht: Jeder liefe in denselben Timeout. Ein einziger
+        ``async_request_refresh`` am Ende, nicht einer je Register -- sonst
+        kaeme zu jedem Heartbeat ein zusaetzlicher Vollabruf.
+        """
+        paare = list(paare)
+
+        def _burst(client, unit_id):
+            ergebnis: dict[int, str | None] = {}
+            verbindung_weg = False
+            for i, (register, rohwert) in enumerate(paare):
+                if verbindung_weg:
+                    ergebnis[register] = "connect"
+                    continue
+                if i:
+                    time.sleep(SATZ_ABSTAND_S)
+                _, err = write_register_sync(client, unit_id, register - HOLDING_BASE, rohwert)
+                ergebnis[register] = err
+                verbindung_weg = err == "connect"
+            return ergebnis
+
+        ergebnis = await self._modbus(_burst)
+        fehler = {r: e for r, e in ergebnis.items() if e and e != VERWORFEN}
+        if fehler:
+            _LOGGER.debug("Fernsteuersatz: %d von %d Registern nicht geschrieben: %s",
+                          len(fehler), len(paare), fehler)
+        await self.async_request_refresh()
+        return ergebnis

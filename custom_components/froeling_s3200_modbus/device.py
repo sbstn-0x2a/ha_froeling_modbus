@@ -25,6 +25,11 @@ DEVICE_NAME = {
     "austragung": "Austragung",
     "zirkulationspumpe": "Zirkulationspumpe",
     "efilter": "E-Abscheider",
+    # Kein Anlagenteil, sondern die Kesselfernsteuerung (48001-48046): Select
+    # "Regelung", Binaersensor und die Vorgabe-Entitaeten aller Instanzen
+    # haengen hier, nicht an den Heizkreisen -- sie gehoeren zusammen und
+    # wirken nur gemeinsam. Bewusst nicht in GRUPPEN.
+    "fernsteuerung": "Fernsteuerung",
 }
 
 #: Baureihe. Steht im Modellfeld aller Geraete, auch der Untergeraete -- sie
@@ -107,6 +112,10 @@ _GRUPPENPRAEFIX = {
     "austragung": (r"^austragung_",),
     "zirkulationspumpe": (r"^zirkulationspumpe_",),
     "efilter": (r"^efilter_",),
+    # Nur das eigene Praefix faellt weg (fernsteuerung_regelung -> regelung).
+    # Heizkreis oder Boiler im Schluessel (hk1_, boiler_1_) bleiben, weil das
+    # Geraet "Fernsteuerung" sie nicht mehr nennt.
+    "fernsteuerung": (r"^fernsteuerung_",),
 }
 
 

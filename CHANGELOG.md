@@ -1,5 +1,113 @@
 # Changelog
 
+## 0.6.0 – unveröffentlicht
+
+### ⚠️ Was sich sichtbar ändert
+
+**Die Kesselfernsteuerung (Register 48001–48046) ist jetzt umgesetzt**, mit
+dem Heartbeat, den die Anlage dafür verlangt. Sie wird bei der Einrichtung
+in einem eigenen Schritt **„Fernsteuerung“** abgefragt: ein Haken, Vorgabe
+aus, auch für bestehende Installationen. Später lässt sie sich über
+**Optionen → Fernsteuerung** ein- oder ausschalten.
+
+**Eingeschaltet entsteht ein eigenes Gerät „Fernsteuerung“** unter dem
+Regler, in dem alles zu diesem Thema liegt: das Select **„Regelung“**
+(Kessel / Home Assistant), der Binärsensor **„Fernsteuerung aktiv“**, je
+vorhandenem Heizkreis „Heizkreis 0n Vorlauf-Soll“ und „Heizkreis 0n
+Freigabe“, je Boiler „Boiler 0n Solltemperatur“. Die fünf bisherigen
+Fernsteuer-Entitäten („… (Fernsteuerung)“ unter Heizkreis 01/02 und
+Boiler 01) wandern in dieses Gerät und bekommen die neuen Namen;
+`unique_id`, `entity_id` und Historie bleiben. Neue Instanzen bekommen
+`entity_id`s nach dem Schema `number.<anlage>_fernsteuerung_<schlüssel>`.
+
+**Ausgeschaltet gibt es keine Fernsteuer-Entitäten**, auch die fünf alten
+nicht, keinen Heartbeat, und die Register 48001–48046 werden nicht gelesen.
+Die Betriebsart der Heizkreise bleibt davon unberührt.
+
+Das Select „Regelung“ entscheidet, wer die Sollwerte der Heizkreise und
+Boiler bestimmt. Bei **Kessel** (Vorgabe) schreibt die Integration nichts an
+diese Register. Bei **Home Assistant** schreibt sie sofort und danach alle
+60 s einen kompletten Satz: Boiler-Solltemperatur, Vorlauf-Soll und
+Freigabe für **alle** vorhandenen Heizkreise und Boiler. Die Entitäten im
+Gerät „Fernsteuerung“ sind **Vorgabewerte** für diesen Satz. Sie schreiben
+nicht selbst: Bei Regelung Home Assistant geht eine Änderung sofort raus,
+bei Regelung Kessel wird sie nur gemerkt. Ohne Einlesen der Anlage zählen
+nur die angehakten Anlagenteile als vorhanden.
+
+Was die Anlage dabei tut (am Gerät gemessen 09.09.2026, Doku B1200522
+Kap. 2.6):
+
+* Der erste Schreibzugriff schaltet die Sollwertvorgabe global ein, wirksam
+  nach einer Sekunde. Ohne weiteren Schreibzugriff fällt die Anlage nach
+  **zwei Minuten** in ihre eigene Regelung zurück; der Heartbeat hält sie am
+  Leben.
+* Einen **Schaltwechsel** (Freigabe an/aus, Boiler-Soll 0 ↔ größer 0) nimmt
+  die Anlage frühestens **zehn Minuten** nach dem letzten an. Die Integration
+  sendet bis dahin den alten Zustand weiter und führt den neuen im Attribut
+  `ausstehend`. Reine Wertänderungen (56 → 58 °C) gehen jederzeit.
+* Zurück auf Kessel heißt: aufhören zu schreiben. Die Anlage übernimmt nach
+  spätestens zwei Minuten wieder selbst. Ein „Freigabe 0“ wird nie
+  nachgeschoben, weil auch ein verworfener Schreibzugriff die Vorgabe
+  verlängert.
+* Nach einem **Neustart** von Home Assistant steht die Regelung immer auf
+  Kessel; die Vorgabewerte bleiben erhalten. War vorher Home Assistant
+  Regelung, steht ein Hinweis im Protokoll.
+
+**Nicht gesetzte Vorgaben bekommen neutrale Werte.** Heizkreis: Freigabe an
+und Soll 0, das ist die Heizkurve der Anlage, aber **ohne
+Außentemperatur-Heizgrenze**. Boiler: der Wert von „Gewünschte
+Boilertemperatur“ (41632). Wer bei Regelung Home Assistant nur den Boiler
+führen will, muss wissen, dass die Heizkreise dann auch im Sommer nach
+Heizkurve laufen.
+
+**Boiler-Soll als Ersatz für das „Extraladen“ der Cloud.** Ein Boiler-Soll
+über der aktuellen Boilertemperatur startet eine Ladung. Laut Doku beginnt
+sie bei `Boiler-Soll − (Gewünschte Boilertemperatur − Nachladen, wenn
+Boilertemperatur unter)` und endet beim Boiler-Soll; 0 schaltet die Ladung
+aus. Beispielautomation im README.
+
+### Update von 0.5.0
+
+* Nach dem Update ist die Fernsteuerung **aus**. Die fünf bisher
+  deaktivierten Fernsteuer-Entitäten verschwinden aus der Registry; alles
+  andere bleibt.
+* Einschalten über **Optionen → Fernsteuerung**. Dann entsteht das Gerät
+  „Fernsteuerung“ mit dem Select „Regelung“, dem Binärsensor und den
+  Vorgabe-Entitäten aller vorhandenen Heizkreise und Boiler. Die fünf
+  bisherigen Entitäten kommen mit ihrer `unique_id` und ihrer bisherigen
+  `entity_id` zurück: Home Assistant merkt sich gelöschte Registry-Einträge
+  und stellt sie wieder her, in der Testinstanz samt gesetzter Vorgabe geprüft.
+* Solange die Regelung auf Kessel steht, schreibt die Integration nichts;
+  erst Regelung Home Assistant startet den Heartbeat.
+
+### Neu
+
+* Schritt **„Fernsteuerung“** in der Einrichtung und in den Optionen.
+* Gerät **„Fernsteuerung“** unter dem Regler mit dem Select **„Regelung“**
+  (`kessel` / `home_assistant`; Attribute `letzter_erfolg`,
+  `letzter_fehler`, `ausstehend`, `verworfen`, `fenster_ueberschritten` und
+  `register` mit den Registern des gesendeten Satzes) und dem Binärsensor
+  **„Fernsteuerung aktiv“**: an, wenn Home Assistant Regelung ist und der
+  letzte erfolgreiche Satz jünger als zwei Minuten. Bleibt der Erfolg zwei
+  Minuten aus, geht er aus und das Protokoll warnt einmal.
+* Vorgabe-Entitäten für **jeden** vorhandenen Heizkreis und Boiler, nicht
+  mehr nur Heizkreis 01/02 und Boiler 01. Sie tragen `register_wert` (der
+  zuletzt von der Anlage angenommene Wert) und `neutral` (keine Vorgabe
+  gesetzt); der `hinweis` sagt, dass sie nur bei Regelung Home Assistant
+  wirken.
+* Ein Satz geht als geschlossene Folge einzelner FC06-Schreibzugriffe raus
+  (FC16 kennt die Anlage nicht, Exception 0x90/02), Reihenfolge Boiler-Soll,
+  HK-Soll, HK-Freigabe, mit einem Refresh am Ende statt einem je Register.
+* Ein von der Anlage verworfener Schaltwechsel (Echo 0xFFFF) zählt in
+  `verworfen` und wird beim nächsten Heartbeat erneut versucht.
+
+### Bekannte Lücken
+
+* **Gerätetests stehen aus:** ob ein Boiler-Soll (48019) im Anlagenzustand
+  „Brauchwasser“ den Kessel tatsächlich startet, die Rangfolge von
+  Betriebsart (48047 ff.) und Freigabe (Betriebsart „Aus“ mit Freigabe 1),
+  und ob die Fernsteuerregister einen Neustart der Anlage überstehen.
+
 ## 0.5.0 – 2026-09-11
 
 ### ⚠️ Was sich sichtbar ändert
