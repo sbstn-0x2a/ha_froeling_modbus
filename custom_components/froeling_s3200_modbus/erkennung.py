@@ -281,11 +281,50 @@ def _tote_register(werte, befund: Befund) -> None:
             befund.tot[z.nummer] = f"Zähler steht bei 0 nach {betriebsstunden} h"
         elif zaehler_pruefbar and z.nummer in (30085, 30086, 30171) and all(x == 0 for x in waermemenge):
             befund.tot[z.nummer] = "kein Wärmemengenzähler"
+    _gekoppelte_register(werte, befund, betriebsstunden if zaehler_pruefbar else None)
     # Tote Register nicht vorhandener Instanzen sind kein eigener Befund.
     nicht_da = {k for k, v in befund.instanzen.items() if v.zustand == NICHT_VORHANDEN}
     for z in TABELLE:
         if z.instanzkennung in nicht_da:
             befund.tot.pop(z.nummer, None)
+
+
+#: Register, die nur mit einem WOS-Antrieb einen Sinn haben: Zeitfenster
+#: (40129/40130), Laufzeit (40061), Intervall (40233), Zustand (30131) und
+#: Rueckmeldung (30078).
+WOS_REGISTER = (40129, 40130, 40061, 40233, 30131, 30078)
+#: Register der Boilerpumpe: Ansteuerung (31633), Nachlauf (41600),
+#: Min-/Maxdrehzahl (41641/41646), Puffer/Boiler-Differenz (41634).
+BOILERPUMPEN_REGISTER = (31633, 41600, 41641, 41646, 41634)
+
+
+def _gekoppelte_register(werte, befund: Befund, betriebsstunden: int | None) -> None:
+    """R7 (Nutzerentscheid 12.09.2026): Register, die an einem Merkmal haengen.
+
+    WOS: Der Betriebsstundenzaehler 30045 zaehlt nur die Laufzeit des Ausgangs
+    "WOS-Antrieb"; ein Handhebel zaehlt nichts. Steht er nach mehr als 24
+    Betriebsstunden auf 0, gibt es keinen Antrieb, und Zeitfenster, Laufzeit,
+    Intervall, Zustand und Rueckmeldung sind wertlos. Bewusst NICHT 40444
+    ("WOS mit eigenem Antrieb vorhanden"): Die Anlage des Nutzers hat einen
+    Antrieb (Zaehler 5 -> 15 h ueber die Saison 2025/26), 40444 steht trotzdem
+    auf 0.
+
+    Boilerpumpe: Bei einem Hygienespeicher (42030 = JA, Mutter-Kind-Speicher)
+    ist "Boiler 01" die Trinkwasserzone im Puffer, es gibt keinen Pumpenkreis.
+    Merkmal ist 42030 zusammen mit einer Ansteuerung 31633 von 0 % beim Scan.
+    Min-/Maxdrehzahl taugen nicht als Merkmal (30/100 sind Werksvorgaben),
+    sie werden nur mit weggelassen. Laeuft die Pumpe doch, zeigt 31633 beim
+    Neu-Einlesen einen Wert ueber 0, und die Entitaeten kommen zurueck.
+    """
+    freigegeben = {z.nummer for z in TABELLE if z.freigegeben and z.plattform}
+    if betriebsstunden is not None and _wert(werte, 30045) == 0:
+        for nummer in WOS_REGISTER:
+            if nummer in freigegeben and nummer in werte:
+                befund.tot[nummer] = f"kein WOS-Antrieb (Betriebsstunden WOS 0 nach {betriebsstunden} h)"
+    if _wert(werte, 42030) == 1 and _wert(werte, 31633) == 0:
+        for nummer in BOILERPUMPEN_REGISTER:
+            if nummer in freigegeben and nummer in werte:
+                befund.tot[nummer] = "Hygienespeicher, keine Boilerpumpe (42030)"
 
 
 def auswerten(werte: dict[int, int], fehlende_bloecke: list[str] | None = None) -> Befund:

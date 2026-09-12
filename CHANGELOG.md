@@ -82,6 +82,17 @@ aus. Beispielautomation im README.
 
 ### Neu
 
+* **Zwei neue Erkennungsregeln.** Bei einem Hygienespeicher (Parameter
+  „Wird ein Hygiene Speicher verwendet“ = JA) und einer Boilerpumpen-Ansteuerung
+  von 0 % gelten die fünf Boilerpumpen-Register (Ansteuerung, Nachlauf,
+  Min-/Maxdrehzahl, Puffer/Boiler-Differenz) als wertlos: Der „Boiler“ ist
+  dann die Trinkwasserzone im Puffer, eine Pumpe gibt es nicht. Steht der
+  Betriebsstundenzähler WOS nach 24 Betriebsstunden auf 0, gelten Zeitfenster,
+  Laufzeit, Intervall, Zustand und Rückmeldung des WOS als wertlos (kein
+  automatischer Antrieb). Beides wirkt erst nach „Anlage neu einlesen“ und
+  folgt der dort gewählten Behandlung; läuft die Pumpe oder der Antrieb doch,
+  bringt das nächste Einlesen die Entitäten zurück.
+
 * Schritt **„Fernsteuerung“** in der Einrichtung und in den Optionen.
 * Gerät **„Fernsteuerung“** unter dem Regler mit dem Select **„Regelung“**
   (`kessel` / `home_assistant`; Attribute `letzter_erfolg`,
