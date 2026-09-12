@@ -89,7 +89,7 @@ Recorded history and long-term statistics are kept until the recorder purges the
 5. **Confirm plant parts:** the boxes are pre-filled from the scan, each with its evidence (e.g. "Heating circuit 02: 30.5 °C, mode Automatic"). Parts that were not detected are under "show further parts". Below that you choose what happens to registers without a usable value: create disabled (default), do not create, create normally.
 6. **Remote control:** a checkbox, off by default. Switched on, it creates the device "Remote control" with the select "Control" and the setpoints of all heating circuits and DHW tanks, see the section on boiler remote control.
 
-Later via **Options**: change connection and interval, show or hide plant parts, switch remote control on or off, or re-scan the plant. Deselecting a part removes its entities together with their history; a re-scan therefore never proposes deselecting by itself.
+Later via **Options**: change connection and interval, show or hide plant parts, switch remote control on or off, align entity IDs with the scheme, or re-scan the plant. Deselecting a part removes its entities together with their history; a re-scan therefore never proposes deselecting by itself.
 
 ---
 

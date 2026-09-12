@@ -68,7 +68,8 @@
           "verbindung": "Verbindung und Abfrageintervall",
           "anlagenteile": "Anlagenteile ein- und ausblenden",
           "neu_einlesen": "Anlage neu einlesen",
-          "fernsteuerung": "Kesselfernsteuerung"
+          "fernsteuerung": "Kesselfernsteuerung",
+          "entitaets_ids": "Entitäts-IDs an das Schema angleichen"
         }
       },
       "verbindung": {
@@ -116,11 +117,23 @@
         "data": {
           "fernsteuerung": "Kesselfernsteuerung einschalten"
         }
+      },
+      "entitaets_ids": {
+        "title": "Entitäts-IDs angleichen",
+        "description": "{anzahl} Entität(en) weichen vom Schema „Anlage, Gerät, Größe“ ab:\n\n{liste}\n\nBeim Umbenennen ziehen Historie und Langzeitstatistik automatisch mit. Automationen, Skripte, Dashboards und Vorlagen müssen von Hand nachgezogen werden.",
+        "data": {
+          "bestaetigen": "Ja, jetzt umbenennen"
+        }
       }
     },
     "error": {
       "invalid_unit_id": "Das Gerät antwortet, weist die Anfrage aber ab. Vermutlich stimmt die Unit-ID nicht.",
       "cannot_connect": "Keine Verbindung. Bitte Host und Port prüfen."
+    },
+    "abort": {
+      "umbenannt": "{anzahl} Entität(en) umbenannt. Übersprungen (Ziel bereits belegt):\n\n{uebersprungen}",
+      "nichts_umzubenennen": "Alle Entitäts-IDs entsprechen bereits dem Schema.",
+      "abgebrochen": "Nichts umbenannt."
     }
   },
   "entity": {

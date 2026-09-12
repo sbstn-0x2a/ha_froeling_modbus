@@ -82,6 +82,13 @@ aus. Beispielautomation im README.
 
 ### Neu
 
+* **Optionen → „Entitäts-IDs an das Schema angleichen“.** Zeigt alle
+  Entitäten, deren ID vom Schema „Anlage, Gerät, Größe“ abweicht (etwa der
+  Bestand aus 0.3.x), als Liste alt → neu und benennt sie nach Bestätigung
+  über die Registry um. Historie und Langzeitstatistik ziehen mit;
+  Automationen, Skripte, Dashboards und Vorlagen sind Handarbeit. Belegte
+  Ziel-IDs werden übersprungen und genannt.
+
 * **Zwei neue Erkennungsregeln.** Bei einem Hygienespeicher (Parameter
   „Wird ein Hygiene Speicher verwendet“ = JA) und einer Boilerpumpen-Ansteuerung
   von 0 % gelten die fünf Boilerpumpen-Register (Ansteuerung, Nachlauf,

@@ -27,7 +27,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig, SelectSelectorMode
 from pymodbus.client import ModbusTcpClient
 
-from . import erkennung
+from . import erkennung, umbenennung
 from .const import (
     DOMAIN,
     MAX_INTERVALL,
@@ -369,7 +369,7 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         return self.async_show_menu(
-            step_id="init", menu_options=["verbindung", "anlagenteile", "fernsteuerung", "neu_einlesen"]
+            step_id="init", menu_options=["verbindung", "anlagenteile", "fernsteuerung", "neu_einlesen", "entitaets_ids"]
         )
 
     async def async_step_fernsteuerung(self, user_input=None):
@@ -384,6 +384,33 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="fernsteuerung",
             data_schema=_fernsteuerung_schema(self._cfg.get("fernsteuerung", False)),
+        )
+
+    async def async_step_entitaets_ids(self, user_input=None):
+        """Entitäts-IDs an das Schema angleichen (Anlage, Gerät, Größe).
+
+        Zeigt alt → neu, benennt erst nach Bestätigung um. Historie und
+        Statistik ziehen mit, Automationen und Dashboards nicht.
+        """
+        paare = umbenennung.vorschlaege(self.hass, self._cfg)
+        if not paare:
+            return self.async_abort(reason="nichts_umzubenennen")
+        if user_input is not None:
+            if not user_input.get("bestaetigen"):
+                return self.async_abort(reason="abgebrochen")
+            ok, uebersprungen = umbenennung.umbenennen(self.hass, paare)
+            return self.async_abort(
+                reason="umbenannt",
+                description_placeholders={
+                    "anzahl": str(ok),
+                    "uebersprungen": "\n".join(uebersprungen) or "keine",
+                },
+            )
+        liste = "\n".join(f"{alt} → {neu}" for alt, neu in paare)
+        return self.async_show_form(
+            step_id="entitaets_ids",
+            data_schema=vol.Schema({vol.Required("bestaetigen", default=False): bool}),
+            description_placeholders={"anzahl": str(len(paare)), "liste": liste},
         )
 
     async def async_step_verbindung(self, user_input=None):

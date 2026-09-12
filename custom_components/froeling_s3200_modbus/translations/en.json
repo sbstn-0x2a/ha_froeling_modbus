@@ -68,7 +68,8 @@
           "verbindung": "Connection and polling interval",
           "anlagenteile": "Show or hide plant parts",
           "neu_einlesen": "Re-scan the plant",
-          "fernsteuerung": "Boiler remote control"
+          "fernsteuerung": "Boiler remote control",
+          "entitaets_ids": "Align entity IDs with the scheme"
         }
       },
       "verbindung": {
@@ -116,11 +117,23 @@
         "data": {
           "fernsteuerung": "Enable boiler remote control"
         }
+      },
+      "entitaets_ids": {
+        "title": "Align entity IDs",
+        "description": "{anzahl} entity/entities differ from the scheme 'plant, device, quantity':\n\n{liste}\n\nHistory and long-term statistics follow the rename automatically. Automations, scripts, dashboards and templates have to be updated by hand.",
+        "data": {
+          "bestaetigen": "Yes, rename now"
+        }
       }
     },
     "error": {
       "invalid_unit_id": "The device answers but rejects the request. The unit ID is probably wrong.",
       "cannot_connect": "No connection. Please check host and port."
+    },
+    "abort": {
+      "umbenannt": "{anzahl} entity/entities renamed. Skipped (target already taken):\n\n{uebersprungen}",
+      "nichts_umzubenennen": "All entity IDs already follow the scheme.",
+      "abgebrochen": "Nothing renamed."
     }
   },
   "entity": {
