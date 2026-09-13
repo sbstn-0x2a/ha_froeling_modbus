@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.3 – 2026-09-13
+
+### Behoben
+
+* Die Kesselzustände 89 „Abstellen Warten (SH)“ und 90 „Abreinigen (SH)“ aus dem
+  Scheitholzbetrieb fehlten seit 0.5.0 wieder: Sie stehen nicht in der
+  Fröling-Doku (die endet bei 82), waren aber seit 0.3.5 in der Integration und
+  gingen beim Umbau auf die generierte Registertabelle verloren. Der Sensor
+  hätte im Winter „Unknown (89)“ gezeigt.
+
 ## 0.6.2 – 2026-09-13
 
 ### Behoben

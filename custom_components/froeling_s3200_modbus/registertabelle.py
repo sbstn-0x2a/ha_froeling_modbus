@@ -2307,6 +2307,10 @@ WERTELISTEN: dict[str, dict[int, str]] = {
         65: "Selbsttest aktiv", 66: "Fehlerbeh. 20min", 67: "FEHLER: Fallschacht", 68: "STÖRUNG: Fallschacht", 69: "Reinigen möglich", 70: "Heizen - Reinigen",
         71: "SH Anheizen", 72: "SH Heizen", 73: "SH Heiz/Abstell", 74: "STÖRUNG sicher", 75: "AGR Nachlauf", 76: "AGR reinigen", 77: "Zündung AUS", 78: "Filter reinigen",
         79: "Anheizassistent", 80: "SH Zünden", 81: "SH Störung", 82: "Sensorcheck",
+        # Nicht in B1200522 (endet bei 82), aber an der SP Dual compact im
+        # Scheitholzbetrieb gemessen und seit 0.3.5 in der Integration; beim
+        # Generator-Umbau in 0.5.0 verloren gegangen, 13.09.2026 zurueckgeholt.
+        89: "Abstellen Warten (SH)", 90: "Abreinigen (SH)",
     },
 }
 
