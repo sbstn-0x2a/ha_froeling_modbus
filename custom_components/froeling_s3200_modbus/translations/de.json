@@ -121,7 +121,7 @@
           "anlagenteile": "Anlagenteile ein- und ausblenden",
           "neu_einlesen": "Anlage neu einlesen",
           "fernsteuerung": "Kesselfernsteuerung",
-          "entitaeten_entfernen": "Einzelne Entitäten entfernen",
+          "entitaeten_entfernen": "Einzelne Entitäten hinzufügen oder entfernen",
           "entitaets_ids": "Entitäts-IDs an das Schema angleichen"
         }
       },
@@ -224,7 +224,7 @@
         }
       },
       "entitaeten_entfernen": {
-        "title": "Entitäten entfernen",
+        "title": "Einzelne Entitäten hinzufügen oder entfernen",
         "description": "Ausgewählte Entitäten werden entfernt und nicht mehr gelesen; ihre Historie geht verloren. Abwählen bringt sie beim nächsten Speichern zurück, mit der alten Entitäts-ID. Zur Auswahl stehen die Entitäten der angehakten Anlagenteile, auch die als wertlos eingestuften. Derzeit entfernt: {anzahl}.\n\nDas zweite Feld ist das Gegenstück: Register, die das Einlesen als wertlos eingestuft hat, werden trotzdem angelegt, gelesen und nicht deaktiviert. Die Auswahl steht in den Optionen und überlebt jedes Neu-Einlesen. Derzeit behalten: {anzahl_behalten}.\n\nSpeichern lädt die Integration neu.",
         "data": {
           "ausgeschlossen": "Entfernte Entitäten",

@@ -121,7 +121,7 @@
           "anlagenteile": "Show or hide plant parts",
           "neu_einlesen": "Re-scan the plant",
           "fernsteuerung": "Boiler remote control",
-          "entitaeten_entfernen": "Remove individual entities",
+          "entitaeten_entfernen": "Add or remove individual entities",
           "entitaets_ids": "Align entity IDs with the scheme"
         }
       },
@@ -224,7 +224,7 @@
         }
       },
       "entitaeten_entfernen": {
-        "title": "Remove entities",
+        "title": "Add or remove individual entities",
         "description": "Selected entities are removed and no longer read; their history is lost. Deselecting brings them back on the next save, with their old entity ID. Offered are the entities of the ticked plant parts, including those judged useless. Currently removed: {anzahl}.\n\nThe second field is the counterpart: registers the scan judged useless are created, read and not disabled anyway. The selection lives in the options and survives every re-scan. Currently kept: {anzahl_behalten}.\n\nSaving reloads the integration.",
         "data": {
           "ausgeschlossen": "Removed entities",
