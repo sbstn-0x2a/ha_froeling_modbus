@@ -36,7 +36,8 @@ DEFAULT_LABELS = {
     },
     # Laut Bedienungsanleitung B1460922 (SP 3200): 0 = Scheitholz trocken
     # (Wassergehalt < 15 %), 1 = Scheitholz feucht. Am Geraet gegengeprueft:
-    # Register 0, Display "Scheitholz trocken". Die Schluessel bleiben, damit
+    # Register 0, Display "Scheitholz trocken"; die Kundenebene bietet am
+    # Display genau diese zwei Optionen (Nutzer, 13.09.2026). Die Schluessel bleiben, damit
     # bestehende Automationen weiterlaufen.
     "fuel": {
         "softwood": "Scheitholz trocken",
