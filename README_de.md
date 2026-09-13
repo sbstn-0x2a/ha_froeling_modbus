@@ -257,6 +257,8 @@ bleiben.
 
 ### Auflagen
 
+* Solange Home Assistant regelt, zeigt die **Betriebsart** der Heizkreise „Fernsteuerung“ (Registerwert 9, nicht dokumentiert, am 13.09.2026 gemessen). Sie ist in dieser Zeit nicht wählbar; zwei Minuten nach dem letzten Satz steht wieder die eigentliche Betriebsart.
+
 * **Zehn Minuten** zwischen zwei Schaltwechseln. Bis dahin sendet die
   Integration den alten Zustand und führt den neuen im Attribut
   `ausstehend` des Selects; ein trotzdem verworfener Zugriff zählt in

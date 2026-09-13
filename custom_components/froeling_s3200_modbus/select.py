@@ -22,7 +22,13 @@ PARALLEL_UPDATES = 1
 # Die Übersetzungsschlüssel je Werteliste. Die Anzeigetexte stehen in
 # translations/*.json unter entity.select.<entity>.state.<key>; die
 # deutschen Texte der Doku dienen als Rückfall.
-HK_MODE_CODE_TO_KEY = {0: "off", 1: "auto", 2: "extra", 3: "eco", 4: "eco_permanent", 5: "party"}
+HK_MODE_CODE_TO_KEY = {0: "off", 1: "auto", 2: "extra", 3: "eco", 4: "eco_permanent", 5: "party", 9: "remote"}
+#: Codes, die die Anlage nur meldet und die nicht waehlbar sind. 9 ist nicht
+#: dokumentiert: Am 13.09.2026 sprang 48048 fuenf Sekunden nach dem ersten
+#: Fernsteuer-Satz von 1 auf 9 und zwei Minuten nach dem letzten Schreibzugriff
+#: zurueck auf 1 -- "Fernsteuerung aktiv". Ob ein Schreiben von 9 etwas tut,
+#: ist ungetestet; deshalb nur Anzeige.
+NUR_ANZEIGE = {9}
 FUEL_CODE_TO_KEY = {0: "softwood", 1: "hardwood"}
 
 DEFAULT_LABELS = {
@@ -33,6 +39,7 @@ DEFAULT_LABELS = {
         "eco": "Absenken",
         "eco_permanent": "Dauerabsenken",
         "party": "Partybetrieb",
+        "remote": "Fernsteuerung",
     },
     # Laut Bedienungsanleitung B1460922 (SP 3200): 0 = Scheitholz trocken
     # (Wassergehalt < 15 %), 1 = Scheitholz feucht. Am Geraet gegengeprueft:
@@ -88,7 +95,7 @@ class RegisterSelect(FroelingRegisterEntity, SelectEntity):
         self._group_key, code_to_key = OPTIONEN[zeile.werteliste]
         self._code_to_key = dict(code_to_key)
         self._key_to_code = {v: k for k, v in code_to_key.items()}
-        self._option_keys = list(self._key_to_code.keys())
+        self._option_keys = [k for k, c in self._key_to_code.items() if c not in NUR_ANZEIGE]
         # Gilt nach einer Auswahl, bis der Coordinator neu gelesen hat.
         self._optimistisch: int | None = None
 
@@ -111,6 +118,11 @@ class RegisterSelect(FroelingRegisterEntity, SelectEntity):
         roh = self._rohwert
         if roh is not None and roh not in self._code_to_key:
             bekannt.append(f"Wert {roh}")
+        elif roh in NUR_ANZEIGE:
+            # Der aktuelle Wert muss in der Optionsliste stehen, sonst lehnt
+            # Home Assistant den Zustand ab -- waehlbar wird er dadurch nur,
+            # wenn er ohnehin gerade anliegt.
+            bekannt.append(self._label_for_key(self._code_to_key[roh]))
         return bekannt
 
     @property

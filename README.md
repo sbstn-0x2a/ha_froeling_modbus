@@ -167,6 +167,8 @@ Measured on the device (SP Dual Compact, 2026-09-09):
 
 ### Constraints
 
+* While Home Assistant is in control, the operating mode of the heating circuits shows 'Remote control' (register value 9, undocumented, measured on 2026-09-13). It cannot be selected during that time; two minutes after the last set the real operating mode is back.
+
 * **Ten minutes** between two switching changes. Until then the integration keeps sending the old state and lists the new one in the select's attribute `ausstehend`; a write that is discarded anyway counts in `verworfen`.
 * **Two minutes** without a successful set and the controller regulates on its own. Home Assistant notices this on the binary sensor and on the attribute `fenster_ueberschritten`.
 * **After a restart** of Home Assistant the control is always at the boiler. The setpoints are kept; an automation has to switch control back on itself.

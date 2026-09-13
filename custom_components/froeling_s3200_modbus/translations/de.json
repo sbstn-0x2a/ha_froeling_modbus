@@ -2245,7 +2245,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "betriebsart_heizkreis_02": {
@@ -2256,7 +2257,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "brennstoffauswahl": {
@@ -2281,7 +2283,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk04_betriebsart_hk_4": {
@@ -2292,7 +2295,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk05_betriebsart_hk_5": {
@@ -2303,7 +2307,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk06_betriebsart_hk_6": {
@@ -2314,7 +2319,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk07_betriebsart_hk_7": {
@@ -2325,7 +2331,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk08_betriebsart_hk_8": {
@@ -2336,7 +2343,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk09_betriebsart_hk_9": {
@@ -2347,7 +2355,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk10_betriebsart_hk_10": {
@@ -2358,7 +2367,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk11_betriebsart_hk_11": {
@@ -2369,7 +2379,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk12_betriebsart_hk_12": {
@@ -2380,7 +2391,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk13_betriebsart_hk_13": {
@@ -2391,7 +2403,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk14_betriebsart_hk_14": {
@@ -2402,7 +2415,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk15_betriebsart_hk_15": {
@@ -2413,7 +2427,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk16_betriebsart_hk_16": {
@@ -2424,7 +2439,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk17_betriebsart_hk_17": {
@@ -2435,7 +2451,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       },
       "hk18_betriebsart_hk_18": {
@@ -2446,7 +2463,8 @@
           "extra": "Extraheizen",
           "eco": "Absenken",
           "eco_permanent": "Dauerabsenken",
-          "party": "Partybetrieb"
+          "party": "Partybetrieb",
+          "remote": "Fernsteuerung"
         }
       }
     },

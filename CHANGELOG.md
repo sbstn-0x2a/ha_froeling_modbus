@@ -140,10 +140,13 @@ aus. Beispielautomation im README.
 
 ### Bekannte Lücken
 
-* **Gerätetests stehen aus:** ob ein Boiler-Soll (48019) im Anlagenzustand
-  „Brauchwasser“ den Kessel tatsächlich startet, die Rangfolge von
-  Betriebsart (48047 ff.) und Freigabe (Betriebsart „Aus“ mit Freigabe 1),
-  und ob die Fernsteuerregister einen Neustart der Anlage überstehen.
+* **Am Gerät geprüft (13.09.2026):** Ein Boiler-Soll über 48019 startet den
+  Kessel auch im Anlagenzustand „Brauchwasser“, sobald Boiler oben unter der
+  Startschwelle `Soll − (Gewünscht − Nachladen ab)` liegt, und die Ladung endet
+  genau am Sollwert. Werte über 65 °C lehnt die Anlage ab. Solange Home
+  Assistant regelt, zeigt die Betriebsart der Heizkreise „Fernsteuerung“
+  (Registerwert 9). Offen bleiben die Rangfolge Betriebsart gegen Freigabe und
+  das Verhalten der Fernsteuerregister nach einem Anlagenneustart.
 
 ## 0.5.0 – 2026-09-11
 
