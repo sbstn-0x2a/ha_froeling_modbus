@@ -121,6 +121,7 @@
           "anlagenteile": "Show or hide plant parts",
           "neu_einlesen": "Re-scan the plant",
           "fernsteuerung": "Boiler remote control",
+          "entitaeten_entfernen": "Remove individual entities",
           "entitaets_ids": "Align entity IDs with the scheme"
         }
       },
@@ -220,6 +221,13 @@
         "description": "With the boiler remote control (registers 48001–48046) Home Assistant can take over the setpoints of **all existing heating circuits and DHW tanks**. Switched on, a device \"Remote control\" appears with the select \"Control\" (Boiler controller / Home Assistant), the binary sensor \"Remote control active\" and setpoint entities per heating circuit and DHW tank.\n\nIt only takes effect once \"Control\" is set to **Home Assistant**. Home Assistant then sends all setpoints every minute; without a write the controller falls back to its own regulation after two minutes. A switching change (enable, DHW setpoint 0/above 0) waits up to ten minutes. After a restart the control is always at the boiler. Values you did not set are sent neutral (heating curve without heating limit, desired DHW temperature). A DHW setpoint above the tank temperature starts a charge – the replacement for the cloud's \"extra charge\".\n\nSwitched off, the integration neither reads nor writes these registers.\n\nSaving reloads the integration. Switching off removes the remote-control entities including their history.",
         "data": {
           "fernsteuerung": "Enable boiler remote control"
+        }
+      },
+      "entitaeten_entfernen": {
+        "title": "Remove entities",
+        "description": "Selected entities are removed and no longer read; their history is lost. Deselecting brings them back on the next save, with their old entity ID. Offered are the entities of the ticked plant parts, including those judged useless. Currently removed: {anzahl}.\n\nSaving reloads the integration.",
+        "data": {
+          "ausgeschlossen": "Removed entities"
         }
       },
       "entitaets_ids": {

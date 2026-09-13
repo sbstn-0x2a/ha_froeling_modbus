@@ -126,6 +126,11 @@ aus. Beispielautomation im README.
   vorhanden meldet oder sie schon angehakt ist -- eine Anlage mit zwei
   Heizkreisen sieht keine 30 Haken. Gelesen wird eine Instanz nur, wenn sie
   angehakt ist.
+* **Optionen → „Einzelne Entitäten entfernen“.** Eine Auswahlliste über die
+  Entitäten der angehakten Anlagenteile („Gerät · Name (entity_id)“).
+  Ausgewählte werden entfernt und nicht mehr gelesen, Historie geht
+  verloren; Abwählen bringt sie mit der alten Entitäts-ID zurück. Die
+  Fernsteuer-Entitäten und der Meldungssensor stehen nicht zur Wahl.
 
 ### Bekannte Lücken
 

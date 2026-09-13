@@ -43,17 +43,43 @@ def fernsteuerung_aktiv(konfiguration: dict[str, Any]) -> bool:
     return bool(konfiguration.get("fernsteuerung", False))
 
 
-def _zeilen_der_gruppen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
-    """Freigegebene Zeilen der gewählten Anlagenteile -- die Grundmenge.
+def ausgeschlossen(konfiguration: dict[str, Any]) -> set[str]:
+    """Vom Nutzer einzeln entfernte Entitäten (Options-Schritt „Entitäten
+    entfernen“): Entitätsschlüssel, nicht entity_ids -- die kann der Nutzer
+    umbenennen, der Schlüssel bleibt."""
+    return {str(k) for k in (konfiguration.get("ausgeschlossen") or [])}
+
+
+def _gruppenzeilen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
+    """Freigegebene Zeilen der gewählten Anlagenteile, ungefiltert.
 
     Ohne die Fernsteuerregister: Die hängen nicht am Anlagenteil, sondern
     am Haken „Kesselfernsteuerung“ (``fernsteuer_zeilen``)."""
-    weg = tote_register(konfiguration) if tote_umgang(konfiguration) == TOTE_WEGLASSEN else {}
     return tuple(
         z for z in TABELLE
         if z.freigegeben and z.kategorie != "fernsteuerung"
         and (z.gruppe is None or konfiguration.get(z.gruppe, False))
-        and z.nummer not in weg
+    )
+
+
+def ausschluss_kandidaten(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
+    """Was sich einzeln entfernen lässt: die Entitäten der angehakten
+    Anlagenteile -- auch die, die die Erkennung als wertlos führt, damit
+    man sie bewusst behandeln kann. Nicht dabei: Fernsteuerzeilen (der Satz
+    muss vollständig bleiben), der Meldungssensor und die beiden
+    Fernsteuer-Entitäten (keine Tabellenzeilen)."""
+    return tuple(z for z in _gruppenzeilen(konfiguration) if z.plattform)
+
+
+def _zeilen_der_gruppen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
+    """Die Grundmenge: Gruppenzeilen ohne „wegzulassende“ tote Register und
+    ohne einzeln ausgeschlossene Entitäten. Ausgeschlossen hat Vorrang vor
+    jeder Behandlung toter Register -- nicht angelegt, nicht gelesen."""
+    weg = tote_register(konfiguration) if tote_umgang(konfiguration) == TOTE_WEGLASSEN else {}
+    raus = ausgeschlossen(konfiguration)
+    return tuple(
+        z for z in _gruppenzeilen(konfiguration)
+        if z.nummer not in weg and not (z.plattform and z.entitaetsschluessel in raus)
     )
 
 
@@ -73,8 +99,10 @@ def zeilen_zum_lesen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
     Fernsteuerung, die „Gewünschte Boilertemperatur“ jedes Boilers im Satz.
     Letztere braucht die Kesselfernsteuerung als neutralen Boiler-Sollwert;
     ohne sie bliebe der Boiler aus dem Satz -- oder bekäme, schlimmer, eine
-    0 (Ladung aus). Ist die Fernsteuerung aus, wird 48001-48046 nicht
-    gelesen; die Betriebsart 48047 ff. gehört zum Heizkreis und bleibt."""
+    0 (Ladung aus). Deshalb wird 41632 auch dann gelesen, wenn der Nutzer
+    die Entität dazu ausgeschlossen hat. Ist die Fernsteuerung aus, wird
+    48001-48046 nicht gelesen; die Betriebsart 48047 ff. gehört zum
+    Heizkreis und bleibt."""
     grund = _zeilen_der_gruppen(konfiguration) + fernsteuer_zeilen(konfiguration)
     if not fernsteuerung_aktiv(konfiguration):
         return grund

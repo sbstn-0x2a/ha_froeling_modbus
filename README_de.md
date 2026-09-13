@@ -108,7 +108,8 @@ nichts geschrieben.
    Heizkreise und Boiler, siehe Abschnitt Kesselfernsteuerung.
 
 Später über **Optionen**: Verbindung und Intervall ändern, Anlagenteile ein-
-und ausblenden, Fernsteuerung ein- oder ausschalten, Entitäts-IDs an das Schema angleichen, oder die Anlage neu
+und ausblenden, Fernsteuerung ein- oder ausschalten, einzelne Entitäten
+entfernen (und wieder aufnehmen), Entitäts-IDs an das Schema angleichen, oder die Anlage neu
 einlesen. Abwählen eines Anlagenteils entfernt seine Entitäten samt
 Historie; das Neu-Einlesen schlägt deshalb nie von selbst ein Abwählen vor.
 

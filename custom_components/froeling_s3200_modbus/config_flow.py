@@ -24,7 +24,13 @@ from datetime import datetime, timezone
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig, SelectSelectorMode
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.selector import (
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 from pymodbus.client import ModbusTcpClient
 
 from . import erkennung, umbenennung
@@ -35,8 +41,8 @@ from .const import (
     STANDARD_INTERVALL,
     eindeutige_kennung,
 )
-from .device import DEVICE_NAME
-from .entitaeten import TOTE_DEAKTIVIERT, TOTE_UMGANG
+from .device import DEVICE_NAME, objekt_id
+from .entitaeten import TOTE_DEAKTIVIERT, TOTE_UMGANG, ausgeschlossen, ausschluss_kandidaten
 from .modbus import read_input_sync
 from .registers import INPUT_BASE, INPUT_REGISTERS
 
@@ -269,6 +275,35 @@ def _gruppen_schema(gruppen, vorgabe) -> dict:
     return {vol.Optional(name, default=bool(vorgabe(name))): bool for name in gruppen}
 
 
+def ausschluss_optionen(hass: HomeAssistant, cfg: dict) -> list[SelectOptionDict]:
+    """Auswahlliste für „Entitäten entfernen“: Wert ist der Entitätsschlüssel,
+    Beschriftung „Gerät · Name (entity_id)“, sortiert nach Gerät und Name.
+
+    Name und entity_id kommen aus der Entity-Registry, damit der Nutzer
+    seine eigenen Umbenennungen wiedererkennt. Eine bereits entfernte
+    Entität hat keinen Registry-Eintrag mehr (Home Assistant hebt sie nur
+    als geloescht auf); dann stehen der Doku-Name der Zeile und der
+    Vorschlag von objekt_id da.
+    """
+    reg = er.async_get(hass)
+    name = cfg["name"]
+    eintraege = []
+    for z in ausschluss_kandidaten(cfg):
+        geraet = z.altes_geraet or z.gruppe or "controller"
+        geraetename = name if geraet == "controller" else DEVICE_NAME.get(geraet, geraet)
+        entity_id = reg.async_get_entity_id(z.plattform, DOMAIN, f"{name}_{z.entitaetsschluessel}")
+        anzeigename = z.name_de
+        if entity_id is not None:
+            eintrag = reg.async_get(entity_id)
+            anzeigename = eintrag.name or eintrag.original_name or z.name_de
+        else:
+            entity_id = objekt_id(z.plattform, name, geraet, z.entitaetsschluessel)
+        eintraege.append((geraetename, anzeigename, entity_id, z.entitaetsschluessel))
+    eintraege.sort(key=lambda e: (e[0].lower(), e[1].lower()))
+    return [SelectOptionDict(value=schluessel, label=f"{geraet} · {anzeige} ({eid})")
+            for geraet, anzeige, eid, schluessel in eintraege]
+
+
 def _fernsteuerung_schema(vorgabe: bool) -> vol.Schema:
     """Ein Haken. Vorgabe aus: Die Fernsteuerung schreibt an die Anlage und
     uebernimmt alle Heizkreise und Boiler -- das schaltet man bewusst ein."""
@@ -398,7 +433,8 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 # --------------------------------------------------------------------------
 
 class FroelingOptionsFlow(config_entries.OptionsFlow):
-    """Nachträgliche Konfiguration: Verbindung, Anlagenteile, Fernsteuerung, neu einlesen."""
+    """Nachträgliche Konfiguration: Verbindung, Anlagenteile, Fernsteuerung,
+    neu einlesen, einzelne Entitäten entfernen, Entitäts-IDs angleichen."""
 
     def __init__(self) -> None:
         self._befund: erkennung.Befund | None = None
@@ -409,7 +445,40 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         return self.async_show_menu(
-            step_id="init", menu_options=["verbindung", "anlagenteile", "fernsteuerung", "neu_einlesen", "entitaets_ids"]
+            step_id="init",
+            menu_options=["verbindung", "anlagenteile", "fernsteuerung", "neu_einlesen",
+                          "entitaeten_entfernen", "entitaets_ids"],
+        )
+
+    async def async_step_entitaeten_entfernen(self, user_input=None):
+        """Einzelne Entitäten ausschließen -- ohne die Entitätenliste von
+        Home Assistant. Ausgeschlossene werden nicht angelegt und nicht
+        gelesen; ihre Registry-Einträge räumt _verwaiste_entfernen beim
+        Reload weg (Historie geht verloren). Abwählen bringt sie beim
+        nächsten Speichern zurück: Home Assistant stellt gelöschte Einträge
+        mit alter entity_id wieder her (Dev-HA, 12.09.2026).
+        """
+        cfg = self._cfg
+        optionen = ausschluss_optionen(self.hass, cfg)
+        angeboten = {o["value"] for o in optionen}
+        bisher = ausgeschlossen(cfg)
+        if user_input is not None:
+            gewaehlt = {k for k in user_input.get("ausgeschlossen", []) if k in angeboten}
+            # Schluessel abgewaehlter Anlagenteile stehen nicht im Formular;
+            # sie bleiben stehen (harmlos), statt still zu verschwinden.
+            neu = (bisher - angeboten) | gewaehlt
+            return self.async_create_entry(
+                title="", data={**self.config_entry.options, "ausgeschlossen": sorted(neu)}
+            )
+        auswahl = SelectSelector(SelectSelectorConfig(
+            options=optionen, multiple=True, custom_value=False, mode=SelectSelectorMode.DROPDOWN,
+        ))
+        return self.async_show_form(
+            step_id="entitaeten_entfernen",
+            data_schema=vol.Schema({
+                vol.Optional("ausgeschlossen", default=sorted(bisher & angeboten)): auswahl,
+            }),
+            description_placeholders={"anzahl": str(len(bisher & angeboten))},
         )
 
     async def async_step_fernsteuerung(self, user_input=None):

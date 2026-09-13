@@ -121,6 +121,7 @@
           "anlagenteile": "Anlagenteile ein- und ausblenden",
           "neu_einlesen": "Anlage neu einlesen",
           "fernsteuerung": "Kesselfernsteuerung",
+          "entitaeten_entfernen": "Einzelne Entitäten entfernen",
           "entitaets_ids": "Entitäts-IDs an das Schema angleichen"
         }
       },
@@ -220,6 +221,13 @@
         "description": "Mit der Kesselfernsteuerung (Register 48001–48046) kann Home Assistant die Sollwerte **aller vorhandenen Heizkreise und Boiler** übernehmen. Eingeschaltet entstehen dafür ein Gerät „Fernsteuerung“ mit der Auswahl „Regelung“ (Kessel / Home Assistant), dem Binärsensor „Fernsteuerung aktiv“ und je Heizkreis und Boiler Vorgabe-Entitäten.\n\nWirksam wird das erst, wenn „Regelung“ auf **Home Assistant** steht. Dann sendet Home Assistant jede Minute alle Sollwerte; ohne Schreibzugriff fällt die Anlage nach zwei Minuten in ihre eigene Regelung zurück. Ein Schaltwechsel (Freigabe, Boiler-Soll 0/größer 0) wartet bis zu zehn Minuten. Nach einem Neustart steht die Regelung immer auf Kessel. Nicht gesetzte Werte gehen neutral mit (Heizkurve ohne Heizgrenze, gewünschte Boilertemperatur). Ein Boiler-Soll über der Boilertemperatur startet eine Ladung – der Ersatz für das „Extraladen“ der Cloud.\n\nAusgeschaltet liest und schreibt die Integration diese Register nicht.\n\nSpeichern lädt die Integration neu. Ausschalten entfernt die Fernsteuer-Entitäten samt Historie.",
         "data": {
           "fernsteuerung": "Kesselfernsteuerung einschalten"
+        }
+      },
+      "entitaeten_entfernen": {
+        "title": "Entitäten entfernen",
+        "description": "Ausgewählte Entitäten werden entfernt und nicht mehr gelesen; ihre Historie geht verloren. Abwählen bringt sie beim nächsten Speichern zurück, mit der alten Entitäts-ID. Zur Auswahl stehen die Entitäten der angehakten Anlagenteile, auch die als wertlos eingestuften. Derzeit entfernt: {anzahl}.\n\nSpeichern lädt die Integration neu.",
+        "data": {
+          "ausgeschlossen": "Entfernte Entitäten"
         }
       },
       "entitaets_ids": {
