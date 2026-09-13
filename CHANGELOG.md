@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.0 – unveröffentlicht
+## 0.6.0 – 2026-09-13
 
 ### ⚠️ Was sich sichtbar ändert
 
