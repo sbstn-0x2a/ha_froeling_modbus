@@ -37,14 +37,17 @@ S3200**, angebunden über Modbus TCP an einem RS485-Gateway.
 Die Registerkarte ist auf dieses Layout festgelegt. Andere Baureihen nutzen
 andere Adressen — die P5 / Lambdatronic P3200 etwa mit einem Versatz von 1000,
 die S3100 weicht ebenfalls ab. Eine solche Anlage verbindet sich zwar, die
-Werte gehören dann aber zu den falschen Größen. Mehr als zwei Heizkreise und
-Solarmodule sind ebenfalls nicht abgedeckt.
+Werte gehören dann aber zu den falschen Größen. Solarmodule sind nicht
+abgedeckt.
 
 Wenn deine Anlage abweicht: bitte ein Issue mit der Typenbezeichnung öffnen,
 statt den angezeigten Werten zu vertrauen.
 
-Noch nicht abgedeckt: Heizkreise ab 03, Boiler ab 02 und Puffer ab 02 werden
-zwar erkannt, aber noch nicht als Entitäten angelegt.
+Heizkreis 03 bis 18, Boiler 02 bis 08 und Puffer 02 bis 04 bekommen dieselben
+Entitäten wie Heizkreis 02, Boiler 01 und Puffer 01. Im Dialog werden sie nur
+angeboten, wenn das Einlesen der Anlage sie als vorhanden meldet (oder sie
+schon angehakt sind) -- eine Anlage mit zwei Heizkreisen sieht keine dreißig
+Haken.
 
 ---
 

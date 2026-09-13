@@ -118,6 +118,14 @@ aus. Beispielautomation im README.
   HK-Soll, HK-Freigabe, mit einem Refresh am Ende statt einem je Register.
 * Ein von der Anlage verworfener Schaltwechsel (Echo 0xFFFF) zählt in
   `verworfen` und wird beim nächsten Heartbeat erneut versucht.
+* **Instanzen jenseits der acht Anlagenteile:** Heizkreis 03–18, Boiler
+  02–08 und Puffer 02–04 sind jetzt wählbare Anlagenteile mit denselben
+  Entitäten wie Heizkreis 02, Boiler 01 und Puffer 01 (gleiche Namen, eigenes
+  Gerät „Heizkreis 03“ …). Der Haken erscheint in der Einrichtung, in den
+  Optionen und beim Neu-Einlesen nur, wenn die Erkennung die Instanz als
+  vorhanden meldet oder sie schon angehakt ist -- eine Anlage mit zwei
+  Heizkreisen sieht keine 30 Haken. Gelesen wird eine Instanz nur, wenn sie
+  angehakt ist.
 
 ### Bekannte Lücken
 

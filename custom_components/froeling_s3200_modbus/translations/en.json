@@ -25,7 +25,33 @@
           "zirkulationspumpe": "Circulation pump",
           "weitere": "Show further parts that were not detected",
           "efilter": "Electrostatic precipitator",
-          "tote": "Registers without a usable value"
+          "tote": "Registers without a usable value",
+          "boiler02": "DHW tank 02",
+          "boiler03": "DHW tank 03",
+          "boiler04": "DHW tank 04",
+          "boiler05": "DHW tank 05",
+          "boiler06": "DHW tank 06",
+          "boiler07": "DHW tank 07",
+          "boiler08": "DHW tank 08",
+          "hk03": "Heating circuit 03",
+          "hk04": "Heating circuit 04",
+          "hk05": "Heating circuit 05",
+          "hk06": "Heating circuit 06",
+          "hk07": "Heating circuit 07",
+          "hk08": "Heating circuit 08",
+          "hk09": "Heating circuit 09",
+          "hk10": "Heating circuit 10",
+          "hk11": "Heating circuit 11",
+          "hk12": "Heating circuit 12",
+          "hk13": "Heating circuit 13",
+          "hk14": "Heating circuit 14",
+          "hk15": "Heating circuit 15",
+          "hk16": "Heating circuit 16",
+          "hk17": "Heating circuit 17",
+          "hk18": "Heating circuit 18",
+          "puffer02": "Buffer 02",
+          "puffer03": "Buffer 03",
+          "puffer04": "Buffer 04"
         }
       },
       "weitere": {
@@ -39,7 +65,33 @@
           "austragung": "Pellet feed",
           "puffer01": "Buffer 01",
           "zirkulationspumpe": "Circulation pump",
-          "efilter": "Electrostatic precipitator"
+          "efilter": "Electrostatic precipitator",
+          "boiler02": "DHW tank 02",
+          "boiler03": "DHW tank 03",
+          "boiler04": "DHW tank 04",
+          "boiler05": "DHW tank 05",
+          "boiler06": "DHW tank 06",
+          "boiler07": "DHW tank 07",
+          "boiler08": "DHW tank 08",
+          "hk03": "Heating circuit 03",
+          "hk04": "Heating circuit 04",
+          "hk05": "Heating circuit 05",
+          "hk06": "Heating circuit 06",
+          "hk07": "Heating circuit 07",
+          "hk08": "Heating circuit 08",
+          "hk09": "Heating circuit 09",
+          "hk10": "Heating circuit 10",
+          "hk11": "Heating circuit 11",
+          "hk12": "Heating circuit 12",
+          "hk13": "Heating circuit 13",
+          "hk14": "Heating circuit 14",
+          "hk15": "Heating circuit 15",
+          "hk16": "Heating circuit 16",
+          "hk17": "Heating circuit 17",
+          "hk18": "Heating circuit 18",
+          "puffer02": "Buffer 02",
+          "puffer03": "Buffer 03",
+          "puffer04": "Buffer 04"
         }
       },
       "fernsteuerung": {
@@ -93,7 +145,33 @@
           "austragung": "Pellet feed",
           "puffer01": "Buffer 01",
           "zirkulationspumpe": "Circulation pump",
-          "efilter": "Electrostatic precipitator"
+          "efilter": "Electrostatic precipitator",
+          "boiler02": "DHW tank 02",
+          "boiler03": "DHW tank 03",
+          "boiler04": "DHW tank 04",
+          "boiler05": "DHW tank 05",
+          "boiler06": "DHW tank 06",
+          "boiler07": "DHW tank 07",
+          "boiler08": "DHW tank 08",
+          "hk03": "Heating circuit 03",
+          "hk04": "Heating circuit 04",
+          "hk05": "Heating circuit 05",
+          "hk06": "Heating circuit 06",
+          "hk07": "Heating circuit 07",
+          "hk08": "Heating circuit 08",
+          "hk09": "Heating circuit 09",
+          "hk10": "Heating circuit 10",
+          "hk11": "Heating circuit 11",
+          "hk12": "Heating circuit 12",
+          "hk13": "Heating circuit 13",
+          "hk14": "Heating circuit 14",
+          "hk15": "Heating circuit 15",
+          "hk16": "Heating circuit 16",
+          "hk17": "Heating circuit 17",
+          "hk18": "Heating circuit 18",
+          "puffer02": "Buffer 02",
+          "puffer03": "Buffer 03",
+          "puffer04": "Buffer 04"
         }
       },
       "neu_einlesen": {
@@ -108,7 +186,33 @@
           "puffer01": "Buffer 01",
           "zirkulationspumpe": "Circulation pump",
           "efilter": "Electrostatic precipitator",
-          "tote": "Registers without a usable value"
+          "tote": "Registers without a usable value",
+          "boiler02": "DHW tank 02",
+          "boiler03": "DHW tank 03",
+          "boiler04": "DHW tank 04",
+          "boiler05": "DHW tank 05",
+          "boiler06": "DHW tank 06",
+          "boiler07": "DHW tank 07",
+          "boiler08": "DHW tank 08",
+          "hk03": "Heating circuit 03",
+          "hk04": "Heating circuit 04",
+          "hk05": "Heating circuit 05",
+          "hk06": "Heating circuit 06",
+          "hk07": "Heating circuit 07",
+          "hk08": "Heating circuit 08",
+          "hk09": "Heating circuit 09",
+          "hk10": "Heating circuit 10",
+          "hk11": "Heating circuit 11",
+          "hk12": "Heating circuit 12",
+          "hk13": "Heating circuit 13",
+          "hk14": "Heating circuit 14",
+          "hk15": "Heating circuit 15",
+          "hk16": "Heating circuit 16",
+          "hk17": "Heating circuit 17",
+          "hk18": "Heating circuit 18",
+          "puffer02": "Buffer 02",
+          "puffer03": "Buffer 03",
+          "puffer04": "Buffer 04"
         }
       },
       "fernsteuerung": {
@@ -746,6 +850,522 @@
       },
       "kessel_oeffnung_der_sekundaerluft_bei_100_ansteuerung": {
         "name": "Secondary air opening at 100 %"
+      },
+      "hk03_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk03_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk04_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk04_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk05_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk05_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk06_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk06_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk07_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk07_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk08_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk08_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk09_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk09_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk10_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk10_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk11_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk11_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk12_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk12_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk13_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk13_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk14_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk14_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk15_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk15_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk16_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk16_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk17_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk17_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "hk18_vorlauf_isttemperatur": {
+        "name": "Flow Actual Temperature"
+      },
+      "hk18_vorlauf_solltemperatur": {
+        "name": "Flow Setpoint Temperature"
+      },
+      "boiler02_boilertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "boiler02_boilerpumpe_ansteuerung": {
+        "name": "Pump Control"
+      },
+      "boiler03_boilertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "boiler03_boilerpumpe_ansteuerung": {
+        "name": "Pump Control"
+      },
+      "boiler04_boilertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "boiler04_boilerpumpe_ansteuerung": {
+        "name": "Pump Control"
+      },
+      "boiler05_boilertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "boiler05_boilerpumpe_ansteuerung": {
+        "name": "Pump Control"
+      },
+      "boiler06_boilertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "boiler06_boilerpumpe_ansteuerung": {
+        "name": "Pump Control"
+      },
+      "boiler07_boilertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "boiler07_boilerpumpe_ansteuerung": {
+        "name": "Pump Control"
+      },
+      "boiler08_boilertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "boiler08_boilerpumpe_ansteuerung": {
+        "name": "Pump Control"
+      },
+      "puffer02_puffertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "puffer02_puffertemperatur_mitte": {
+        "name": "Middle Temperature"
+      },
+      "puffer02_puffertemperatur_unten": {
+        "name": "Bottom Temperature"
+      },
+      "puffer02_pufferpumpen_ansteuerung": {
+        "name": "Buffer Pump Control"
+      },
+      "puffer02_pufferladezustand": {
+        "name": "State of Charge"
+      },
+      "puffer03_puffertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "puffer03_puffertemperatur_mitte": {
+        "name": "Middle Temperature"
+      },
+      "puffer03_puffertemperatur_unten": {
+        "name": "Bottom Temperature"
+      },
+      "puffer03_pufferpumpen_ansteuerung": {
+        "name": "Buffer Pump Control"
+      },
+      "puffer03_pufferladezustand": {
+        "name": "State of Charge"
+      },
+      "puffer04_puffertemperatur_oben": {
+        "name": "Top Temperature"
+      },
+      "puffer04_puffertemperatur_mitte": {
+        "name": "Middle Temperature"
+      },
+      "puffer04_puffertemperatur_unten": {
+        "name": "Bottom Temperature"
+      },
+      "puffer04_pufferpumpen_ansteuerung": {
+        "name": "Buffer Pump Control"
+      },
+      "puffer04_pufferladezustand": {
+        "name": "State of Charge"
+      },
+      "hk03_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk03_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk03_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk04_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk04_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk04_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk05_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk05_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk05_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk06_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk06_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk06_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk07_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk07_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk07_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk08_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk08_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk08_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk09_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk09_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk09_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk10_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk10_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk10_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk11_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk11_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk11_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk12_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk12_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk12_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk13_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk13_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk13_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk14_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk14_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk14_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk15_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk15_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk15_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk16_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk16_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk16_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk17_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk17_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk17_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "hk18_maximale_heizkreis_vorlauftemperatur": {
+        "name": "Maximum Flow Temperature"
+      },
+      "hk18_laufzeit_des_mischers": {
+        "name": "Mixer Running Time"
+      },
+      "hk18_von_welchem_puffer_wird_dieser_hk_versorgt_0_kessel": {
+        "name": "Buffer Supply"
+      },
+      "boiler02_laden_wenn_puffer_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Buffer/DHW Temperature Difference"
+      },
+      "boiler02_wann_soll_die_legionellenaufheizung_durchgefuehrt_werden": {
+        "name": "Legionella Day"
+      },
+      "boiler02_laden_wenn_kessel_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Boiler/DHW Temperature Difference"
+      },
+      "boiler02_soll_differenz_zwischen_kessel_und_boiler": {
+        "name": "Setpoint Differential Boiler/DHW"
+      },
+      "boiler02_minimale_drehzahl_der_boilerpumpe": {
+        "name": "Min. DHW Pump Speed"
+      },
+      "boiler02_maximale_drehzahl_der_boilerpumpe": {
+        "name": "Max. DHW Pump Speed"
+      },
+      "boiler03_laden_wenn_puffer_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Buffer/DHW Temperature Difference"
+      },
+      "boiler03_wann_soll_die_legionellenaufheizung_durchgefuehrt_werden": {
+        "name": "Legionella Day"
+      },
+      "boiler03_laden_wenn_kessel_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Boiler/DHW Temperature Difference"
+      },
+      "boiler03_soll_differenz_zwischen_kessel_und_boiler": {
+        "name": "Setpoint Differential Boiler/DHW"
+      },
+      "boiler03_minimale_drehzahl_der_boilerpumpe": {
+        "name": "Min. DHW Pump Speed"
+      },
+      "boiler03_maximale_drehzahl_der_boilerpumpe": {
+        "name": "Max. DHW Pump Speed"
+      },
+      "boiler04_laden_wenn_puffer_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Buffer/DHW Temperature Difference"
+      },
+      "boiler04_wann_soll_die_legionellenaufheizung_durchgefuehrt_werden": {
+        "name": "Legionella Day"
+      },
+      "boiler04_laden_wenn_kessel_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Boiler/DHW Temperature Difference"
+      },
+      "boiler04_soll_differenz_zwischen_kessel_und_boiler": {
+        "name": "Setpoint Differential Boiler/DHW"
+      },
+      "boiler04_minimale_drehzahl_der_boilerpumpe": {
+        "name": "Min. DHW Pump Speed"
+      },
+      "boiler04_maximale_drehzahl_der_boilerpumpe": {
+        "name": "Max. DHW Pump Speed"
+      },
+      "boiler05_laden_wenn_puffer_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Buffer/DHW Temperature Difference"
+      },
+      "boiler05_wann_soll_die_legionellenaufheizung_durchgefuehrt_werden": {
+        "name": "Legionella Day"
+      },
+      "boiler05_laden_wenn_kessel_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Boiler/DHW Temperature Difference"
+      },
+      "boiler05_soll_differenz_zwischen_kessel_und_boiler": {
+        "name": "Setpoint Differential Boiler/DHW"
+      },
+      "boiler05_minimale_drehzahl_der_boilerpumpe": {
+        "name": "Min. DHW Pump Speed"
+      },
+      "boiler05_maximale_drehzahl_der_boilerpumpe": {
+        "name": "Max. DHW Pump Speed"
+      },
+      "boiler06_laden_wenn_puffer_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Buffer/DHW Temperature Difference"
+      },
+      "boiler06_wann_soll_die_legionellenaufheizung_durchgefuehrt_werden": {
+        "name": "Legionella Day"
+      },
+      "boiler06_laden_wenn_kessel_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Boiler/DHW Temperature Difference"
+      },
+      "boiler06_soll_differenz_zwischen_kessel_und_boiler": {
+        "name": "Setpoint Differential Boiler/DHW"
+      },
+      "boiler06_minimale_drehzahl_der_boilerpumpe": {
+        "name": "Min. DHW Pump Speed"
+      },
+      "boiler06_maximale_drehzahl_der_boilerpumpe": {
+        "name": "Max. DHW Pump Speed"
+      },
+      "boiler07_laden_wenn_puffer_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Buffer/DHW Temperature Difference"
+      },
+      "boiler07_wann_soll_die_legionellenaufheizung_durchgefuehrt_werden": {
+        "name": "Legionella Day"
+      },
+      "boiler07_laden_wenn_kessel_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Boiler/DHW Temperature Difference"
+      },
+      "boiler07_soll_differenz_zwischen_kessel_und_boiler": {
+        "name": "Setpoint Differential Boiler/DHW"
+      },
+      "boiler07_minimale_drehzahl_der_boilerpumpe": {
+        "name": "Min. DHW Pump Speed"
+      },
+      "boiler07_maximale_drehzahl_der_boilerpumpe": {
+        "name": "Max. DHW Pump Speed"
+      },
+      "boiler08_laden_wenn_puffer_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Buffer/DHW Temperature Difference"
+      },
+      "boiler08_wann_soll_die_legionellenaufheizung_durchgefuehrt_werden": {
+        "name": "Legionella Day"
+      },
+      "boiler08_laden_wenn_kessel_und_boiler_eine_temperaturdiff_aufweisen_v": {
+        "name": "Charge at Boiler/DHW Temperature Difference"
+      },
+      "boiler08_soll_differenz_zwischen_kessel_und_boiler": {
+        "name": "Setpoint Differential Boiler/DHW"
+      },
+      "boiler08_minimale_drehzahl_der_boilerpumpe": {
+        "name": "Min. DHW Pump Speed"
+      },
+      "boiler08_maximale_drehzahl_der_boilerpumpe": {
+        "name": "Max. DHW Pump Speed"
+      },
+      "puffer02_heizkreisfreigabe_ab_folgender_puffertemperatur": {
+        "name": "Heating Circuit Enable from Buffer Temperature"
+      },
+      "puffer02_minimale_drehzahl_der_pufferpumpe": {
+        "name": "Minimum Buffer Pump Speed"
+      },
+      "puffer02_kesselstart_bei_differenz_zwischen_kessel_solltemperatur_und": {
+        "name": "Boiler Start at Δ Boiler Setpoint/Top"
+      },
+      "puffer02_puffer_durchgeladen_wenn_temperaturdiff_zwischen_kesselsoll": {
+        "name": "Fully Charged at Δ Boiler Setpoint/Bottom"
+      },
+      "puffer02_maximale_drehzahl_der_pufferpumpe": {
+        "name": "Maximum Buffer Pump Speed"
+      },
+      "puffer02_pufferladezustand_ist_0_bei_folgender_temperatur_absolutwert": {
+        "name": "0% SOC from Temperature"
+      },
+      "puffer02_pufferladezustand_ist_100_bei_kesselsoll_parameter": {
+        "name": "100% SOC at Boiler Setpoint"
+      },
+      "puffer03_heizkreisfreigabe_ab_folgender_puffertemperatur": {
+        "name": "Heating Circuit Enable from Buffer Temperature"
+      },
+      "puffer03_minimale_drehzahl_der_pufferpumpe": {
+        "name": "Minimum Buffer Pump Speed"
+      },
+      "puffer03_kesselstart_bei_differenz_zwischen_kessel_solltemperatur_und": {
+        "name": "Boiler Start at Δ Boiler Setpoint/Top"
+      },
+      "puffer03_puffer_durchgeladen_wenn_temperaturdiff_zwischen_kesselsoll": {
+        "name": "Fully Charged at Δ Boiler Setpoint/Bottom"
+      },
+      "puffer03_maximale_drehzahl_der_pufferpumpe": {
+        "name": "Maximum Buffer Pump Speed"
+      },
+      "puffer03_pufferladezustand_ist_0_bei_folgender_temperatur_absolutwert": {
+        "name": "0% SOC from Temperature"
+      },
+      "puffer03_pufferladezustand_ist_100_bei_kesselsoll_parameter": {
+        "name": "100% SOC at Boiler Setpoint"
+      },
+      "puffer04_heizkreisfreigabe_ab_folgender_puffertemperatur": {
+        "name": "Heating Circuit Enable from Buffer Temperature"
+      },
+      "puffer04_minimale_drehzahl_der_pufferpumpe": {
+        "name": "Minimum Buffer Pump Speed"
+      },
+      "puffer04_kesselstart_bei_differenz_zwischen_kessel_solltemperatur_und": {
+        "name": "Boiler Start at Δ Boiler Setpoint/Top"
+      },
+      "puffer04_puffer_durchgeladen_wenn_temperaturdiff_zwischen_kesselsoll": {
+        "name": "Fully Charged at Δ Boiler Setpoint/Bottom"
+      },
+      "puffer04_maximale_drehzahl_der_pufferpumpe": {
+        "name": "Maximum Buffer Pump Speed"
+      },
+      "puffer04_pufferladezustand_ist_0_bei_folgender_temperatur_absolutwert": {
+        "name": "0% SOC from Temperature"
+      },
+      "puffer04_pufferladezustand_ist_100_bei_kesselsoll_parameter": {
+        "name": "100% SOC at Boiler Setpoint"
       }
     },
     "number": {
@@ -907,6 +1527,441 @@
       },
       "boiler08_boiler_solltemperatur_boiler_8": {
         "name": "DHW tank 08 setpoint"
+      },
+      "hk03_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41092": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk03_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41093": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk03_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk03_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk03_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk03_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk03_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk03_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk04_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41122": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk04_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41123": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk04_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk04_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk04_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk04_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk04_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk04_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk05_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41152": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk05_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41153": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk05_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk05_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk05_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk05_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk05_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk05_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk06_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41182": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk06_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41183": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk06_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk06_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk06_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk06_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk06_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk06_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk07_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41212": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk07_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41213": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk07_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk07_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk07_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk07_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk07_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk07_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk08_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41242": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk08_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41243": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk08_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk08_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk08_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk08_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk08_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk08_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk09_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41272": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk09_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41273": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk09_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk09_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk09_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk09_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk09_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk09_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk10_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41302": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk10_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41303": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk10_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk10_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk10_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk10_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk10_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk10_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk11_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41332": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk11_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41333": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk11_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk11_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk11_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk11_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk11_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk11_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk12_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41362": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk12_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41363": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk12_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk12_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk12_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk12_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk12_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk12_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk13_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41392": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk13_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41393": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk13_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk13_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk13_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk13_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk13_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk13_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk14_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41422": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk14_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41423": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk14_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk14_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk14_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk14_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk14_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk14_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk15_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41452": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk15_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41453": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk15_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk15_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk15_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk15_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk15_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk15_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk16_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41482": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk16_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41483": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk16_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk16_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk16_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk16_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk16_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk16_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk17_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41512": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk17_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41513": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk17_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk17_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk17_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk17_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk17_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk17_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "hk18_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41542": {
+        "name": "Flow at 10°C Outside"
+      },
+      "hk18_gewuenschte_vorlauf_temperatur_bei_10_c_aussentemperatur_41543": {
+        "name": "Flow at −10°C Outside"
+      },
+      "hk18_absenkung_der_vorlauftemperatur_im_absenkbetrieb": {
+        "name": "Flow Temperature Reduction (Setback)"
+      },
+      "hk18_aussentemperatur_unter_der_die_heizkreispumpe_im_heizbetrieb": {
+        "name": "Outside Temp to Turn Pump ON (Heating)"
+      },
+      "hk18_aussentemperatur_unter_der_die_heizkreispumpe_im_absenkbetri": {
+        "name": "Outside Temp to Turn Pump ON (Setback)"
+      },
+      "hk18_frostschutztemperatur": {
+        "name": "Frost Protection Temperature"
+      },
+      "hk18_heizkreispumpe_ausschalten_wenn_vorlauf_soll_kleiner_ist_als": {
+        "name": "Pump OFF when Flow Setpoint below"
+      },
+      "hk18_temp_am_puffer_oben_ab_der_der_ueberhitzungsschutz_aktiv_wir": {
+        "name": "Buffer Top Temp for Overheat Protection"
+      },
+      "boiler02_gewuenschte_boilertemperatur": {
+        "name": "Desired Temperature"
+      },
+      "boiler02_nachladen_wenn_boilertemperatur_unter": {
+        "name": "Recharge when Temperature below"
+      },
+      "boiler03_gewuenschte_boilertemperatur": {
+        "name": "Desired Temperature"
+      },
+      "boiler03_nachladen_wenn_boilertemperatur_unter": {
+        "name": "Recharge when Temperature below"
+      },
+      "boiler04_gewuenschte_boilertemperatur": {
+        "name": "Desired Temperature"
+      },
+      "boiler04_nachladen_wenn_boilertemperatur_unter": {
+        "name": "Recharge when Temperature below"
+      },
+      "boiler05_gewuenschte_boilertemperatur": {
+        "name": "Desired Temperature"
+      },
+      "boiler05_nachladen_wenn_boilertemperatur_unter": {
+        "name": "Recharge when Temperature below"
+      },
+      "boiler06_gewuenschte_boilertemperatur": {
+        "name": "Desired Temperature"
+      },
+      "boiler06_nachladen_wenn_boilertemperatur_unter": {
+        "name": "Recharge when Temperature below"
+      },
+      "boiler07_gewuenschte_boilertemperatur": {
+        "name": "Desired Temperature"
+      },
+      "boiler07_nachladen_wenn_boilertemperatur_unter": {
+        "name": "Recharge when Temperature below"
+      },
+      "boiler08_gewuenschte_boilertemperatur": {
+        "name": "Desired Temperature"
+      },
+      "boiler08_nachladen_wenn_boilertemperatur_unter": {
+        "name": "Recharge when Temperature below"
+      },
+      "puffer02_temperaturdifferenz_zwischen_kessel_und_grenzschicht": {
+        "name": "ΔT Boiler vs. Stratification Layer"
+      },
+      "puffer03_temperaturdifferenz_zwischen_kessel_und_grenzschicht": {
+        "name": "ΔT Boiler vs. Stratification Layer"
+      },
+      "puffer04_temperaturdifferenz_zwischen_kessel_und_grenzschicht": {
+        "name": "ΔT Boiler vs. Stratification Layer"
       }
     },
     "binary_sensor": {
@@ -1002,6 +2057,174 @@
       },
       "fernsteuerung_aktiv": {
         "name": "Remote control active"
+      },
+      "hk03_heizkreispumpe_3": {
+        "name": "Pump ON/OFF"
+      },
+      "hk04_heizkreispumpe_4": {
+        "name": "Pump ON/OFF"
+      },
+      "hk05_heizkreispumpe_5": {
+        "name": "Pump ON/OFF"
+      },
+      "hk06_heizkreispumpe_6": {
+        "name": "Pump ON/OFF"
+      },
+      "hk07_heizkreispumpe_7": {
+        "name": "Pump ON/OFF"
+      },
+      "hk08_heizkreispumpe_8": {
+        "name": "Pump ON/OFF"
+      },
+      "hk09_heizkreispumpe_9": {
+        "name": "Pump ON/OFF"
+      },
+      "hk10_heizkreispumpe_10": {
+        "name": "Pump ON/OFF"
+      },
+      "hk11_heizkreispumpe_11": {
+        "name": "Pump ON/OFF"
+      },
+      "hk12_heizkreispumpe_12": {
+        "name": "Pump ON/OFF"
+      },
+      "hk13_heizkreispumpe_13": {
+        "name": "Pump ON/OFF"
+      },
+      "hk14_heizkreispumpe_14": {
+        "name": "Pump ON/OFF"
+      },
+      "hk15_heizkreispumpe_15": {
+        "name": "Pump ON/OFF"
+      },
+      "hk16_heizkreispumpe_16": {
+        "name": "Pump ON/OFF"
+      },
+      "hk17_heizkreispumpe_17": {
+        "name": "Pump ON/OFF"
+      },
+      "hk18_heizkreispumpe_18": {
+        "name": "Pump ON/OFF"
+      },
+      "hk03_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk04_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk05_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk06_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk07_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk08_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk09_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk10_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk11_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk12_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk13_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk14_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk15_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk16_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk17_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "hk18_darf_dieser_heizkreis_bei_aktiven_boilervorrang_heizen": {
+        "name": "DHW Priority Heating Allowed"
+      },
+      "boiler02_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "boiler02_boiler_nur_einmal_pro_tag_aufladen": {
+        "name": "Charge Only Once per Day"
+      },
+      "boiler02_legionelle_aufheizung_aktiv": {
+        "name": "Legionella Heating Active"
+      },
+      "boiler03_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "boiler03_boiler_nur_einmal_pro_tag_aufladen": {
+        "name": "Charge Only Once per Day"
+      },
+      "boiler03_legionelle_aufheizung_aktiv": {
+        "name": "Legionella Heating Active"
+      },
+      "boiler04_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "boiler04_boiler_nur_einmal_pro_tag_aufladen": {
+        "name": "Charge Only Once per Day"
+      },
+      "boiler04_legionelle_aufheizung_aktiv": {
+        "name": "Legionella Heating Active"
+      },
+      "boiler05_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "boiler05_boiler_nur_einmal_pro_tag_aufladen": {
+        "name": "Charge Only Once per Day"
+      },
+      "boiler05_legionelle_aufheizung_aktiv": {
+        "name": "Legionella Heating Active"
+      },
+      "boiler06_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "boiler06_boiler_nur_einmal_pro_tag_aufladen": {
+        "name": "Charge Only Once per Day"
+      },
+      "boiler06_legionelle_aufheizung_aktiv": {
+        "name": "Legionella Heating Active"
+      },
+      "boiler07_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "boiler07_boiler_nur_einmal_pro_tag_aufladen": {
+        "name": "Charge Only Once per Day"
+      },
+      "boiler07_legionelle_aufheizung_aktiv": {
+        "name": "Legionella Heating Active"
+      },
+      "boiler08_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "boiler08_boiler_nur_einmal_pro_tag_aufladen": {
+        "name": "Charge Only Once per Day"
+      },
+      "boiler08_legionelle_aufheizung_aktiv": {
+        "name": "Legionella Heating Active"
+      },
+      "puffer02_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "puffer03_restwaermenutzung": {
+        "name": "Use Residual Heat"
+      },
+      "puffer04_restwaermenutzung": {
+        "name": "Use Residual Heat"
       }
     },
     "select": {
@@ -1039,6 +2262,182 @@
         "state": {
           "kessel": "Boiler controller",
           "home_assistant": "Home Assistant"
+        }
+      },
+      "hk03_betriebsart_hk_3": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk04_betriebsart_hk_4": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk05_betriebsart_hk_5": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk06_betriebsart_hk_6": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk07_betriebsart_hk_7": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk08_betriebsart_hk_8": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk09_betriebsart_hk_9": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk10_betriebsart_hk_10": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk11_betriebsart_hk_11": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk12_betriebsart_hk_12": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk13_betriebsart_hk_13": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk14_betriebsart_hk_14": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk15_betriebsart_hk_15": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk16_betriebsart_hk_16": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk17_betriebsart_hk_17": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
+        }
+      },
+      "hk18_betriebsart_hk_18": {
+        "name": "Mode",
+        "state": {
+          "off": "Off",
+          "auto": "Automatic",
+          "extra": "Extra Heating",
+          "eco": "Setback",
+          "eco_permanent": "Permanent Setback",
+          "party": "Party Mode"
         }
       }
     },

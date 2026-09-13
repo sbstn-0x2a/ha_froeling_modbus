@@ -30,7 +30,9 @@ for name in ("pymodbus", "pymodbus.client", "pymodbus.transaction", "pymodbus.fr
 DOMAIN = "froeling_s3200_modbus"
 _LOGGER = logging.getLogger(__name__)
 
-#: Die Anlagenteile, die sich ein- und ausblenden lassen.
+#: Die Anlagenteile, die sich ein- und ausblenden lassen: die acht der
+#: 0.4.0, danach die Folgeinstanzen (Spiegelung der Registertabelle). Muss
+#: mit config_flow.GRUPPEN uebereinstimmen.
 GRUPPEN = (
     "kessel",
     "boiler01",
@@ -40,6 +42,9 @@ GRUPPEN = (
     "puffer01",
     "zirkulationspumpe",
     "efilter",
+    *(f"hk{n:02d}" for n in range(3, 19)),
+    *(f"boiler{n:02d}" for n in range(2, 9)),
+    *(f"puffer{n:02d}" for n in range(2, 5)),
 )
 
 

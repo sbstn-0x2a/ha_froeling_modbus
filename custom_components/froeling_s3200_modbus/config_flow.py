@@ -45,8 +45,18 @@ _LOGGER = logging.getLogger(__name__)
 #: Zum Probelesen. Das erste bekannte Input-Register der Anlage.
 PROBE_REGISTER = INPUT_REGISTERS[0]
 
-#: Die Anlagenteile, für die es Entitäten gibt -- Schlüssel im Config-Entry.
-GRUPPEN = ("kessel", "boiler01", "hk01", "hk02", "austragung", "puffer01", "zirkulationspumpe", "efilter")
+#: Die acht Anlagenteile der 0.4.0 -- immer im Dialog, Schlüssel im Config-Entry.
+BASISGRUPPEN = ("kessel", "boiler01", "hk01", "hk02", "austragung", "puffer01", "zirkulationspumpe", "efilter")
+#: Folgeinstanzen (Spiegelung der Registertabelle). Sie erscheinen im Dialog
+#: nur, wenn die Erkennung sie als vorhanden meldet oder sie schon angehakt
+#: sind -- eine Anlage mit zwei Heizkreisen soll keine 30 Haken sehen.
+ERWEITERTE_GRUPPEN = (
+    *(f"hk{n:02d}" for n in range(3, 19)),
+    *(f"boiler{n:02d}" for n in range(2, 9)),
+    *(f"puffer{n:02d}" for n in range(2, 5)),
+)
+#: Muss mit __init__.GRUPPEN uebereinstimmen.
+GRUPPEN = BASISGRUPPEN + ERWEITERTE_GRUPPEN
 
 #: Instanzkennung der Erkennung -> Schlüssel im Config-Entry (sonst gleich).
 INSTANZ_ZU_GRUPPE = {"zirkulation": "zirkulationspumpe"}
@@ -158,6 +168,26 @@ def _zustand(befund: erkennung.Befund | None, gruppe: str) -> str | None:
     return eintrag.zustand if eintrag else None
 
 
+def _zustand_aus_entry(cfg: dict, gruppe: str) -> str | None:
+    """Zustand aus dem gespeicherten Befund (``erkannt.vorschlag``) -- für den
+    Options-Flow, der ohne neues Einlesen auskommen muss."""
+    vorschlag = (cfg.get("erkannt") or {}).get("vorschlag") or {}
+    return vorschlag.get(GRUPPE_ZU_INSTANZ.get(gruppe, gruppe))
+
+
+def _angeboten(gruppe: str, zustand: str | None, bisher: bool | None = None) -> bool:
+    """Steht der Haken überhaupt im Formular?
+
+    Die acht Basisgruppen immer. Eine Folgeinstanz nur, wenn die Erkennung
+    sie als vorhanden meldet oder sie bereits angehakt ist -- auch nicht
+    unter „weitere Anlagenteile“: Wer dort Heizkreis 03 bis 18 anbietet,
+    zeigt einer Anlage mit zwei Heizkreisen 30 Haken.
+    """
+    if gruppe in BASISGRUPPEN:
+        return True
+    return zustand == erkennung.VORHANDEN or bool(bisher)
+
+
 def _vorbelegung(befund: erkennung.Befund | None, gruppe: str, bisher: bool | None = None) -> bool:
     """Haken aus der Erkennung.
 
@@ -193,6 +223,11 @@ def belege_text(befund: erkennung.Befund | None, gruppen=GRUPPEN, bisher: dict |
         instanz = GRUPPE_ZU_INSTANZ.get(gruppe, gruppe)
         eintrag = befund.instanzen.get(instanz)
         if eintrag is None:
+            continue
+        if gruppe not in BASISGRUPPEN and eintrag.zustand == erkennung.NICHT_VORHANDEN \
+                and not (bisher and bisher.get(gruppe)):
+            # 27 Zeilen "✘ Heizkreis 07 Istwerte 0" sagen nichts; nur
+            # Folgeinstanzen mit Befund oder Haken kommen in den Text.
             continue
         name = DEVICE_NAME.get(gruppe, gruppe)
         marke = {erkennung.VORHANDEN: "✔", erkennung.NICHT_VORHANDEN: "✘", erkennung.UNSICHER: "?"}[eintrag.zustand]
@@ -290,11 +325,14 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_anlagenteile(self, user_input=None):
         """Erkannte Anlagenteile bestätigen."""
-        sichtbar = [g for g in GRUPPEN if _sichtbar(self._befund, g)]
+        sichtbar = [g for g in GRUPPEN
+                    if _angeboten(g, _zustand(self._befund, g)) and _sichtbar(self._befund, g)]
+        # "Weitere" kennt nur die Basisgruppen; Folgeinstanzen ohne Befund
+        # gibt es im Dialog nicht.
+        uebrige = [g for g in BASISGRUPPEN if g not in sichtbar]
         if user_input is not None:
             self._gewaehlt = {g: bool(user_input.get(g, False)) for g in sichtbar}
             self._tote = user_input.get("tote", TOTE_DEAKTIVIERT)
-            uebrige = [g for g in GRUPPEN if g not in sichtbar]
             if user_input.get("weitere") and uebrige:
                 return await self.async_step_weitere()
             return await self.async_step_fernsteuerung()
@@ -302,7 +340,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         schema = {**_gruppen_schema(sichtbar, lambda g: _vorbelegung(self._befund, g))}
         if self._befund is not None and self._befund.tot:
             schema[vol.Optional("tote", default=TOTE_DEAKTIVIERT)] = _TOTE_AUSWAHL
-        if len(sichtbar) < len(GRUPPEN):
+        if uebrige:
             schema[vol.Optional("weitere", default=False)] = bool
         return self.async_show_form(
             step_id="anlagenteile",
@@ -313,7 +351,7 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_weitere(self, user_input=None):
         """Anlagenteile, die die Erkennung nicht gefunden hat."""
-        uebrige = [g for g in GRUPPEN if g not in self._gewaehlt]
+        uebrige = [g for g in BASISGRUPPEN if g not in self._gewaehlt]
         if user_input is not None:
             self._gewaehlt.update({g: bool(user_input.get(g, False)) for g in uebrige})
             return await self.async_step_fernsteuerung()
@@ -340,7 +378,9 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _anlegen(self):
         data = {
             **self._verbindung,
-            **{g: self._gewaehlt.get(g, False) for g in GRUPPEN},
+            **{g: self._gewaehlt.get(g, False) for g in BASISGRUPPEN},
+            # Folgeinstanzen nur, wenn gewaehlt -- sonst staenden 27 False im Entry.
+            **{g: True for g in ERWEITERTE_GRUPPEN if self._gewaehlt.get(g)},
             "erkannt": erkannt_als_dict(self._befund),
             "tote": self._tote,
             "fernsteuerung": self._fernsteuerung,
@@ -444,27 +484,38 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
         })
         return self.async_show_form(step_id="verbindung", data_schema=schema, errors=errors)
 
+    def _angebotene_gruppen(self, befund: erkennung.Befund | None = None) -> list[str]:
+        """Basisgruppen plus Folgeinstanzen, die erkannt oder angehakt sind --
+        aus dem frischen Befund, sonst aus dem gespeicherten."""
+        cfg = self._cfg
+        return [
+            g for g in GRUPPEN
+            if _angeboten(g, _zustand(befund, g) if befund is not None else _zustand_aus_entry(cfg, g), cfg.get(g))
+        ]
+
     async def async_step_anlagenteile(self, user_input=None):
         cfg = self._cfg
+        gruppen = self._angebotene_gruppen()
         if user_input is not None:
             return self.async_create_entry(
                 title="",
-                data={**self.config_entry.options, **{g: bool(user_input.get(g, False)) for g in GRUPPEN}},
+                data={**self.config_entry.options, **{g: bool(user_input.get(g, False)) for g in gruppen}},
             )
         return self.async_show_form(
             step_id="anlagenteile",
-            data_schema=vol.Schema(_gruppen_schema(GRUPPEN, lambda g: cfg.get(g, True))),
+            data_schema=vol.Schema(_gruppen_schema(gruppen, lambda g: cfg.get(g, g in BASISGRUPPEN))),
         )
 
     async def async_step_neu_einlesen(self, user_input=None):
         """Anlage scannen und die Haken neu vorschlagen. Nichts ohne Bestätigung."""
         cfg = self._cfg
         if user_input is not None:
+            gruppen = self._angebotene_gruppen(self._befund)
             return self.async_create_entry(
                 title="",
                 data={
                     **self.config_entry.options,
-                    **{g: bool(user_input.get(g, False)) for g in GRUPPEN},
+                    **{g: bool(user_input.get(g, False)) for g in gruppen},
                     "erkannt": erkannt_als_dict(self._befund),
                     "tote": user_input.get("tote", TOTE_DEAKTIVIERT),
                 },
@@ -473,11 +524,13 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
         if self._befund is None:
             return self.async_show_form(
                 step_id="neu_einlesen",
-                data_schema=vol.Schema(_gruppen_schema(GRUPPEN, lambda g: cfg.get(g, True))),
+                data_schema=vol.Schema(_gruppen_schema(self._angebotene_gruppen(),
+                                                       lambda g: cfg.get(g, g in BASISGRUPPEN))),
                 errors={"base": "cannot_connect"},
                 description_placeholders={"belege": belege_text(None), "tot": "keine"},
             )
-        schema = _gruppen_schema(GRUPPEN, lambda g: _vorbelegung(self._befund, g, cfg.get(g)))
+        gruppen = self._angebotene_gruppen(self._befund)
+        schema = _gruppen_schema(gruppen, lambda g: _vorbelegung(self._befund, g, cfg.get(g)))
         if self._befund.tot:
             schema[vol.Optional("tote", default=cfg.get("tote", TOTE_DEAKTIVIERT))] = _TOTE_AUSWAHL
         return self.async_show_form(

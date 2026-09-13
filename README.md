@@ -34,11 +34,11 @@ It allows you to read states and sensor values of your heating system (boiler, h
 Developed and tested against a **Fröling SP Dual Compact with Lambdatronic
 S3200**, connected over Modbus TCP through an RS485 gateway.
 
-The register map is fixed to that layout. Other models use different addresses — the P5 / Lambdatronic P3200 for instance shifts them by an offset of 1000, and the S3100 differs as well. Such a device will connect, but the values will belong to the wrong quantities. More than two heating circuits and solar modules are not covered either.
+The register map is fixed to that layout. Other models use different addresses — the P5 / Lambdatronic P3200 for instance shifts them by an offset of 1000, and the S3100 differs as well. Such a device will connect, but the values will belong to the wrong quantities. Solar modules are not covered.
 
 If your plant differs, please open an issue with the model designation rather than relying on the readings.
 
-Not covered yet: heating circuits from 03, DHW tanks from 02 and buffers from 02 are detected but not created as entities.
+Heating circuits 03 to 18, DHW tanks 02 to 08 and buffers 02 to 04 get the same entities as heating circuit 02, DHW tank 01 and buffer 01. They are only offered in the dialog when the plant scan reports them as present (or they are already ticked), so a plant with two heating circuits does not see thirty tick boxes.
 
 ---
 

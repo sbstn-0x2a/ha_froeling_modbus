@@ -31,6 +31,11 @@ DEVICE_NAME = {
     # wirken nur gemeinsam. Bewusst nicht in GRUPPEN.
     "fernsteuerung": "Fernsteuerung",
 }
+# Folgeinstanzen (Spiegelung der Registertabelle): HK 03-18, Boiler 02-08,
+# Puffer 02-04. Generiert statt 27 Zeilen -- die Namen folgen einem Muster.
+DEVICE_NAME.update({f"hk{n:02d}": f"Heizkreis {n:02d}" for n in range(3, 19)})
+DEVICE_NAME.update({f"boiler{n:02d}": f"Boiler {n:02d}" for n in range(2, 9)})
+DEVICE_NAME.update({f"puffer{n:02d}": f"Puffer {n:02d}" for n in range(2, 5)})
 
 #: Baureihe. Steht im Modellfeld aller Geraete, auch der Untergeraete -- sie
 #: sind Teile derselben Anlage, kein eigenes Modell.
@@ -105,10 +110,6 @@ def _slug(text: str) -> str:
 #: Schreibweisen gleich mit.
 _GRUPPENPRAEFIX = {
     "kessel": (r"^kessel_",),
-    "hk01": (r"^hk_?0?1_", r"_heizkreis_0?1$"),
-    "hk02": (r"^hk_?0?2_", r"_heizkreis_0?2$"),
-    "boiler01": (r"^boiler_?0?1_",),
-    "puffer01": (r"^puffer_?0?1_",),
     "austragung": (r"^austragung_",),
     "zirkulationspumpe": (r"^zirkulationspumpe_",),
     "efilter": (r"^efilter_",),
@@ -117,6 +118,25 @@ _GRUPPENPRAEFIX = {
     # Geraet "Fernsteuerung" sie nicht mehr nennt.
     "fernsteuerung": (r"^fernsteuerung_",),
 }
+
+
+_NUMMERIERT = re.compile(r"^(hk|boiler|puffer)(\d{2})$")
+
+
+def _praefixe(device_key: str) -> tuple[str, ...]:
+    """Muster, die im Schluessel wegfallen. Nummerierte Instanzen (hk02,
+    boiler01, puffer03 ...) folgen einem Schema: hk_?0?N_ bzw. _heizkreis_0?N$
+    fuer Heizkreise, boiler_?0?N_ und puffer_?0?N_ fuer die anderen -- so
+    standen sie vorher als vier Einzelzeilen fuer hk01/hk02/boiler01/puffer01."""
+    if device_key in _GRUPPENPRAEFIX:
+        return _GRUPPENPRAEFIX[device_key]
+    m = _NUMMERIERT.match(device_key)
+    if not m:
+        return ()
+    fam, n = m.group(1), int(m.group(2))
+    if fam == "hk":
+        return (rf"^hk_?0?{n}_", rf"_heizkreis_0?{n}$")
+    return (rf"^{fam}_?0?{n}_",)
 
 
 def objekt_id(
@@ -141,7 +161,7 @@ def objekt_id(
     Bestandsinstallationen aendern sich also nicht.
     """
     rest = entity_key
-    for muster in _GRUPPENPRAEFIX.get(device_key, ()):
+    for muster in _praefixe(device_key):
         rest = re.sub(muster, "", rest)
     rest = rest or entity_key
 
