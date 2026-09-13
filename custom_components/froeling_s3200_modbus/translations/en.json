@@ -9,7 +9,8 @@
           "host": "Hostname/IP",
           "port": "Port (Default: 502)",
           "unit_id": "Modbus address (Unit ID)",
-          "update_interval": "Polling interval in seconds (15–3600, default 30)"
+          "update_interval": "Polling interval in seconds (15–3600, default 30)",
+          "praefix": "Entity ID prefix (empty = from the name, only a-z, 0-9, _)"
         }
       },
       "anlagenteile": {
@@ -106,7 +107,8 @@
       "cannot_connect": "No connection. Please check host and port.",
       "invalid_auth": "Invalid authentication",
       "unknown": "Unknown error",
-      "invalid_unit_id": "The device answers but rejects the request. The unit ID is probably wrong."
+      "invalid_unit_id": "The device answers but rejects the request. The unit ID is probably wrong.",
+      "praefix_ungueltig": "Invalid prefix: only lowercase a–z, digits and underscore."
     },
     "abort": {
       "already_configured": "This device is already configured."
@@ -233,15 +235,17 @@
       },
       "entitaets_ids": {
         "title": "Align entity IDs",
-        "description": "{anzahl} entity/entities differ from the scheme 'plant, device, quantity':\n\n{liste}\n\nHistory and long-term statistics follow the rename automatically. Automations, scripts, dashboards and templates have to be updated by hand.",
+        "description": "Prefix '{praefix}' (so far '{aktuell}'). {anzahl} entity/entities differ from the scheme 'prefix, device, quantity':\n\n{liste}\n\nA changed prefix without the tick refreshes the list; with the tick the prefix is saved and the entities are renamed. History and long-term statistics follow the rename automatically. Automations, scripts, dashboards and templates have to be updated by hand.",
         "data": {
+          "praefix": "Entity ID prefix (empty = from the name)",
           "bestaetigen": "Yes, rename now"
         }
       }
     },
     "error": {
       "invalid_unit_id": "The device answers but rejects the request. The unit ID is probably wrong.",
-      "cannot_connect": "No connection. Please check host and port."
+      "cannot_connect": "No connection. Please check host and port.",
+      "praefix_ungueltig": "Invalid prefix: only lowercase a–z, digits and underscore."
     },
     "abort": {
       "umbenannt": "{anzahl} entity/entities renamed. Skipped (target already taken):\n\n{uebersprungen}",

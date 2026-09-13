@@ -139,8 +139,25 @@ def _praefixe(device_key: str) -> tuple[str, ...]:
     return (rf"^{fam}_?0?{n}_",)
 
 
+#: Ein Praefix der Entitaets-IDs: nur Kleinbuchstaben, Ziffern und
+#: Unterstrich -- das, was slugify ohnehin uebrig liesse.
+PRAEFIX_MUSTER = re.compile(r"^[a-z0-9_]+$")
+
+
+def standard_praefix(device_name_from_config: str) -> str:
+    """Erstes Segment der entity_id, wenn kein eigenes Praefix gesetzt ist:
+    der Anlagenname als Slug ("Froeling SP Dual compact" ->
+    "froeling_sp_dual_compact")."""
+    return _slug(device_name_from_config)
+
+
+def praefix_gueltig(text: str) -> bool:
+    return bool(PRAEFIX_MUSTER.match(text))
+
+
 def objekt_id(
-    plattform: str, device_name_from_config: str, device_key: str, entity_key: str
+    plattform: str, device_name_from_config: str, device_key: str, entity_key: str,
+    praefix: str | None = None,
 ) -> str:
     """Vorschlag fuer die entity_id: Anlage, Geraet, Groesse.
 
@@ -159,13 +176,19 @@ def objekt_id(
     Home Assistant nimmt den Vorschlag nur an, wenn die Entitaet neu angelegt
     wird; ein bestehender Registry-Eintrag behaelt seine entity_id.
     Bestandsinstallationen aendern sich also nicht.
+
+    ``praefix`` ersetzt das erste Segment (Option ``praefix`` im Entry, seit
+    0.6.1): Der Anlagenname steckt in der unique_id und ist eingefroren --
+    wer seine Anlage "Froeling SP Dual compact" genannt hat, bekaeme sonst
+    fuer immer ``froeling_sp_dual_compact_...``. Leer oder None heisst
+    ``standard_praefix``, also das bisherige Verhalten.
     """
     rest = entity_key
     for muster in _praefixe(device_key):
         rest = re.sub(muster, "", rest)
     rest = rest or entity_key
 
-    teile = [_slug(device_name_from_config)]
+    teile = [praefix or standard_praefix(device_name_from_config)]
     if device_key != "controller":
         teile.append(_slug(device_key))
     teile.append(_slug(rest))

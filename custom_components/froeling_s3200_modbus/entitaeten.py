@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .device import standard_praefix
 from .fernsteuerung import boilerregister_zum_lesen, satz_zeilen
 from .registertabelle import TABELLE, Register
 
@@ -41,6 +42,13 @@ def fernsteuerung_aktiv(konfiguration: dict[str, Any]) -> bool:
     Bestandseinträge ohne den Schlüssel: Wer die Fernsteuerung will, schaltet
     sie bewusst ein, und erst dann entstehen ihre Entitäten und der Heartbeat."""
     return bool(konfiguration.get("fernsteuerung", False))
+
+
+def praefix(konfiguration: dict[str, Any]) -> str:
+    """Erstes Segment der entity_ids: Option ``praefix`` (Slug), sonst der
+    Anlagenname als Slug -- das Verhalten bis 0.6.0."""
+    eigenes = str(konfiguration.get("praefix") or "").strip()
+    return eigenes or standard_praefix(konfiguration["name"])
 
 
 def ausgeschlossen(konfiguration: dict[str, Any]) -> set[str]:

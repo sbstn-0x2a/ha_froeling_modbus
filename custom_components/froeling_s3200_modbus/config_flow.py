@@ -41,7 +41,7 @@ from .const import (
     STANDARD_INTERVALL,
     eindeutige_kennung,
 )
-from .device import DEVICE_NAME, objekt_id
+from .device import DEVICE_NAME, objekt_id, praefix_gueltig
 from .entitaeten import (
     TOTE_DEAKTIVIERT,
     TOTE_UMGANG,
@@ -49,6 +49,7 @@ from .entitaeten import (
     ausschluss_kandidaten,
     behalten,
     behalten_kandidaten,
+    praefix,
     tote_register,
 )
 from .modbus import read_input_sync
@@ -279,6 +280,11 @@ _TOTE_AUSWAHL = SelectSelector(SelectSelectorConfig(
 ))
 
 
+def _praefix_bereinigen(text) -> str:
+    """Eingabe des Praefix-Felds: ohne Rand-Leerzeichen; leer = Vorgabe."""
+    return str(text or "").strip()
+
+
 def _gruppen_schema(gruppen, vorgabe) -> dict:
     return {vol.Optional(name, default=bool(vorgabe(name))): bool for name in gruppen}
 
@@ -305,7 +311,7 @@ def ausschluss_optionen(hass: HomeAssistant, cfg: dict) -> list[SelectOptionDict
             eintrag = reg.async_get(entity_id)
             anzeigename = eintrag.name or eintrag.original_name or z.name_de
         else:
-            entity_id = objekt_id(z.plattform, name, geraet, z.entitaetsschluessel)
+            entity_id = objekt_id(z.plattform, name, geraet, z.entitaetsschluessel, praefix=praefix(cfg))
         eintraege.append((geraetename, anzeigename, entity_id, z.entitaetsschluessel))
     eintraege.sort(key=lambda e: (e[0].lower(), e[1].lower()))
     return [SelectOptionDict(value=schluessel, label=f"{geraet} · {anzeige} ({eid})")
@@ -376,12 +382,16 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             ))
             self._abort_if_unique_id_configured()
 
-            fehler = await pruefe_verbindung(self.hass, user_input)
-            if fehler is None:
-                self._verbindung = dict(user_input)
-                self._befund = await anlage_einlesen(self.hass, user_input)
-                return await self.async_step_anlagenteile()
-            errors["base"] = fehler
+            praefix_eingabe = _praefix_bereinigen(user_input.get("praefix"))
+            if praefix_eingabe and not praefix_gueltig(praefix_eingabe):
+                errors["praefix"] = "praefix_ungueltig"
+            else:
+                fehler = await pruefe_verbindung(self.hass, user_input)
+                if fehler is None:
+                    self._verbindung = {**user_input, "praefix": praefix_eingabe}
+                    self._befund = await anlage_einlesen(self.hass, user_input)
+                    return await self.async_step_anlagenteile()
+                errors["base"] = fehler
 
         # Bei einem Fehler die Eingaben erhalten, statt sie zu verwerfen.
         vorher = user_input or {}
@@ -392,6 +402,10 @@ class FroelingModbusConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Optional("unit_id", default=vorher.get("unit_id", 2)): int,
             vol.Required("update_interval",
                          default=vorher.get("update_interval", STANDARD_INTERVALL)): _INTERVALL,
+            # Erstes Segment der entity_ids; leer = aus dem Namen. Der Name
+            # steckt in der unique_id und ist spaeter eingefroren, das
+            # Praefix nicht -- deshalb hier gleich abfragen.
+            vol.Optional("praefix", default=vorher.get("praefix", "")): str,
         })
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
@@ -549,25 +563,54 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
         Zeigt alt → neu, benennt erst nach Bestätigung um. Historie und
         Statistik ziehen mit, Automationen und Dashboards nicht.
         """
-        paare = umbenennung.vorschlaege(self.hass, self._cfg)
-        if not paare:
-            return self.async_abort(reason="nichts_umzubenennen")
+        cfg = self._cfg
+        aktuell = praefix(cfg)
+        errors: dict[str, str] = {}
+        eingabe = str(cfg.get("praefix") or "")
         if user_input is not None:
+            eingabe = _praefix_bereinigen(user_input.get("praefix"))
+            if eingabe and not praefix_gueltig(eingabe):
+                errors["praefix"] = "praefix_ungueltig"
+        # Die Liste alt -> neu mit dem eingegebenen Praefix rechnen; leer
+        # heisst Vorgabe aus dem Namen (wie bisher).
+        cfg_neu = {**cfg, "praefix": eingabe} if not errors else cfg
+        paare = umbenennung.vorschlaege(self.hass, cfg_neu)
+        # Das Formular erscheint immer, auch ohne Abweichung -- sonst waere
+        # das Praefixfeld nicht erreichbar.
+        if user_input is not None and not errors:
+            geaendert = eingabe != str(cfg.get("praefix") or "")
             if not user_input.get("bestaetigen"):
-                return self.async_abort(reason="abgebrochen")
-            ok, uebersprungen = umbenennung.umbenennen(self.hass, paare)
-            return self.async_abort(
-                reason="umbenannt",
-                description_placeholders={
-                    "anzahl": str(ok),
-                    "uebersprungen": "\n".join(uebersprungen) or "keine",
-                },
-            )
-        liste = "\n".join(f"{alt} → {neu}" for alt, neu in paare)
+                # Nur das Praefix geaendert: Formular mit neuer Liste zeigen.
+                if not geaendert:
+                    return self.async_abort(reason="abgebrochen")
+            elif not paare and not geaendert:
+                return self.async_abort(reason="nichts_umzubenennen")
+            else:
+                # Erst umbenennen (Registry, synchron), dann das Praefix
+                # speichern -- das loest ueber den Update-Listener den Reload
+                # aus, der die Umbenennung nicht mehr stoert.
+                ok, uebersprungen = umbenennung.umbenennen(self.hass, paare)
+                if geaendert:
+                    self.hass.config_entries.async_update_entry(
+                        self.config_entry, options={**self.config_entry.options, "praefix": eingabe}
+                    )
+                return self.async_abort(
+                    reason="umbenannt",
+                    description_placeholders={
+                        "anzahl": str(ok),
+                        "uebersprungen": "\n".join(uebersprungen) or "keine",
+                    },
+                )
+        liste = "\n".join(f"{alt} → {neu}" for alt, neu in paare) or "keine"
         return self.async_show_form(
             step_id="entitaets_ids",
-            data_schema=vol.Schema({vol.Required("bestaetigen", default=False): bool}),
-            description_placeholders={"anzahl": str(len(paare)), "liste": liste},
+            data_schema=vol.Schema({
+                vol.Optional("praefix", default=eingabe): str,
+                vol.Required("bestaetigen", default=False): bool,
+            }),
+            errors=errors,
+            description_placeholders={"anzahl": str(len(paare)), "liste": liste,
+                                      "praefix": praefix(cfg_neu), "aktuell": aktuell},
         )
 
     async def async_step_verbindung(self, user_input=None):

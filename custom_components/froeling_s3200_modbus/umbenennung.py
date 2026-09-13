@@ -17,12 +17,14 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN
 from .device import objekt_id
-from .entitaeten import fernsteuerung_aktiv, zeilen_fuer
+from .entitaeten import fernsteuerung_aktiv, praefix, zeilen_fuer
 
 
 def _erwartet(data: dict) -> list[tuple[str, str, str]]:
-    """(Plattform, unique_id, vorgeschlagene entity_id) für jede Entität des Entry."""
+    """(Plattform, unique_id, vorgeschlagene entity_id) für jede Entität des
+    Entry -- mit dem Präfix aus ``data`` (Option ``praefix``, sonst Anlagenname)."""
     name = data["name"]
+    p = praefix(data)
     liste = []
     for z in zeilen_fuer(data):
         if z.kategorie == "fernsteuerung":
@@ -30,13 +32,13 @@ def _erwartet(data: dict) -> list[tuple[str, str, str]]:
         else:
             geraet = z.altes_geraet or z.gruppe or "controller"
         liste.append((z.plattform, f"{name}_{z.entitaetsschluessel}",
-                      objekt_id(z.plattform, name, geraet, z.entitaetsschluessel)))
-    liste.append(("sensor", f"{name}_meldungen", objekt_id("sensor", name, "controller", "meldungen")))
+                      objekt_id(z.plattform, name, geraet, z.entitaetsschluessel, praefix=p)))
+    liste.append(("sensor", f"{name}_meldungen", objekt_id("sensor", name, "controller", "meldungen", praefix=p)))
     if fernsteuerung_aktiv(data):
         for plattform, schluessel in (("select", "fernsteuerung_regelung"),
                                       ("binary_sensor", "fernsteuerung_aktiv")):
             liste.append((plattform, f"{name}_{schluessel}",
-                          objekt_id(plattform, name, "fernsteuerung", schluessel)))
+                          objekt_id(plattform, name, "fernsteuerung", schluessel, praefix=p)))
     return liste
 
 

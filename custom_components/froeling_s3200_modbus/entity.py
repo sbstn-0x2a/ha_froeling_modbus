@@ -17,7 +17,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import FroelingCoordinator
 from .device import device_info_for, objekt_id, tr_key
-from .entitaeten import TOTE_DEAKTIVIERT, behalten, tote_register, tote_umgang
+from .entitaeten import TOTE_DEAKTIVIERT, behalten, praefix, tote_register, tote_umgang
 from .modbus import VERWORFEN
 from .registertabelle import Register
 
@@ -46,7 +46,7 @@ class FroelingEntity(CoordinatorEntity[FroelingCoordinator]):
         self._entity_id = entity_id
         self._device_key = device_key
         self.entity_id = objekt_id(
-            self._plattform, self._device_name, device_key, entity_id
+            self._plattform, self._device_name, device_key, entity_id, praefix=praefix(data)
         )
         self._attr_translation_key = tr_key(entity_id)
 

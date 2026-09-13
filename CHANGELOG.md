@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.1 – 2026-09-13
+
+### Neu
+
+* **Präfix der Entitäts-IDs frei wählbar, Vorgabe Anlagenname.** Der
+  Anlagenname steckt in der `unique_id` und ist eingefroren; bisher begann
+  deshalb jede neue `entity_id` mit dem Namen als Slug („Froeling SP Dual
+  compact“ → `sensor.froeling_sp_dual_compact_…`). Neu: ein Feld **„Präfix
+  der Entitäts-IDs“** bei der Einrichtung (leer = aus dem Namen) und in
+  **Optionen → „Entitäts-IDs an das Schema angleichen“**. Dort zeigt ein
+  geändertes Präfix die Liste alt → neu neu an; mit Haken wird das Präfix
+  gespeichert und umbenannt. Erlaubt sind Kleinbuchstaben, Ziffern und
+  Unterstrich. `unique_id`, Historie und Statistik bleiben.
+
 ## 0.6.0 – 2026-09-13
 
 ### ⚠️ Was sich sichtbar ändert

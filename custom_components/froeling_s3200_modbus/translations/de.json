@@ -9,7 +9,8 @@
           "host": "Hostname/IP",
           "port": "Port (Standard: 502)",
           "unit_id": "Modbus-Adresse (Unit ID)",
-          "update_interval": "Abfrageintervall in Sekunden (15–3600, Standard 30)"
+          "update_interval": "Abfrageintervall in Sekunden (15–3600, Standard 30)",
+          "praefix": "Präfix der Entitäts-IDs (leer = aus dem Namen, nur a-z, 0-9, _)"
         }
       },
       "anlagenteile": {
@@ -106,7 +107,8 @@
       "cannot_connect": "Keine Verbindung. Bitte Host und Port prüfen.",
       "invalid_auth": "Ungültige Zugangsdaten",
       "unknown": "Unbekannter Fehler",
-      "invalid_unit_id": "Das Gerät antwortet, weist die Anfrage aber ab. Vermutlich stimmt die Unit-ID nicht."
+      "invalid_unit_id": "Das Gerät antwortet, weist die Anfrage aber ab. Vermutlich stimmt die Unit-ID nicht.",
+      "praefix_ungueltig": "Ungültiges Präfix: nur Kleinbuchstaben a–z, Ziffern und Unterstrich."
     },
     "abort": {
       "already_configured": "Dieses Gerät ist bereits konfiguriert."
@@ -233,15 +235,17 @@
       },
       "entitaets_ids": {
         "title": "Entitäts-IDs angleichen",
-        "description": "{anzahl} Entität(en) weichen vom Schema „Anlage, Gerät, Größe“ ab:\n\n{liste}\n\nBeim Umbenennen ziehen Historie und Langzeitstatistik automatisch mit. Automationen, Skripte, Dashboards und Vorlagen müssen von Hand nachgezogen werden.",
+        "description": "Präfix „{praefix}“ (bisher „{aktuell}“). {anzahl} Entität(en) weichen vom Schema „Präfix, Gerät, Größe“ ab:\n\n{liste}\n\nEin geändertes Präfix ohne Haken zeigt die Liste neu; mit Haken wird das Präfix gespeichert und umbenannt. Beim Umbenennen ziehen Historie und Langzeitstatistik automatisch mit. Automationen, Skripte, Dashboards und Vorlagen müssen von Hand nachgezogen werden.",
         "data": {
+          "praefix": "Präfix der Entitäts-IDs (leer = aus dem Namen)",
           "bestaetigen": "Ja, jetzt umbenennen"
         }
       }
     },
     "error": {
       "invalid_unit_id": "Das Gerät antwortet, weist die Anfrage aber ab. Vermutlich stimmt die Unit-ID nicht.",
-      "cannot_connect": "Keine Verbindung. Bitte Host und Port prüfen."
+      "cannot_connect": "Keine Verbindung. Bitte Host und Port prüfen.",
+      "praefix_ungueltig": "Ungültiges Präfix: nur Kleinbuchstaben a–z, Ziffern und Unterstrich."
     },
     "abort": {
       "umbenannt": "{anzahl} Entität(en) umbenannt. Übersprungen (Ziel bereits belegt):\n\n{uebersprungen}",

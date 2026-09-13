@@ -85,6 +85,7 @@ Recorded history and long-term statistics are kept until the recorder purges the
    - Port (default: 502)  
    - Update interval (default: 30 s, allowed 15–3600 s)
    - Modbus UnitID (2)
+   - Entity ID prefix (optional; empty = the plant name as a slug, e.g. `froeling`; only a–z, 0–9, `_`)
 4. The controller is read once completely (a few seconds).
 5. **Confirm plant parts:** the boxes are pre-filled from the scan, each with its evidence (e.g. "Heating circuit 02: 30.5 °C, mode Automatic"). Parts that were not detected are under "show further parts". Below that you choose what happens to registers without a usable value: create disabled (default), do not create, create normally.
 6. **Remote control:** a checkbox, off by default. Switched on, it creates the device "Remote control" with the select "Control" and the setpoints of all heating circuits and DHW tanks, see the section on boiler remote control.
@@ -101,7 +102,7 @@ The electrostatic precipitator and the detection of registers without a usable v
 
 Re-scanning pays off again later: it judges afresh every time. If a previously useless register now delivers values, e.g. a counter that has started counting, its entity is re-enabled or created again; conversely, a register newly found useless is disabled. Entities you disabled yourself are left alone, and a useless-rated entity you enabled by hand stays enabled on the next re-scan (it is kept automatically; see the option "Create despite detection"). Counters only count as useless after 24 operating hours of the plant, so a freshly commissioned plant is not judged prematurely.
 
-**Plant name:** the name given during setup is part of every entity's `unique_id` and therefore cannot be changed afterwards; a different name would be a new plant without history to Home Assistant. To change the label, rename the controller device under *Settings → Devices*; all entity display names follow immediately, history and statistics are kept.
+**Plant name:** the name given during setup is part of every entity's `unique_id` and therefore cannot be changed afterwards; a different name would be a new plant without history to Home Assistant. To change the label, rename the controller device under *Settings → Devices*; all entity display names follow immediately, history and statistics are kept. The **prefix of the entity IDs** is not frozen: by default it is the plant name as a slug, but you can choose a short one (e.g. `heizung`) during setup or later under **Options → Align entity IDs with the scheme** — a changed prefix refreshes the list old → new there, the tick saves it and renames; history and statistics follow.
 
 ---
 

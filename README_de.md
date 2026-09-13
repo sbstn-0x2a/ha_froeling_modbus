@@ -97,6 +97,8 @@ nichts geschrieben.
    - Port (Standard: 502)
    - Update-Intervall (Standard: 30 s, erlaubt 15–3600 s)  
    - Modbus UnitID (2)
+   - Präfix der Entitäts-IDs (optional; leer = der Anlagenname als Slug,
+     etwa `froeling`; nur a–z, 0–9, `_`)
 4. Die Anlage wird einmal komplett gelesen (wenige Sekunden).
 5. **Anlagenteile bestätigen:** Die Haken sind aus dem Scan vorbelegt, jeder
    mit Beleg (etwa „Heizkreis 02: 30,5 °C, Betriebsart Automatik“). Nicht
@@ -148,7 +150,12 @@ Betrieb genommene Anlage nicht vorschnell eingestuft wird.
 ein anderer Name wäre für Home Assistant eine neue Anlage ohne Historie. Wer
 eine andere Beschriftung will, benennt das Reglergerät unter *Einstellungen →
 Geräte* um; die Anzeigenamen aller Entitäten folgen sofort, Historie und
-Statistik bleiben.
+Statistik bleiben. Das **Präfix der Entitäts-IDs** ist dagegen nicht
+eingefroren: Vorgabe ist der Anlagenname als Slug, ein kurzes (etwa
+`heizung`) wählst du bei der Einrichtung oder später unter **Optionen →
+Entitäts-IDs an das Schema angleichen** — ein geändertes Präfix zeigt dort
+die Liste alt → neu neu an, der Haken speichert es und benennt um; Historie
+und Statistik ziehen mit.
 
 ---
 
