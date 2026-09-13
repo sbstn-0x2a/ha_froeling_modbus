@@ -50,6 +50,32 @@ def ausgeschlossen(konfiguration: dict[str, Any]) -> set[str]:
     return {str(k) for k in (konfiguration.get("ausgeschlossen") or [])}
 
 
+def behalten(konfiguration: dict[str, Any]) -> set[str]:
+    """Vom Nutzer trotz Erkennung behaltene Entitäten (Options-Schritt
+    „Entitäten entfernen“, zweites Feld): Entitätsschlüssel von Zeilen, die
+    der Befund als wertlos führt, die aber wie normale Register behandelt
+    werden -- angelegt, gelesen, nicht deaktiviert. Überlebt jedes
+    Neu-Einlesen, weil es in den Optionen steht, nicht im Befund."""
+    return {str(k) for k in (konfiguration.get("behalten") or [])}
+
+
+#: Registernummer -> Entitätsschlüssel, für den Abgleich des Befunds (der
+#: Nummern kennt) mit ``behalten``/``ausgeschlossen`` (die Schlüssel kennen).
+_SCHLUESSEL_VON_NUMMER: dict[int, str] = {
+    z.nummer: z.entitaetsschluessel for z in TABELLE if z.plattform and z.kategorie != "fernsteuerung"
+}
+
+
+def wirksam_tot(konfiguration: dict[str, Any]) -> dict[int, str]:
+    """Der Befund ``tot`` ohne die vom Nutzer behaltenen Register -- das, was
+    Anlegen, Lesen und Deaktivieren tatsächlich steuert. ``ausgeschlossen``
+    braucht hier keinen Vorrang: Ausgeschlossene Zeilen fehlen ohnehin in
+    der Grundmenge."""
+    behalt = behalten(konfiguration)
+    return {n: g for n, g in tote_register(konfiguration).items()
+            if _SCHLUESSEL_VON_NUMMER.get(n) not in behalt}
+
+
 def _gruppenzeilen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
     """Freigegebene Zeilen der gewählten Anlagenteile, ungefiltert.
 
@@ -71,11 +97,20 @@ def ausschluss_kandidaten(konfiguration: dict[str, Any]) -> tuple[Register, ...]
     return tuple(z for z in _gruppenzeilen(konfiguration) if z.plattform)
 
 
+def behalten_kandidaten(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
+    """Was sich trotz Erkennung anlegen lässt: die Zeilen der angehakten
+    Anlagenteile, die der aktuelle Befund als wertlos führt -- auch die bei
+    „weglassen“ gar nicht angelegten."""
+    tot = tote_register(konfiguration)
+    return tuple(z for z in _gruppenzeilen(konfiguration) if z.plattform and z.nummer in tot)
+
+
 def _zeilen_der_gruppen(konfiguration: dict[str, Any]) -> tuple[Register, ...]:
-    """Die Grundmenge: Gruppenzeilen ohne „wegzulassende“ tote Register und
-    ohne einzeln ausgeschlossene Entitäten. Ausgeschlossen hat Vorrang vor
-    jeder Behandlung toter Register -- nicht angelegt, nicht gelesen."""
-    weg = tote_register(konfiguration) if tote_umgang(konfiguration) == TOTE_WEGLASSEN else {}
+    """Die Grundmenge: Gruppenzeilen ohne „wegzulassende“ tote Register (die
+    behaltenen zählen nicht als tot) und ohne einzeln ausgeschlossene
+    Entitäten. Ausgeschlossen hat Vorrang vor jeder Behandlung toter Register
+    und vor ``behalten`` -- nicht angelegt, nicht gelesen."""
+    weg = wirksam_tot(konfiguration) if tote_umgang(konfiguration) == TOTE_WEGLASSEN else {}
     raus = ausgeschlossen(konfiguration)
     return tuple(
         z for z in _gruppenzeilen(konfiguration)

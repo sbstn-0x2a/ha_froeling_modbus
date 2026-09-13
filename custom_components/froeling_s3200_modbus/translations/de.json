@@ -225,9 +225,10 @@
       },
       "entitaeten_entfernen": {
         "title": "Entitäten entfernen",
-        "description": "Ausgewählte Entitäten werden entfernt und nicht mehr gelesen; ihre Historie geht verloren. Abwählen bringt sie beim nächsten Speichern zurück, mit der alten Entitäts-ID. Zur Auswahl stehen die Entitäten der angehakten Anlagenteile, auch die als wertlos eingestuften. Derzeit entfernt: {anzahl}.\n\nSpeichern lädt die Integration neu.",
+        "description": "Ausgewählte Entitäten werden entfernt und nicht mehr gelesen; ihre Historie geht verloren. Abwählen bringt sie beim nächsten Speichern zurück, mit der alten Entitäts-ID. Zur Auswahl stehen die Entitäten der angehakten Anlagenteile, auch die als wertlos eingestuften. Derzeit entfernt: {anzahl}.\n\nDas zweite Feld ist das Gegenstück: Register, die das Einlesen als wertlos eingestuft hat, werden trotzdem angelegt, gelesen und nicht deaktiviert. Die Auswahl steht in den Optionen und überlebt jedes Neu-Einlesen. Derzeit behalten: {anzahl_behalten}.\n\nSpeichern lädt die Integration neu.",
         "data": {
-          "ausgeschlossen": "Entfernte Entitäten"
+          "ausgeschlossen": "Entfernte Entitäten",
+          "behalten": "Trotz Erkennung anlegen"
         }
       },
       "entitaets_ids": {

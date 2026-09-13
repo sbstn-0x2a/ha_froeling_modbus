@@ -89,7 +89,7 @@ Recorded history and long-term statistics are kept until the recorder purges the
 5. **Confirm plant parts:** the boxes are pre-filled from the scan, each with its evidence (e.g. "Heating circuit 02: 30.5 °C, mode Automatic"). Parts that were not detected are under "show further parts". Below that you choose what happens to registers without a usable value: create disabled (default), do not create, create normally.
 6. **Remote control:** a checkbox, off by default. Switched on, it creates the device "Remote control" with the select "Control" and the setpoints of all heating circuits and DHW tanks, see the section on boiler remote control.
 
-Later via **Options**: change connection and interval, show or hide plant parts, switch remote control on or off, remove individual entities (and bring them back), align entity IDs with the scheme, or re-scan the plant. Deselecting a part removes its entities together with their history; a re-scan therefore never proposes deselecting by itself.
+Later via **Options**: change connection and interval, show or hide plant parts, switch remote control on or off, remove individual entities or create them despite detection, align entity IDs with the scheme, or re-scan the plant. Deselecting a part removes its entities together with their history; a re-scan therefore never proposes deselecting by itself.
 
 ---
 
@@ -99,7 +99,7 @@ An upgrade leaves existing entities alone: every entity keeps its `entity_id`, h
 
 The electrostatic precipitator and the detection of registers without a usable value only arrive with **Options → Re-scan the plant**. A notice under *Repairs* reminds you. There you also choose whether such registers are created disabled (history kept), removed (history lost) or left as they are.
 
-Re-scanning pays off again later: it judges afresh every time. If a previously useless register now delivers values, e.g. a counter that has started counting, its entity is re-enabled or created again; conversely, a register newly found useless is disabled. Entities you disabled yourself are left alone. Counters only count as useless after 24 operating hours of the plant, so a freshly commissioned plant is not judged prematurely.
+Re-scanning pays off again later: it judges afresh every time. If a previously useless register now delivers values, e.g. a counter that has started counting, its entity is re-enabled or created again; conversely, a register newly found useless is disabled. Entities you disabled yourself are left alone, and a useless-rated entity you enabled by hand stays enabled on the next re-scan (it is kept automatically; see the option "Create despite detection"). Counters only count as useless after 24 operating hours of the plant, so a freshly commissioned plant is not judged prematurely.
 
 **Plant name:** the name given during setup is part of every entity's `unique_id` and therefore cannot be changed afterwards; a different name would be a new plant without history to Home Assistant. To change the label, rename the controller device under *Settings → Devices*; all entity display names follow immediately, history and statistics are kept.
 

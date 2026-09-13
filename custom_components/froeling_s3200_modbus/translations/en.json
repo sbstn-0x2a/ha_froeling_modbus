@@ -225,9 +225,10 @@
       },
       "entitaeten_entfernen": {
         "title": "Remove entities",
-        "description": "Selected entities are removed and no longer read; their history is lost. Deselecting brings them back on the next save, with their old entity ID. Offered are the entities of the ticked plant parts, including those judged useless. Currently removed: {anzahl}.\n\nSaving reloads the integration.",
+        "description": "Selected entities are removed and no longer read; their history is lost. Deselecting brings them back on the next save, with their old entity ID. Offered are the entities of the ticked plant parts, including those judged useless. Currently removed: {anzahl}.\n\nThe second field is the counterpart: registers the scan judged useless are created, read and not disabled anyway. The selection lives in the options and survives every re-scan. Currently kept: {anzahl_behalten}.\n\nSaving reloads the integration.",
         "data": {
-          "ausgeschlossen": "Removed entities"
+          "ausgeschlossen": "Removed entities",
+          "behalten": "Create despite detection"
         }
       },
       "entitaets_ids": {

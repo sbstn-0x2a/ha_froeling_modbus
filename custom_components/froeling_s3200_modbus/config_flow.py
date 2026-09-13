@@ -42,7 +42,15 @@ from .const import (
     eindeutige_kennung,
 )
 from .device import DEVICE_NAME, objekt_id
-from .entitaeten import TOTE_DEAKTIVIERT, TOTE_UMGANG, ausgeschlossen, ausschluss_kandidaten
+from .entitaeten import (
+    TOTE_DEAKTIVIERT,
+    TOTE_UMGANG,
+    ausgeschlossen,
+    ausschluss_kandidaten,
+    behalten,
+    behalten_kandidaten,
+    tote_register,
+)
 from .modbus import read_input_sync
 from .registers import INPUT_BASE, INPUT_REGISTERS
 
@@ -304,6 +312,35 @@ def ausschluss_optionen(hass: HomeAssistant, cfg: dict) -> list[SelectOptionDict
             for geraet, anzeige, eid, schluessel in eintraege]
 
 
+def behalten_optionen(hass: HomeAssistant, cfg: dict) -> list[SelectOptionDict]:
+    """Auswahlliste für „trotz Erkennung anlegen“: die als wertlos
+    eingestuften Zeilen der angehakten Anlagenteile, Beschriftung
+    „Gerät · Name — Grund aus dem Befund“. Auch nicht angelegte Zeilen
+    (Modus „weglassen“) stehen hier -- sonst käme man nie an sie heran."""
+    reg = er.async_get(hass)
+    name = cfg["name"]
+    tot = tote_register(cfg)
+    eintraege = []
+    for z in behalten_kandidaten(cfg):
+        geraet = z.altes_geraet or z.gruppe or "controller"
+        geraetename = name if geraet == "controller" else DEVICE_NAME.get(geraet, geraet)
+        entity_id = reg.async_get_entity_id(z.plattform, DOMAIN, f"{name}_{z.entitaetsschluessel}")
+        anzeigename = z.name_de
+        if entity_id is not None:
+            eintrag = reg.async_get(entity_id)
+            anzeigename = eintrag.name or eintrag.original_name or z.name_de
+        eintraege.append((geraetename, anzeigename, tot[z.nummer], z.entitaetsschluessel))
+    eintraege.sort(key=lambda e: (e[0].lower(), e[1].lower()))
+    return [SelectOptionDict(value=schluessel, label=f"{geraet} · {anzeige} — {grund}")
+            for geraet, anzeige, grund, schluessel in eintraege]
+
+
+def _mehrfachauswahl(optionen: list[SelectOptionDict]) -> SelectSelector:
+    return SelectSelector(SelectSelectorConfig(
+        options=optionen, multiple=True, custom_value=False, mode=SelectSelectorMode.DROPDOWN,
+    ))
+
+
 def _fernsteuerung_schema(vorgabe: bool) -> vol.Schema:
     """Ein Haken. Vorgabe aus: Die Fernsteuerung schreibt an die Anlage und
     uebernimmt alle Heizkreise und Boiler -- das schaltet man bewusst ein."""
@@ -462,23 +499,34 @@ class FroelingOptionsFlow(config_entries.OptionsFlow):
         optionen = ausschluss_optionen(self.hass, cfg)
         angeboten = {o["value"] for o in optionen}
         bisher = ausgeschlossen(cfg)
+        # Zweites Feld, das Gegenstueck: als wertlos eingestufte Register
+        # trotzdem anlegen und lesen. Steht in den Optionen, nicht im Befund,
+        # und ueberlebt deshalb jedes Neu-Einlesen.
+        optionen_b = behalten_optionen(self.hass, cfg)
+        angeboten_b = {o["value"] for o in optionen_b}
+        bisher_b = behalten(cfg)
         if user_input is not None:
             gewaehlt = {k for k in user_input.get("ausgeschlossen", []) if k in angeboten}
-            # Schluessel abgewaehlter Anlagenteile stehen nicht im Formular;
-            # sie bleiben stehen (harmlos), statt still zu verschwinden.
+            gewaehlt_b = {k for k in user_input.get("behalten", []) if k in angeboten_b}
+            # Schluessel abgewaehlter Anlagenteile (oder eines aelteren
+            # Befunds) stehen nicht im Formular; sie bleiben stehen
+            # (harmlos), statt still zu verschwinden.
             neu = (bisher - angeboten) | gewaehlt
+            neu_b = (bisher_b - angeboten_b) | gewaehlt_b
             return self.async_create_entry(
-                title="", data={**self.config_entry.options, "ausgeschlossen": sorted(neu)}
+                title="",
+                data={**self.config_entry.options, "ausgeschlossen": sorted(neu), "behalten": sorted(neu_b)},
             )
-        auswahl = SelectSelector(SelectSelectorConfig(
-            options=optionen, multiple=True, custom_value=False, mode=SelectSelectorMode.DROPDOWN,
-        ))
         return self.async_show_form(
             step_id="entitaeten_entfernen",
             data_schema=vol.Schema({
-                vol.Optional("ausgeschlossen", default=sorted(bisher & angeboten)): auswahl,
+                vol.Optional("ausgeschlossen", default=sorted(bisher & angeboten)): _mehrfachauswahl(optionen),
+                # Ohne toten Befund eine leere Liste -- das Feld bleibt
+                # gueltig, nur ohne Auswahl.
+                vol.Optional("behalten", default=sorted(bisher_b & angeboten_b)): _mehrfachauswahl(optionen_b),
             }),
-            description_placeholders={"anzahl": str(len(bisher & angeboten))},
+            description_placeholders={"anzahl": str(len(bisher & angeboten)),
+                                      "anzahl_behalten": str(len(bisher_b & angeboten_b))},
         )
 
     async def async_step_fernsteuerung(self, user_input=None):

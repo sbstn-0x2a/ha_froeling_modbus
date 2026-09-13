@@ -15,9 +15,10 @@ from .coordinator import FroelingCoordinator, FroelingRuntimeData
 from .device import device_info_for
 from .entitaeten import (
     TOTE_DEAKTIVIERT,
+    behalten,
     fernsteuerung_aktiv,
-    tote_register,
     tote_umgang,
+    wirksam_tot,
     zeilen_fuer,
     zeilen_zum_lesen,
 )
@@ -100,6 +101,39 @@ def _verwaiste_entfernen(hass: HomeAssistant, entry: ConfigEntry, data: dict) ->
     return len(weg)
 
 
+def _behaltene_einschalten(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
+    """Vom Nutzer behaltene Register, die die Integration frueher als tot
+    deaktiviert hat, wieder einschalten -- **vor** den Plattformen.
+
+    Unabhaengig vom Befundzeitstempel: "behalten" aendert sich in den
+    Optionen, nicht im Befund, und muss sofort wirken. Und vor den
+    Plattformen, weil Home Assistant eine erst nach dem Setup eingeschaltete
+    Entitaet nicht mehr anlegt, sondern den Entry 30 s spaeter neu laedt --
+    so entsteht sie gleich in diesem Durchlauf. Ausserdem faellt sie aus der
+    Liste der als tot deaktivierten (``tot_deaktiviert``).
+    """
+    behalt = behalten(data)
+    if not behalt:
+        return
+    ent_reg = er.async_get(hass)
+    an = 0
+    for zeile in zeilen_fuer(data):
+        if zeile.entitaetsschluessel not in behalt or zeile.kategorie == "fernsteuerung":
+            continue
+        entity_id = ent_reg.async_get_entity_id(zeile.plattform, DOMAIN, f"{data['name']}_{zeile.entitaetsschluessel}")
+        eintrag = ent_reg.async_get(entity_id) if entity_id else None
+        if eintrag is not None and eintrag.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
+            ent_reg.async_update_entity(entity_id, disabled_by=None)
+            an += 1
+    if an:
+        _LOGGER.info("%d behaltene Entitaet(en) wieder eingeschaltet", an)
+    vorher_tot = set(data.get("tot_deaktiviert") or [])
+    if vorher_tot & behalt:
+        hass.config_entries.async_update_entry(
+            entry, data={**entry.data, "tot_deaktiviert": sorted(vorher_tot - behalt)}
+        )
+
+
 def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
     erkannt = data.get("erkannt") or {}
     zeit = erkannt.get("zeit")
@@ -108,7 +142,16 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
     ent_reg = er.async_get(hass)
     vorhanden = {e.unique_id: e for e in ent_reg.entities.values()
                  if e.config_entry_id == entry.entry_id}
-    tot = tote_register(data)
+    # Behaltene Register zaehlen nicht als tot: Sie werden nie deaktiviert
+    # (wieder eingeschaltet hat sie _behaltene_einschalten vor den Plattformen).
+    tot = wirksam_tot(data)
+    #: Schluessel, die beim letzten Anwenden als tot deaktiviert blieben. Ist
+    #: so eine Entitaet jetzt eingeschaltet, hat das der Nutzer getan -- der
+    #: naechste Befund darf sie nicht stumm wieder ausschalten (Luecke bis
+    #: 0.6.0), sondern traegt sie in "behalten" ein.
+    vorher_tot = set(data.get("tot_deaktiviert") or [])
+    jetzt_tot: set[str] = set()
+    neu_behalten: set[str] = set()
     aus = an = 0
     for zeile in zeilen_fuer(data):
         eintrag = vorhanden.get(f"{data['name']}_{zeile.entitaetsschluessel}")
@@ -116,19 +159,43 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
             # Fernsteuerregister sind Vorgabewerte in HA, keine Messwerte der
             # Anlage -- ein Befund "wertlos" sagt ueber sie nichts aus.
             continue
+        schluessel = zeile.entitaetsschluessel
         if zeile.nummer in tot and eintrag.disabled_by is None:
+            if schluessel in vorher_tot:
+                neu_behalten.add(schluessel)
+                continue
             ent_reg.async_update_entity(
                 eintrag.entity_id, disabled_by=er.RegistryEntryDisabler.INTEGRATION
             )
             aus += 1
         elif zeile.nummer not in tot and eintrag.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
             # Frueher wertlos, jetzt nicht mehr (ein Zaehler hat begonnen zu
-            # zaehlen): wieder einschalten. Vom Nutzer Deaktiviertes bleibt aus.
+            # zaehlen, oder der Nutzer hat das Register behalten): wieder
+            # einschalten. Vom Nutzer Deaktiviertes bleibt aus.
             ent_reg.async_update_entity(eintrag.entity_id, disabled_by=None)
             an += 1
+        if zeile.nummer in tot and schluessel not in neu_behalten \
+                and ent_reg.async_get(eintrag.entity_id).disabled_by == er.RegistryEntryDisabler.INTEGRATION:
+            jetzt_tot.add(schluessel)
     if aus or an:
         _LOGGER.info("Befund angewendet: %d Entitaet(en) deaktiviert, %d wieder aktiviert", aus, an)
-    hass.config_entries.async_update_entry(entry, data={**entry.data, "tot_angewendet": zeit})
+    if neu_behalten:
+        _LOGGER.info(
+            "Befund angewendet: %d vom Nutzer eingeschaltete Entitaet(en) bleiben an und werden "
+            "behalten: %s", len(neu_behalten), ", ".join(sorted(neu_behalten)),
+        )
+    # Vor add_update_listener (siehe Setup-Reihenfolge): Schreiben in data
+    # und options loest hier keinen Reload aus.
+    optionen = entry.options
+    if neu_behalten:
+        alle = sorted(behalten(data) | neu_behalten)
+        optionen = {**entry.options, "behalten": alle}
+        data["behalten"] = alle    # Laufzeitkopie mitziehen
+    hass.config_entries.async_update_entry(
+        entry,
+        data={**entry.data, "tot_angewendet": zeit, "tot_deaktiviert": sorted(jetzt_tot)},
+        options=optionen,
+    )
 
 
 async def _neu_laden(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -223,6 +290,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             translation_key="anlage_einlesen",
             translation_placeholders={"name": data["name"]},
         )
+
+    # Behaltene Register vor den Plattformen einschalten, damit sie in
+    # diesem Durchlauf entstehen (siehe _behaltene_einschalten).
+    _behaltene_einschalten(hass, entry, data)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

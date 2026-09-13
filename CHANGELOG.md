@@ -130,7 +130,13 @@ aus. Beispielautomation im README.
   Entitäten der angehakten Anlagenteile („Gerät · Name (entity_id)“).
   Ausgewählte werden entfernt und nicht mehr gelesen, Historie geht
   verloren; Abwählen bringt sie mit der alten Entitäts-ID zurück. Die
-  Fernsteuer-Entitäten und der Meldungssensor stehen nicht zur Wahl.
+  Fernsteuer-Entitäten und der Meldungssensor stehen nicht zur Wahl. Ein
+  zweites Feld „Trotz Erkennung anlegen“ ist das Gegenstück: Register, die
+  das Einlesen als wertlos eingestuft hat, werden trotzdem angelegt,
+  gelesen und nicht deaktiviert -- die Auswahl überlebt jedes Neu-Einlesen.
+  Dazu geschlossen: Eine als wertlos deaktivierte Entität, die du von Hand
+  eingeschaltet hast, schaltete das nächste Einlesen stumm wieder aus. Jetzt
+  bleibt sie an und wird automatisch behalten (Hinweis im Protokoll).
 
 ### Bekannte Lücken
 

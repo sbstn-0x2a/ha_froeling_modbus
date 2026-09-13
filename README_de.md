@@ -109,7 +109,7 @@ nichts geschrieben.
 
 Später über **Optionen**: Verbindung und Intervall ändern, Anlagenteile ein-
 und ausblenden, Fernsteuerung ein- oder ausschalten, einzelne Entitäten
-entfernen (und wieder aufnehmen), Entitäts-IDs an das Schema angleichen, oder die Anlage neu
+entfernen oder trotz Erkennung anlegen, Entitäts-IDs an das Schema angleichen, oder die Anlage neu
 einlesen. Abwählen eines Anlagenteils entfernt seine Entitäten samt
 Historie; das Neu-Einlesen schlägt deshalb nie von selbst ein Abwählen vor.
 
@@ -136,7 +136,10 @@ Das Neu-Einlesen lohnt sich später erneut: Es bewertet jedes Mal frisch.
 Liefert ein vorher wertloses Register inzwischen Werte, etwa ein Zähler, der
 zu zählen begonnen hat, wird seine Entität wieder aktiviert beziehungsweise
 neu angelegt; umgekehrt wird ein neu als wertlos erkanntes Register
-deaktiviert. Was du selbst deaktiviert hast, bleibt unberührt. Zähler gelten
+deaktiviert. Was du selbst deaktiviert hast, bleibt unberührt; und eine als
+wertlos eingestufte Entität, die du von Hand eingeschaltet hast, bleibt beim
+nächsten Einlesen an (sie wird automatisch behalten, siehe Option „Trotz
+Erkennung anlegen“). Zähler gelten
 erst ab 24 Betriebsstunden der Anlage als wertlos, damit eine frisch in
 Betrieb genommene Anlage nicht vorschnell eingestuft wird.
 
