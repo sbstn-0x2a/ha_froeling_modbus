@@ -235,7 +235,7 @@
       },
       "entitaets_ids": {
         "title": "Align entity IDs",
-        "description": "Prefix '{praefix}' (so far '{aktuell}'). {anzahl} entity/entities differ from the scheme 'prefix, device, quantity':\n\n{liste}\n\nA changed prefix without the tick refreshes the list; with the tick the prefix is saved and the entities are renamed. History and long-term statistics follow the rename automatically. Automations, scripts, dashboards and templates have to be updated by hand.",
+        "description": "Prefix {praefix} (so far {aktuell}). {anzahl} entity/entities differ from the scheme 'prefix, device, quantity':\n\n{liste}\n\nA changed prefix without the tick refreshes the list; with the tick the prefix is saved and the entities are renamed. History and long-term statistics follow the rename automatically. Automations, scripts, dashboards and templates have to be updated by hand.",
         "data": {
           "praefix": "Entity ID prefix (empty = from the name)",
           "bestaetigen": "Yes, rename now"

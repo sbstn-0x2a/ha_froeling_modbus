@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.2 – 2026-09-13
+
+### Behoben
+
+* hassfest-Prüfung: Die englische Beschreibung des Schritts „Entitäts-IDs
+  angleichen“ enthielt Platzhalter in einfachen Anführungszeichen, was die
+  Übersetzungsprüfung ablehnt. Keine funktionale Änderung.
+
 ## 0.6.1 – 2026-09-13
 
 ### Neu
