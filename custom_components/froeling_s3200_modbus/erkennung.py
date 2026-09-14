@@ -299,13 +299,13 @@ BOILERPUMPEN_REGISTER = (31633, 41600, 41641, 41646, 41634)
 
 
 def _gekoppelte_register(werte, befund: Befund, betriebsstunden: int | None) -> None:
-    """R7 (Nutzerentscheid 12.09.2026): Register, die an einem Merkmal haengen.
+    """R7 (festgelegt 12.09.2026): Register, die an einem Merkmal haengen.
 
     WOS: Der Betriebsstundenzaehler 30045 zaehlt nur die Laufzeit des Ausgangs
     "WOS-Antrieb"; ein Handhebel zaehlt nichts. Steht er nach mehr als 24
     Betriebsstunden auf 0, gibt es keinen Antrieb, und Zeitfenster, Laufzeit,
     Intervall, Zustand und Rueckmeldung sind wertlos. Bewusst NICHT 40444
-    ("WOS mit eigenem Antrieb vorhanden"): Die Anlage des Nutzers hat einen
+    ("WOS mit eigenem Antrieb vorhanden"): Die Referenzanlage hat einen
     Antrieb (Zaehler 5 -> 15 h ueber die Saison 2025/26), 40444 steht trotzdem
     auf 0.
 

@@ -352,7 +352,7 @@ class Fernsteuerung:
 
     async def async_vorgabe_setzen(self, register: int, rohwert: int) -> None:
         """Eine Vorgabe merken. Bei Master HA sofort senden, nicht erst beim
-        naechsten Heartbeat -- der Nutzer will die Wirkung jetzt sehen."""
+        naechsten Heartbeat, damit die Wirkung sofort sichtbar ist."""
         self.vorgaben[register] = rohwert
         if self.master == MASTER_HA:
             await self.async_senden()

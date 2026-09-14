@@ -67,8 +67,8 @@ def _verwaiste_entfernen(hass: HomeAssistant, entry: ConfigEntry, data: dict) ->
 
     Entstehen z. B., wenn Register nach dem Neu-Einlesen auf "gar nicht
     anlegen" stehen oder sich eine Kennung beim Update geaendert hat. Ohne
-    Aufraeumen bleiben sie dauerhaft als "nicht verfuegbar" stehen -- der
-    Nutzer sah in der Testinstanz 254 statt 242 Entitaeten.
+    Aufraeumen bleiben sie dauerhaft als "nicht verfuegbar" stehen -- in der
+    Testinstanz standen so 254 statt 242 Entitaeten.
     """
     erwartet = {f"{data['name']}_{z.entitaetsschluessel}" for z in zeilen_fuer(data)}
     erwartet.add(f"{data['name']}_meldungen")
@@ -146,7 +146,7 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
     # (wieder eingeschaltet hat sie _behaltene_einschalten vor den Plattformen).
     tot = wirksam_tot(data)
     #: Schluessel, die beim letzten Anwenden als tot deaktiviert blieben. Ist
-    #: so eine Entitaet jetzt eingeschaltet, hat das der Nutzer getan -- der
+    #: so eine Entitaet jetzt eingeschaltet, geschah das von Hand -- der
     #: naechste Befund darf sie nicht stumm wieder ausschalten (Luecke bis
     #: 0.6.0), sondern traegt sie in "behalten" ein.
     vorher_tot = set(data.get("tot_deaktiviert") or [])
@@ -170,8 +170,8 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
             aus += 1
         elif zeile.nummer not in tot and eintrag.disabled_by == er.RegistryEntryDisabler.INTEGRATION:
             # Frueher wertlos, jetzt nicht mehr (ein Zaehler hat begonnen zu
-            # zaehlen, oder der Nutzer hat das Register behalten): wieder
-            # einschalten. Vom Nutzer Deaktiviertes bleibt aus.
+            # zaehlen, oder das Register steht in ``behalten``): wieder
+            # einschalten. Von Hand Deaktiviertes bleibt aus.
             ent_reg.async_update_entity(eintrag.entity_id, disabled_by=None)
             an += 1
         if zeile.nummer in tot and schluessel not in neu_behalten \
@@ -181,7 +181,7 @@ def _tote_anwenden(hass: HomeAssistant, entry: ConfigEntry, data: dict) -> None:
         _LOGGER.info("Befund angewendet: %d Entitaet(en) deaktiviert, %d wieder aktiviert", aus, an)
     if neu_behalten:
         _LOGGER.info(
-            "Befund angewendet: %d vom Nutzer eingeschaltete Entitaet(en) bleiben an und werden "
+            "Befund angewendet: %d von Hand eingeschaltete Entitaet(en) bleiben an und werden "
             "behalten: %s", len(neu_behalten), ", ".join(sorted(neu_behalten)),
         )
     # Vor add_update_listener (siehe Setup-Reihenfolge): Schreiben in data

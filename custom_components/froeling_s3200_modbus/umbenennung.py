@@ -7,7 +7,7 @@ Aktion mit derselben Regel wie beim Neuanlegen (``objekt_id``): Anlage,
 Gerät, Größe. Die Registry zieht Historie und Statistik automatisch mit;
 Automationen, Skripte und Dashboards nicht -- das steht im Dialog.
 
-Nutzerentscheid vom 11.09.2026 (Plan „Für 0.6.0 vorgemerkt“).
+Festgelegt am 11.09.2026 (Plan „Für 0.6.0 vorgemerkt“).
 """
 
 from __future__ import annotations

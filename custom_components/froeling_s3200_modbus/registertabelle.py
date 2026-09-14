@@ -2305,11 +2305,20 @@ WERTELISTEN: dict[str, dict[int, str]] = {
         51: "FEHLER: Saugzug", 52: "FEHLER: Umfeld", 53: "FEHLER: Stoker", 54: "STÖRUNG: Stoker", 55: "FB: Stoker leeren", 56: "Vorbelüften", 57: "STÖRUNG: Hackgut",
         58: "FEHLER: Hackgut", 59: "NB: Tür offen", 60: "NB: Anheizen", 61: "NB: Heizen", 62: "FEHLER: STB/NA", 63: "FEHLER: Allgemein", 64: "NB: Feuer Aus",
         65: "Selbsttest aktiv", 66: "Fehlerbeh. 20min", 67: "FEHLER: Fallschacht", 68: "STÖRUNG: Fallschacht", 69: "Reinigen möglich", 70: "Heizen - Reinigen",
-        71: "SH Anheizen", 72: "SH Heizen", 73: "SH Heiz/Abstell", 74: "STÖRUNG sicher", 75: "AGR Nachlauf", 76: "AGR reinigen", 77: "Zündung AUS", 78: "Filter reinigen",
+        71: "SH Anheizen", 72: "SH Heizen", 73: "SH Heiz/Abstell", 74: "STÖRUNG sicher", 75: "AGR Nachlauf", 76: "AGR reinigen", 77: "Zündung AUS", 78: "E-Abscheider reinigen",
         79: "Anheizassistent", 80: "SH Zünden", 81: "SH Störung", 82: "Sensorcheck",
-        # Nicht in B1200522 (endet bei 82), aber an der SP Dual compact im
-        # Scheitholzbetrieb gemessen und seit 0.3.5 in der Integration; beim
-        # Generator-Umbau in 0.5.0 verloren gegangen, 13.09.2026 zurueckgeholt.
+        # 83 bis 90 stehen nicht in B1200522 (endet bei 82). Quelle ist die
+        # Zustandsliste der Anlagen-Firmware, wie sie Froeling Connect fuer
+        # Register 34002 liefert (Attribut options des Cloud-Sensors, 91
+        # Eintraege, abgelesen 14.09.2026; gleiche Liste in den Testdaten von
+        # github.com/Layf21/froeling-connect). Die Firmware fuehrt fuer den
+        # Scheitholz-/Kombibetrieb eigene Nummern mit gleichem Anzeigetext
+        # (83 bis 88) und benennt 89/90 selbst mit "(SH)". Schreibweise exakt
+        # uebernehmen: Automationen vergleichen den Zustandstext. 89/90 waren
+        # seit 0.3.5 in der Integration, beim Generator-Umbau in 0.5.0
+        # verloren, 13.09.2026 zurueckgeholt. 78 heisst in der Firmware
+        # "E-Abscheider reinigen", die Modbus-Doku schreibt "Filter reinigen".
+        83: "Feuererhaltung", 84: "Tür offen", 85: "Tür offen", 86: "Heizen", 87: "Mantelkühlung", 88: "Mantelkühlung",
         89: "Abstellen Warten (SH)", 90: "Abreinigen (SH)",
     },
 }

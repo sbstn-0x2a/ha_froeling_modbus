@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.4 – 2026-09-14
+
+### Behoben
+
+* **Kesselzustände 83 bis 88 ergänzt.** Die Anlagen-Firmware kennt für den
+  Scheitholz- und Kombibetrieb weitere Nummern mit den Texten „Feuererhaltung“
+  (83), „Tür offen“ (84, 85), „Heizen“ (86) und „Mantelkühlung“ (87, 88). Der
+  Sensor zeigte dafür „Unknown (83)“ und so weiter, und Automationen, die auf
+  „Heizen“ oder „Feuererhaltung“ prüfen, sahen einen falschen Kesselwechsel.
+  Quelle ist die Zustandsliste, die Fröling Connect für die Anlage liefert;
+  die Modbus-Doku endet bei 82.
+* Zustand 78 heißt jetzt wie in der Firmware „E-Abscheider reinigen“ statt
+  „Filter reinigen“ aus der Modbus-Doku. Wer den alten Text in einer
+  Automation vergleicht, muss ihn anpassen.
+
 ## 0.6.3 – 2026-09-13
 
 ### Behoben
